@@ -200,7 +200,7 @@
 
 <header>
   <h1>📈 株朝活ダッシュボード</h1>
-  <span class="time">2026年06月22日 17:20</span>
+  <span class="time">2026年06月22日 17:37</span>
 </header>
 
 <!-- 日本市場 -->
@@ -224,8 +224,8 @@
         </div>
         <div class="index-card">
           <div class="index-name">ドル円</div>
-          <div class="index-price">161.75</div>
-          <div class="index-change up">▲ +0.29%</div>
+          <div class="index-price">161.73</div>
+          <div class="index-change up">▲ +0.27%</div>
         </div>
 </div>
 
@@ -442,13 +442,13 @@
 </div>
 
 <script>
-const MARKET_DATA = `【取得時刻】2026年06月22日 17:20
+const MARKET_DATA = `【取得時刻】2026年06月22日 17:37
 
 【日本市場】
 ・日経平均: 72,353.96 (+1.55%)
 ・TOPIX: 434.50 (+1.12%)
 ・グロース250: 573.00 (+4.14%)
-・ドル円: 161.75 (+0.29%)
+・ドル円: 161.73 (+0.27%)
 
 【米国市場（前日終値）】
 ・ダウ平均: 51,564.70 (+0.14%)
@@ -578,8 +578,99 @@ function showToast() {
   setTimeout(() => t.style.display = 'none', 3000);
 }
 
+function buildGeminiPrompt() {
+  const lines = MARKET_DATA.split('\n');
+  const nikkei = lines.find(l => l.includes('日経平均')) || '';
+  const dollar = lines.find(l => l.includes('ドル円')) || '';
+  const dow = lines.find(l => l.includes('ダウ')) || '';
+  const nasdaq = lines.find(l => l.includes('ナスダック')) || '';
+
+  // 上昇/下落の判定
+  const nikkeiUp = nikkei.includes('+');
+  const dowUp = dow.includes('+');
+  const nasdaqUp = nasdaq.includes('+');
+
+  const trend = nikkeiUp ? '上昇傾向' : '下落傾向';
+  const usTrend = (dowUp && nasdaqUp) ? '米国市場は前日上昇' : (!dowUp && !nasdaqUp) ? '米国市場は前日下落' : '米国市場は強弱まちまち';
+
+  return `【本日の市場データ】
+${MARKET_DATA}
+
+上記のデータを踏まえて、今日の日本株について教えてください。
+
+■ 今日の注目ニュース・材料
+・日経平均が${trend}している背景にある具体的なニュースや材料は？
+・${usTrend}が日本株に与える影響は？
+・今日の朝時点で出ている決算・業績修正・M&A・新製品などの企業ニュース
+
+■ 好材料のある銘柄（具体的に）
+・銘柄名・コード・好材料の内容・株価への影響度（大/中/小）
+
+■ 悪材料のある銘柄（具体的に）
+・銘柄名・コード・悪材料の内容・下落リスク度
+
+■ 今日強そうなセクター・テーマ（3つ）
+・テーマ名 → 理由 → 代表銘柄コードと銘柄名
+
+■ 今日弱そうなセクター・テーマ（3つ）
+・テーマ名 → 理由
+
+■ 株価500〜600円前後の注目銘柄（3〜5つ）
+・銘柄名・コード・現在値・注目理由・出来高の特徴
+
+できるだけ具体的な銘柄コードと数字で回答してください。`;
+}
+
+function buildChatGPTPrompt() {
+  const lines = MARKET_DATA.split('\n');
+  const nikkei = lines.find(l => l.includes('日経平均')) || '';
+  const dollar = lines.find(l => l.includes('ドル円')) || '';
+  const growth = lines.find(l => l.includes('グロース')) || '';
+
+  const nikkeiPct = (nikkei.match(/([\+\-][\d\.]+)%/) || ['',''])[1];
+  const dollarVal = (dollar.match(/([\d\.]+)/) || ['',''])[1];
+  const growthUp = growth.includes('+');
+
+  return `【本日の市場データ】
+${MARKET_DATA}
+
+上記を踏まえてデイトレード戦略を分析してください。
+
+■ 為替・金利の影響分析
+・ドル円${dollarVal}円という水準は輸出株・輸入株にどう影響するか
+・今日特に為替感応度が高い銘柄セクターは？
+
+■ グロース株の動き
+・グロース250が${growthUp ? '上昇' : '下落'}している中で、今日狙えるグロース銘柄は？
+・値動きが軽く出来高が増えそうな小型株（500〜600円前後）を具体的に
+
+■ 今日の値動きパターン予測
+・寄り付き直後（9:00〜9:30）に動きそうな銘柄
+・前場（10:00〜11:30）に狙い目になる銘柄
+・後場（12:30〜15:00）まで持ち越し不要な銘柄
+
+■ デイトレで使えるチャートパターン
+・今日の市場環境ではどんなエントリーパターンが有効か
+・避けるべきトレードパターン
+
+■ リスク管理アドバイス
+・今日の市場で特に注意すべきリスクイベント（経済指標発表時間など）
+・損切りを迷わず実行するための判断基準
+
+■ 今日の一言戦略
+・初心者が今日取るべき行動を1〜2行で
+
+具体的な銘柄コードと価格帯で回答してください。`;
+}
+
 function copyHint(hintId, toastId) {
-  const text = document.getElementById(hintId).innerText;
+  const text = hintId === 'gemini-hint' ? buildGeminiPrompt() :
+               hintId === 'chatgpt-hint' ? buildChatGPTPrompt() :
+               document.getElementById(hintId).innerText;
+
+  // ヒント欄も更新して表示
+  document.getElementById(hintId).innerText = text;
+
   navigator.clipboard.writeText(text).catch(() => {
     const el = document.createElement('textarea');
     el.value = text;

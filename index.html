@@ -10,45 +10,52 @@
       font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
       background: #0d1117;
       color: #e6edf3;
-      padding: 16px;
-      max-width: 600px;
+      padding: 14px;
+      max-width: 640px;
       margin: 0 auto;
     }
     header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
     }
-    h1 { font-size: 1.2rem; }
-    .time { color: #8b949e; font-size: 0.8rem; }
-
-    /* 指数カード */
+    h1 { font-size: 1.15rem; }
+    .time { color: #8b949e; font-size: 0.78rem; }
+    .section-title {
+      font-size: 0.78rem;
+      color: #8b949e;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 8px;
+      margin-top: 14px;
+    }
     .index-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 16px;
+      gap: 8px;
+      margin-bottom: 6px;
     }
+    .index-grid.us { grid-template-columns: repeat(3, 1fr); }
     .index-card {
       background: #161b22;
       border: 1px solid #30363d;
       border-radius: 10px;
-      padding: 12px;
+      padding: 11px 12px;
     }
-    .index-name { font-size: 0.75rem; color: #8b949e; margin-bottom: 4px; }
-    .index-price { font-size: 1.1rem; font-weight: bold; }
-    .index-change { font-size: 0.85rem; margin-top: 2px; }
+    .index-card.small { padding: 9px 10px; }
+    .index-name { font-size: 0.72rem; color: #8b949e; margin-bottom: 3px; }
+    .index-price { font-size: 1.05rem; font-weight: bold; }
+    .index-card.small .index-price { font-size: 0.92rem; }
+    .index-change { font-size: 0.82rem; margin-top: 2px; }
     .up { color: #3fb950; }
     .down { color: #f85149; }
-
-    /* セクション共通 */
     .card {
       background: #161b22;
       border: 1px solid #30363d;
       border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 14px;
+      padding: 13px;
+      margin-bottom: 12px;
     }
     .card-header {
       display: flex;
@@ -56,28 +63,40 @@
       gap: 8px;
       margin-bottom: 10px;
     }
-    .card-title { font-size: 0.95rem; font-weight: bold; }
+    .card-title { font-size: 0.92rem; font-weight: bold; }
     .badge {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       background: #21262d;
       color: #8b949e;
-      padding: 2px 8px;
+      padding: 2px 7px;
       border-radius: 10px;
     }
-
-    /* 銘柄テーブル */
-    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-    th { color: #8b949e; font-size: 0.75rem; padding: 4px 6px; border-bottom: 1px solid #21262d; text-align: left; }
-    td { padding: 7px 6px; border-bottom: 1px solid #21262d; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
+    th { color: #8b949e; font-size: 0.72rem; padding: 3px 6px; border-bottom: 1px solid #21262d; text-align: left; }
+    td { padding: 6px 6px; border-bottom: 1px solid #21262d; }
     .price { font-weight: bold; }
-    .vol { color: #8b949e; font-size: 0.8rem; }
-
-    /* AI情報入力 */
-    .ai-input-label {
-      font-size: 0.8rem;
-      color: #8b949e;
-      margin-bottom: 6px;
+    .vol { color: #8b949e; font-size: 0.78rem; }
+    .news-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px 0;
+      border-bottom: 1px solid #21262d;
+      text-decoration: none;
+      color: inherit;
     }
+    .news-item:last-child { border-bottom: none; }
+    .news-item:active { opacity: 0.7; }
+    .news-source {
+      flex-shrink: 0;
+      font-size: 0.65rem;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 2px;
+    }
+    .news-title { font-size: 0.85rem; line-height: 1.4; }
+    .no-news { color: #8b949e; font-size: 0.85rem; }
     textarea {
       width: 100%;
       background: #0d1117;
@@ -85,54 +104,28 @@
       border-radius: 8px;
       color: #e6edf3;
       padding: 10px;
-      font-size: 0.85rem;
+      font-size: 0.83rem;
       line-height: 1.5;
       resize: vertical;
-      min-height: 100px;
+      min-height: 90px;
       font-family: inherit;
     }
-    textarea:focus {
-      outline: none;
-      border-color: #58a6ff;
-    }
+    textarea:focus { outline: none; border-color: #58a6ff; }
     textarea::placeholder { color: #484f58; }
-
-    /* ボタン */
     .btn {
       display: block;
       width: 100%;
-      padding: 15px;
+      padding: 14px;
       border-radius: 10px;
       border: none;
-      font-size: 1rem;
+      font-size: 0.97rem;
       font-weight: bold;
       cursor: pointer;
       transition: opacity 0.15s;
-      text-align: center;
     }
     .btn:active { opacity: 0.7; }
-    .btn-generate {
-      background: linear-gradient(135deg, #238636, #1a6128);
-      color: #fff;
-      margin-bottom: 10px;
-    }
-    .btn-claude {
-      background: linear-gradient(135deg, #1f6feb, #1158c7);
-      color: #fff;
-    }
-    .prompt-preview {
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      padding: 12px;
-      font-size: 0.78rem;
-      color: #8b949e;
-      white-space: pre-wrap;
-      max-height: 180px;
-      overflow-y: auto;
-      margin-bottom: 10px;
-      display: none;
-    }
+    .btn-generate { background: linear-gradient(135deg, #238636, #1a6128); color: #fff; margin-bottom: 10px; }
+    .btn-claude { background: linear-gradient(135deg, #1f6feb, #1158c7); color: #fff; }
     .toast {
       display: none;
       background: #238636;
@@ -140,31 +133,46 @@
       padding: 10px;
       border-radius: 8px;
       text-align: center;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       margin-bottom: 10px;
     }
     .step-badge {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       background: #1f6feb;
       color: #fff;
       border-radius: 50%;
-      width: 22px; height: 22px;
-      line-height: 22px;
-      text-align: center;
-      font-size: 0.75rem;
+      width: 20px; height: 20px;
+      font-size: 0.72rem;
       font-weight: bold;
       flex-shrink: 0;
     }
+    .prompt-preview {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 10px;
+      font-size: 0.75rem;
+      color: #8b949e;
+      white-space: pre-wrap;
+      max-height: 160px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      display: none;
+    }
+    .divider { border: none; border-top: 1px solid #21262d; margin: 14px 0; }
   </style>
 </head>
 <body>
 
 <header>
   <h1>📈 株朝活ダッシュボード</h1>
-  <span class="time">2026年06月22日 17:02</span>
+  <span class="time">2026年06月22日 17:12</span>
 </header>
 
-<!-- 指数 -->
+<!-- 日本市場 -->
+<div class="section-title">🇯🇵 日本市場</div>
 <div class="index-grid">
   
         <div class="index-card">
@@ -184,12 +192,35 @@
         </div>
         <div class="index-card">
           <div class="index-name">ドル円</div>
-          <div class="index-price">161.29</div>
-          <div class="index-change up">▲ +0.00%</div>
+          <div class="index-price">161.77</div>
+          <div class="index-change up">▲ +0.30%</div>
         </div>
 </div>
 
-<!-- 変動率上位 -->
+<!-- 米国市場 -->
+<div class="section-title">🇺🇸 米国市場（前日終値）</div>
+<div class="index-grid us">
+  
+        <div class="index-card small">
+          <div class="index-name">ダウ平均</div>
+          <div class="index-price">51,564.70</div>
+          <div class="index-change up">▲ +0.14%</div>
+        </div>
+        <div class="index-card small">
+          <div class="index-name">ナスダック</div>
+          <div class="index-price">26,517.93</div>
+          <div class="index-change up">▲ +1.91%</div>
+        </div>
+        <div class="index-card small">
+          <div class="index-name">S&P500</div>
+          <div class="index-price">7,500.58</div>
+          <div class="index-change up">▲ +1.08%</div>
+        </div>
+</div>
+
+<hr class="divider">
+
+<!-- 変動率上位銘柄 -->
 <div class="card">
   <div class="card-header">
     <span class="card-title">🔥 変動率上位銘柄</span>
@@ -249,14 +280,86 @@
   </table>
 </div>
 
+<!-- ニュース -->
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">📰 株関連ニュース</span>
+    <span class="badge">NHK・Yahoo・東洋経済・ITmedia</span>
+  </div>
+  
+        <a href="http://www3.nhk.or.jp/news/html/20260622/k10015156031000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e63946">NHK経済</span>
+          <span class="news-title">株価 終値初の7万2000円超 6営業日連続で終値として最高値更新</span>
+        </a>
+        <a href="http://www3.nhk.or.jp/news/html/20260622/k10015156291000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e63946">NHK経済</span>
+          <span class="news-title">「紅プリンセス」苗木が中国で販売か 農相“愛媛県を支援”</span>
+        </a>
+        <a href="http://www3.nhk.or.jp/news/html/20260622/k10015155841000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e63946">NHK経済</span>
+          <span class="news-title">メガバンク3行 ステーブルコイン 今年度中に共同発行へ</span>
+        </a>
+        <a href="http://www3.nhk.or.jp/news/html/20260620/k10015154971000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e63946">NHK経済</span>
+          <span class="news-title">東電の提携交渉 日米の投資ファンドや通信大手の5陣営が軸に</span>
+        </a>
+        <a href="http://www3.nhk.or.jp/news/html/20260619/k10015154801000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e63946">NHK経済</span>
+          <span class="news-title">NISA対象と偽って不適切販売 外資系ネット証券に行政処分</span>
+        </a>
+        <a href="https://news.yahoo.co.jp/pickup/6585206?source=rss" target="_blank" class="news-item">
+          <span class="news-source" style="background:#6200ea">Yahoo!株式</span>
+          <span class="news-title">日経平均終値 初の7万2000円超え</span>
+        </a>
+        <a href="https://toyokeizai.net/articles/-/948691?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-source" style="background:#0077b6">東洋経済</span>
+          <span class="news-title">ヨーロッパ首脳はなぜトランプ氏を持ち上げたのか､緩衝役を買って出た高市首相､ウクライナ･イラン･中国で揺れるG7 | 政治・経済・投資 | 東洋経済オンライン</span>
+        </a>
+        <a href="https://toyokeizai.net/articles/-/948890?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-source" style="background:#0077b6">東洋経済</span>
+          <span class="news-title">天皇陛下が異例の&quot;ご発言&quot;､｢令和の藤原氏｣誕生の懸念も？ ｢皇室典範改正｣をめぐる動きがここまでこじれる根本理由 | 政治・経済・投資 | 東洋経済オンライン</span>
+        </a>
+        <a href="https://toyokeizai.net/articles/-/948900?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-source" style="background:#0077b6">東洋経済</span>
+          <span class="news-title">【ホンダ社長続投の舞台裏】有力OBが社長に退任勧告／大赤字転落で社長への風当たり／謝罪でも「社員の心に響かないのでは」／次期社長の最有力候補／40代“キーマン”の手腕／株主総会で賛同を得られる？ | ビジネス | 東洋経済オンライン</span>
+        </a>
+        <a href="https://toyokeizai.net/articles/-/948874?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-source" style="background:#0077b6">東洋経済</span>
+          <span class="news-title">【日本市況】株上昇､AI関連の一角に買い－和平協議への懸念で円軟調 | 政治・経済・投資 | 東洋経済オンライン</span>
+        </a>
+        <a href="https://toyokeizai.net/articles/-/948318?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-source" style="background:#0077b6">東洋経済</span>
+          <span class="news-title">｢買ってはいけない｣と言われるのに…タコ足分配を高齢者が｢知りながら買う｣現役世代にはわからない&quot;切実な理由&quot; | 政治・経済・投資 | 東洋経済オンライン</span>
+        </a>
+        <a href="https://www.itmedia.co.jp/business/articles/2606/22/news050.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
+          <span class="news-title">データセンターの排熱で発電!?　東電「新しい火の発明」が夢物語と言い切れないワケ</span>
+        </a>
+        <a href="https://www.itmedia.co.jp/business/articles/2606/22/news017.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
+          <span class="news-title">米国は「スタバ離れ」が深刻なのに、なぜ日本では好調？　ドトールやコメダにはない強さとは</span>
+        </a>
+        <a href="https://www.itmedia.co.jp/business/articles/2606/22/news057.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
+          <span class="news-title">京阪はプレミアムカー、阪急はまちづくりDX　関西私鉄が描く次の成長戦略</span>
+        </a>
+        <a href="https://www.itmedia.co.jp/business/articles/2606/21/news001.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
+          <span class="news-title">「昔ながらの氷のう」が100万本ヒット　魔法瓶技術が生んだ新市場</span>
+        </a>
+        <a href="https://www.itmedia.co.jp/business/articles/2606/20/news002.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
+          <span class="news-title">ホテル料金はどこまで上がる？　客室単価が4年で2.3倍に</span>
+        </a>
+</div>
+
 <!-- STEP 2: Gemini -->
 <div class="card">
   <div class="card-header">
     <span class="step-badge">2</span>
     <span class="card-title">Geminiの分析を貼り付け</span>
   </div>
-  <div class="ai-input-label">GeminiやGoogle AIから得た今日の株情報・テーマを貼り付けてください</div>
-  <textarea id="gemini-input" placeholder="例）本日の注目テーマは半導体・AI関連。米国市場の上昇を受けて..."></textarea>
+  <textarea id="gemini-input" placeholder="Geminiに「今日の日本株で注目テーマと強い銘柄は？」と聞いた結果を貼り付けてください"></textarea>
 </div>
 
 <!-- STEP 3: ChatGPT -->
@@ -265,32 +368,36 @@
     <span class="step-badge">3</span>
     <span class="card-title">ChatGPTの分析を貼り付け</span>
   </div>
-  <div class="ai-input-label">ChatGPTから得た今日の株情報・テーマを貼り付けてください</div>
-  <textarea id="chatgpt-input" placeholder="例）本日注目セクターはグロース株。決算発表銘柄に注意..."></textarea>
+  <textarea id="chatgpt-input" placeholder="ChatGPTに「今日の日本株デイトレで注目すべき点は？」と聞いた結果を貼り付けてください"></textarea>
 </div>
 
-<!-- STEP 4: 最終分析 -->
+<!-- STEP 4: Claude最終分析 -->
 <div class="card">
   <div class="card-header">
     <span class="step-badge">4</span>
     <span class="card-title">Claudeで最終分析</span>
   </div>
-  <button class="btn btn-generate" onclick="generatePrompt()">✨ 最終プロンプトを生成</button>
+  <button class="btn btn-generate" onclick="generatePrompt()">✨ 最終プロンプトを生成してコピー</button>
   <div class="toast" id="toast">✅ コピーしました！Claude.aiに貼り付けてください</div>
   <div class="prompt-preview" id="prompt-preview"></div>
   <a href="https://claude.ai" target="_blank" id="claude-link" style="display:none">
-    <button class="btn btn-claude">🤖 Claude.aiを開いて分析する →</button>
+    <button class="btn btn-claude">🤖 Claude.aiを開く →</button>
   </a>
 </div>
 
 <script>
-const MARKET_DATA = `【取得時刻】2026年06月22日 17:02
+const MARKET_DATA = `【取得時刻】2026年06月22日 17:12
 
-【主要指数・為替】
+【日本市場】
 ・日経平均: 72,353.96 (+1.55%)
 ・TOPIX: 434.50 (+1.12%)
 ・グロース250: 573.00 (+4.14%)
-・ドル円: 161.29 (+0.00%)
+・ドル円: 161.77 (+0.30%)
+
+【米国市場（前日終値）】
+・ダウ平均: 51,564.70 (+0.14%)
+・ナスダック: 26,517.93 (+1.91%)
+・S&P500: 7,500.58 (+1.08%)
 
 【変動率上位銘柄】
 ・2413 エムスリー: 1706円 (+4.18%) 出来高:5,031,600
@@ -300,16 +407,33 @@ const MARKET_DATA = `【取得時刻】2026年06月22日 17:02
 ・4565 そーせいグループ: 986円 (+2.82%) 出来高:504,100
 ・3765 ガンホー: 2230円 (+2.72%) 出来高:335,300
 ・3697 SHIFT: 621円 (-1.68%) 出来高:4,495,800
-・9434 ソフトバンク: 209円 (-0.85%) 出来高:54,973,100`;
+・9434 ソフトバンク: 209円 (-0.85%) 出来高:54,973,100
+
+【本日のニュース】
+・[NHK経済] 株価 終値初の7万2000円超 6営業日連続で終値として最高値更新
+・[NHK経済] 「紅プリンセス」苗木が中国で販売か 農相“愛媛県を支援”
+・[NHK経済] メガバンク3行 ステーブルコイン 今年度中に共同発行へ
+・[NHK経済] 東電の提携交渉 日米の投資ファンドや通信大手の5陣営が軸に
+・[NHK経済] NISA対象と偽って不適切販売 外資系ネット証券に行政処分
+・[Yahoo!株式] 日経平均終値 初の7万2000円超え
+・[東洋経済] ヨーロッパ首脳はなぜトランプ氏を持ち上げたのか､緩衝役を買って出た高市首相､ウクライナ･イラン･中国で揺れるG7 | 政治・経済・投資 | 東洋経済オンライン
+・[東洋経済] 天皇陛下が異例の"ご発言"､｢令和の藤原氏｣誕生の懸念も？ ｢皇室典範改正｣をめぐる動きがここまでこじれる根本理由 | 政治・経済・投資 | 東洋経済オンライン
+・[東洋経済] 【ホンダ社長続投の舞台裏】有力OBが社長に退任勧告／大赤字転落で社長への風当たり／謝罪でも「社員の心に響かないのでは」／次期社長の最有力候補／40代“キーマン”の手腕／株主総会で賛同を得られる？ | ビジネス | 東洋経済オンライン
+・[東洋経済] 【日本市況】株上昇､AI関連の一角に買い－和平協議への懸念で円軟調 | 政治・経済・投資 | 東洋経済オンライン
+・[東洋経済] ｢買ってはいけない｣と言われるのに…タコ足分配を高齢者が｢知りながら買う｣現役世代にはわからない"切実な理由" | 政治・経済・投資 | 東洋経済オンライン
+・[ITmediaビジネス] データセンターの排熱で発電!?　東電「新しい火の発明」が夢物語と言い切れないワケ
+・[ITmediaビジネス] 米国は「スタバ離れ」が深刻なのに、なぜ日本では好調？　ドトールやコメダにはない強さとは
+・[ITmediaビジネス] 京阪はプレミアムカー、阪急はまちづくりDX　関西私鉄が描く次の成長戦略
+・[ITmediaビジネス] 「昔ながらの氷のう」が100万本ヒット　魔法瓶技術が生んだ新市場`;
 
 function generatePrompt() {
   const gemini = document.getElementById('gemini-input').value.trim();
   const chatgpt = document.getElementById('chatgpt-input').value.trim();
 
-  let prompt = `あなたは日本株専門のプロトレーダーです。以下の3つの情報源を総合的に分析し、本日のデイトレード戦略を教えてください。
+  let prompt = `あなたは日本株専門のプロトレーダーです。以下の情報を総合的に分析し、本日のデイトレード戦略を教えてください。
 
 ━━━━━━━━━━━━━━━━━━
-【情報①】本日の市場データ（自動取得）
+【情報①】本日の市場データ・ニュース（自動収集）
 ━━━━━━━━━━━━━━━━━━
 ${MARKET_DATA}
 `;
@@ -336,26 +460,24 @@ ${chatgpt}
 ━━━━━━━━━━━━━━━━━━
 【分析依頼】
 ━━━━━━━━━━━━━━━━━━
-上記を踏まえて、以下を箇条書きで簡潔にまとめてください：
+上記を踏まえて以下を箇条書きで教えてください：
 
-1. 本日の市場の方向感（強気/弱気/中立）とその根拠
-2. 本日強そうなテーマ 3つ
-3. 本日弱そうなテーマ 3つ
-4. デイトレ推奨銘柄 5つ（各銘柄に「銘柄名・価格・推奨理由・注意点」を記載）
-5. 本日の総合戦略まとめ（1〜2行）
+1. 本日の市場の方向感（強気/弱気/中立）と根拠
+2. 米国市場の影響（日本株への影響）
+3. 本日強そうなテーマ 3つ（理由付き）
+4. 本日弱そうなテーマ 3つ（理由付き）
+5. デイトレ推奨銘柄 5つ
+   - 銘柄名・現在価格・推奨理由・エントリー目安・注意点
+6. 本日の総合戦略（2〜3行）
 
-※条件：資金5万円のデイトレーダー向け。1株単価が低く回転が効く銘柄を優先。リスクも正直に教えること。`;
+※資金5万円のデイトレーダー向け。1株単価が低く回転の効く銘柄を優先。リスクも正直に。`;
 
-  // プレビュー表示
   const preview = document.getElementById('prompt-preview');
   preview.textContent = prompt;
   preview.style.display = 'block';
   document.getElementById('claude-link').style.display = 'block';
 
-  // クリップボードにコピー
-  navigator.clipboard.writeText(prompt).then(() => {
-    showToast();
-  }).catch(() => {
+  navigator.clipboard.writeText(prompt).then(showToast).catch(() => {
     const el = document.createElement('textarea');
     el.value = prompt;
     document.body.appendChild(el);

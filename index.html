@@ -162,13 +162,45 @@
       display: none;
     }
     .divider { border: none; border-top: 1px solid #21262d; margin: 14px 0; }
+    .prompt-hint {
+      background: #0d1117;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.78rem;
+      color: #8b949e;
+      margin-bottom: 8px;
+      line-height: 1.6;
+      white-space: pre-wrap;
+    }
+    .btn-copy-hint {
+      display: block;
+      width: 100%;
+      padding: 9px;
+      border-radius: 8px;
+      border: 1px solid #30363d;
+      background: #21262d;
+      color: #e6edf3;
+      font-size: 0.83rem;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: opacity 0.15s;
+    }
+    .btn-copy-hint:active { opacity: 0.7; }
+    .toast-small {
+      display: none;
+      color: #3fb950;
+      font-size: 0.8rem;
+      margin-bottom: 6px;
+    }
   </style>
 </head>
 <body>
 
 <header>
   <h1>📈 株朝活ダッシュボード</h1>
-  <span class="time">2026年06月22日 17:12</span>
+  <span class="time">2026年06月22日 17:19</span>
 </header>
 
 <!-- 日本市場 -->
@@ -192,8 +224,8 @@
         </div>
         <div class="index-card">
           <div class="index-name">ドル円</div>
-          <div class="index-price">161.77</div>
-          <div class="index-change up">▲ +0.30%</div>
+          <div class="index-price">161.75</div>
+          <div class="index-change up">▲ +0.29%</div>
         </div>
 </div>
 
@@ -357,18 +389,42 @@
 <div class="card">
   <div class="card-header">
     <span class="step-badge">2</span>
-    <span class="card-title">Geminiの分析を貼り付け</span>
+    <span class="card-title">Geminiに聞く → 結果を貼り付け</span>
   </div>
-  <textarea id="gemini-input" placeholder="Geminiに「今日の日本株で注目テーマと強い銘柄は？」と聞いた結果を貼り付けてください"></textarea>
+  <div class="prompt-hint" id="gemini-hint">今日の日本株市場について教えてください。
+
+①本日の注目ニュース・材料（好材料・悪材料それぞれ）
+②強そうなセクター・テーマ（3つ）
+③弱そうなセクター・テーマ（3つ）
+④株価500〜600円前後（100株=5〜6万円）で買える、本日注目の銘柄を3〜5つ
+　- 銘柄名・コード・理由・好材料または悪材料
+⑤本日の市場全体の方向感（強気/弱気/中立）
+
+できるだけ具体的な銘柄名とコードで教えてください。</div>
+  <button class="btn-copy-hint" onclick="copyHint('gemini-hint', 'gemini-copied')">📋 上のプロンプトをコピーしてGeminiに貼り付ける</button>
+  <div class="toast-small" id="gemini-copied">✅ コピーしました！</div>
+  <textarea id="gemini-input" placeholder="Geminiの回答をここに貼り付けてください"></textarea>
 </div>
 
 <!-- STEP 3: ChatGPT -->
 <div class="card">
   <div class="card-header">
     <span class="step-badge">3</span>
-    <span class="card-title">ChatGPTの分析を貼り付け</span>
+    <span class="card-title">ChatGPTに聞く → 結果を貼り付け</span>
   </div>
-  <textarea id="chatgpt-input" placeholder="ChatGPTに「今日の日本株デイトレで注目すべき点は？」と聞いた結果を貼り付けてください"></textarea>
+  <div class="prompt-hint" id="chatgpt-hint">今日の日本株デイトレードについて分析してください。
+
+①米国市場・為替の動きが日本株に与える影響
+②本日動きそうなテーマ株・材料株（具体的な銘柄コードと銘柄名で）
+③株価500〜600円前後（100株5〜6万円）で買えるデイトレ向き銘柄
+　- 推奨理由・リスク・出来高の多さ
+④今日避けたほうがいいセクター・銘柄（理由付き）
+⑤初心者デイトレーダーへのアドバイス（欲張らず小さく勝つ方法）
+
+具体的な銘柄コードと数字で教えてください。</div>
+  <button class="btn-copy-hint" onclick="copyHint('chatgpt-hint', 'chatgpt-copied')">📋 上のプロンプトをコピーしてChatGPTに貼り付ける</button>
+  <div class="toast-small" id="chatgpt-copied">✅ コピーしました！</div>
+  <textarea id="chatgpt-input" placeholder="ChatGPTの回答をここに貼り付けてください"></textarea>
 </div>
 
 <!-- STEP 4: Claude最終分析 -->
@@ -386,13 +442,13 @@
 </div>
 
 <script>
-const MARKET_DATA = `【取得時刻】2026年06月22日 17:12
+const MARKET_DATA = `【取得時刻】2026年06月22日 17:19
 
 【日本市場】
 ・日経平均: 72,353.96 (+1.55%)
 ・TOPIX: 434.50 (+1.12%)
 ・グロース250: 573.00 (+4.14%)
-・ドル円: 161.77 (+0.30%)
+・ドル円: 161.75 (+0.29%)
 
 【米国市場（前日終値）】
 ・ダウ平均: 51,564.70 (+0.14%)
@@ -460,17 +516,45 @@ ${chatgpt}
 ━━━━━━━━━━━━━━━━━━
 【分析依頼】
 ━━━━━━━━━━━━━━━━━━
-上記を踏まえて以下を箇条書きで教えてください：
 
-1. 本日の市場の方向感（強気/弱気/中立）と根拠
-2. 米国市場の影響（日本株への影響）
-3. 本日強そうなテーマ 3つ（理由付き）
-4. 本日弱そうなテーマ 3つ（理由付き）
-5. デイトレ推奨銘柄 5つ
-   - 銘柄名・現在価格・推奨理由・エントリー目安・注意点
-6. 本日の総合戦略（2〜3行）
+私は資金5万〜6万円のデイトレード初心者です。
+1日に少しずつ増やすことを目標にしています。大きく勝とうとせず、小さく確実に勝ちたいです。
 
-※資金5万円のデイトレーダー向け。1株単価が低く回転の効く銘柄を優先。リスクも正直に。`;
+以下の項目を順番に教えてください：
+
+■ 1. 今日の市場の空気感
+・強気/弱気/中立 とその理由を1〜2行で
+
+■ 2. 米国市場・為替の影響
+・昨晩の米国市場が今日の日本株にどう影響するか
+
+■ 3. 今日強いテーマ（3つ）
+・テーマ名 → 理由 → 関連する具体的銘柄コード
+
+■ 4. 今日弱いテーマ・避けるべきもの（3つ）
+・なぜ弱いのか理由も
+
+■ 5. 本日のデイトレ推奨銘柄（3〜5つ）
+　各銘柄について以下を教えてください：
+　・銘柄名・コード・現在値
+　・なぜ今日動きそうか（好材料/悪材料/テーマ性）
+　・エントリーのタイミング目安（寄り付き/前場/後場/どのタイミングが狙い目か）
+　・利確目安（何円 or 何%上がったら売るか）
+　・損切りライン（何円 or 何%下がったら迷わず切るか）
+　・リスク・注意点（正直に）
+
+■ 6. 今日やってはいけないこと
+・初心者が陥りやすいNG行動
+
+■ 7. 今日の総合戦略まとめ
+・1〜3行でシンプルに
+
+※前提条件：
+- 資金: 5〜6万円（100株単位で買える500〜600円前後の銘柄を優先）
+- 目標: 1日500〜2000円の利益で十分
+- ルール: 損切りは必ず守る、欲張らない
+- レベル: 初心者、感情的になりやすい
+- 正直に「今日は休んだほうがいい」という判断もOK`;
 
   const preview = document.getElementById('prompt-preview');
   preview.textContent = prompt;
@@ -492,6 +576,21 @@ function showToast() {
   const t = document.getElementById('toast');
   t.style.display = 'block';
   setTimeout(() => t.style.display = 'none', 3000);
+}
+
+function copyHint(hintId, toastId) {
+  const text = document.getElementById(hintId).innerText;
+  navigator.clipboard.writeText(text).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = text;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+  });
+  const t = document.getElementById(toastId);
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
 }
 </script>
 

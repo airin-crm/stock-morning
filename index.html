@@ -3,575 +3,588 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>株朝活ダッシュボード</title>
+  <title>株朝活 PRO</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", sans-serif;
-      background: #0d1117;
-      color: #e6edf3;
-      padding: 14px;
-      max-width: 640px;
-      margin: 0 auto;
-    }
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-    h1 { font-size: 1.15rem; }
-    .time { color: #8b949e; font-size: 0.78rem; }
-    .section-title {
-      font-size: 0.78rem;
-      color: #8b949e;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 8px;
-      margin-top: 14px;
-    }
-    .index-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 8px;
-      margin-bottom: 6px;
-    }
-    .index-grid.us { grid-template-columns: repeat(3, 1fr); }
-    .index-card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 11px 12px;
-    }
-    .index-card.small { padding: 9px 10px; }
-    .index-name { font-size: 0.72rem; color: #8b949e; margin-bottom: 3px; }
-    .index-price { font-size: 1.05rem; font-weight: bold; }
-    .index-card.small .index-price { font-size: 0.92rem; }
-    .index-change { font-size: 0.82rem; margin-top: 2px; }
-    .up { color: #3fb950; }
-    .down { color: #f85149; }
-    .card {
-      background: #161b22;
-      border: 1px solid #30363d;
-      border-radius: 12px;
-      padding: 13px;
-      margin-bottom: 12px;
-    }
-    .card-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 10px;
-    }
-    .card-title { font-size: 0.92rem; font-weight: bold; }
-    .badge {
-      font-size: 0.68rem;
-      background: #21262d;
-      color: #8b949e;
-      padding: 2px 7px;
-      border-radius: 10px;
-    }
-    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
-    th { color: #8b949e; font-size: 0.72rem; padding: 3px 6px; border-bottom: 1px solid #21262d; text-align: left; }
-    td { padding: 6px 6px; border-bottom: 1px solid #21262d; }
-    .price { font-weight: bold; }
-    .vol { color: #8b949e; font-size: 0.78rem; }
-    .news-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      padding: 8px 0;
-      border-bottom: 1px solid #21262d;
-      text-decoration: none;
-      color: inherit;
-    }
-    .news-item:last-child { border-bottom: none; }
-    .news-item:active { opacity: 0.7; }
-    .news-source {
-      flex-shrink: 0;
-      font-size: 0.65rem;
-      color: #fff;
-      padding: 2px 6px;
-      border-radius: 4px;
-      margin-top: 2px;
-    }
-    .news-title { font-size: 0.85rem; line-height: 1.4; }
-    .no-news { color: #8b949e; font-size: 0.85rem; }
-    textarea {
-      width: 100%;
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      color: #e6edf3;
-      padding: 10px;
-      font-size: 0.83rem;
-      line-height: 1.5;
-      resize: vertical;
-      min-height: 90px;
-      font-family: inherit;
-    }
-    textarea:focus { outline: none; border-color: #58a6ff; }
-    textarea::placeholder { color: #484f58; }
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 14px;
-      border-radius: 10px;
-      border: none;
-      font-size: 0.97rem;
-      font-weight: bold;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
-    .btn:active { opacity: 0.7; }
-    .btn-generate { background: linear-gradient(135deg, #238636, #1a6128); color: #fff; margin-bottom: 10px; }
-    .btn-claude { background: linear-gradient(135deg, #1f6feb, #1158c7); color: #fff; }
-    .toast {
-      display: none;
-      background: #238636;
-      color: #fff;
-      padding: 10px;
-      border-radius: 8px;
-      text-align: center;
-      font-size: 0.88rem;
-      margin-bottom: 10px;
-    }
-    .step-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: #1f6feb;
-      color: #fff;
-      border-radius: 50%;
-      width: 20px; height: 20px;
-      font-size: 0.72rem;
-      font-weight: bold;
-      flex-shrink: 0;
-    }
-    .prompt-preview {
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      padding: 10px;
-      font-size: 0.75rem;
-      color: #8b949e;
-      white-space: pre-wrap;
-      max-height: 160px;
-      overflow-y: auto;
-      margin-bottom: 10px;
-      display: none;
-    }
-    .divider { border: none; border-top: 1px solid #21262d; margin: 14px 0; }
-    .prompt-hint {
-      background: #0d1117;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 0.78rem;
-      color: #8b949e;
-      margin-bottom: 8px;
-      line-height: 1.6;
-      white-space: pre-wrap;
-    }
-    .btn-copy-hint {
-      display: block;
-      width: 100%;
-      padding: 9px;
-      border-radius: 8px;
-      border: 1px solid #30363d;
-      background: #21262d;
-      color: #e6edf3;
-      font-size: 0.83rem;
-      font-weight: bold;
-      cursor: pointer;
-      margin-bottom: 8px;
-      transition: opacity 0.15s;
-    }
-    .btn-copy-hint:active { opacity: 0.7; }
-    .toast-small {
-      display: none;
-      color: #3fb950;
-      font-size: 0.8rem;
-      margin-bottom: 6px;
-    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;background:#0d1117;color:#e6edf3;padding:14px;max-width:680px;margin:0 auto}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+    h1{font-size:1.15rem}
+    .time{color:#8b949e;font-size:0.75rem}
+    .section-title{font-size:0.72rem;color:#8b949e;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 7px}
+    .index-grid{display:grid;gap:8px;margin-bottom:6px}
+    .grid-2{grid-template-columns:repeat(2,1fr)}
+    .grid-3{grid-template-columns:repeat(3,1fr)}
+    .grid-4{grid-template-columns:repeat(4,1fr)}
+    .index-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:10px 11px}
+    .index-card.small{padding:8px 10px}
+    .index-name{font-size:0.68rem;color:#8b949e;margin-bottom:2px}
+    .index-price{font-size:1rem;font-weight:bold}
+    .index-card.small .index-price{font-size:0.88rem}
+    .index-change{font-size:0.78rem;margin-top:1px}
+    .index-sub{font-size:0.66rem;color:#8b949e;margin-top:2px}
+    .up{color:#3fb950}.down{color:#f85149}
+    .card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:13px;margin-bottom:12px}
+    .card-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+    .card-title{font-size:0.9rem;font-weight:bold}
+    .badge{font-size:0.65rem;background:#21262d;color:#8b949e;padding:2px 7px;border-radius:10px}
+    table{width:100%;border-collapse:collapse;font-size:0.78rem}
+    th{color:#8b949e;font-size:0.68rem;padding:3px 5px;border-bottom:1px solid #21262d;text-align:left;white-space:nowrap}
+    td{padding:6px 5px;border-bottom:1px solid #21262d;vertical-align:middle}
+    .stock-name{font-size:0.78rem;font-weight:bold}
+    .candle-label{font-size:0.65rem;color:#8b949e}
+    .price{font-weight:bold}
+    .vol-hot{color:#f0a500;font-weight:bold}
+    .rsi-hot{color:#f85149;font-weight:bold}
+    .rsi-cold{color:#58a6ff;font-weight:bold}
+    .news-item{display:flex;align-items:flex-start;gap:7px;padding:7px 0;border-bottom:1px solid #21262d;text-decoration:none;color:inherit}
+    .news-item:last-child{border-bottom:none}
+    .news-source{flex-shrink:0;font-size:0.62rem;color:#fff;padding:2px 5px;border-radius:4px;margin-top:2px;white-space:nowrap}
+    .news-title{font-size:0.82rem;line-height:1.4}
+    .no-news{color:#8b949e;font-size:0.83rem}
+    textarea{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;padding:10px;font-size:0.8rem;line-height:1.55;resize:vertical;min-height:90px;font-family:inherit}
+    textarea:focus{outline:none;border-color:#58a6ff}
+    textarea::placeholder{color:#484f58}
+    .btn{display:block;width:100%;padding:13px;border-radius:10px;border:none;font-size:0.93rem;font-weight:bold;cursor:pointer;transition:opacity .15s}
+    .btn:active{opacity:.7}
+    .btn-generate{background:linear-gradient(135deg,#238636,#1a6128);color:#fff;margin-bottom:10px}
+    .btn-claude{background:linear-gradient(135deg,#1f6feb,#1158c7);color:#fff}
+    .toast{display:none;background:#238636;color:#fff;padding:10px;border-radius:8px;text-align:center;font-size:0.85rem;margin-bottom:10px}
+    .step-badge{display:inline-flex;align-items:center;justify-content:center;background:#1f6feb;color:#fff;border-radius:50%;width:20px;height:20px;font-size:0.7rem;font-weight:bold;flex-shrink:0}
+    .prompt-box{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px;font-size:0.73rem;color:#8b949e;white-space:pre-wrap;max-height:180px;overflow-y:auto;margin-bottom:8px}
+    .btn-copy-hint{display:block;width:100%;padding:9px;border-radius:8px;border:1px solid #30363d;background:#21262d;color:#e6edf3;font-size:0.8rem;font-weight:bold;cursor:pointer;margin-bottom:8px;transition:opacity .15s}
+    .btn-copy-hint:active{opacity:.7}
+    .toast-small{display:none;color:#3fb950;font-size:0.78rem;margin-bottom:6px}
+    .divider{border:none;border-top:1px solid #21262d;margin:14px 0}
+    .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+    .legend-item{font-size:0.65rem;color:#8b949e}
   </style>
 </head>
 <body>
 
 <header>
-  <h1>📈 株朝活ダッシュボード</h1>
-  <span class="time">2026年06月24日 07:34</span>
+  <h1>📈 株朝活 PRO</h1>
+  <span class="time">2026年06月24日 13:50</span>
 </header>
 
-<!-- 日本市場 -->
 <div class="section-title">🇯🇵 日本市場</div>
-<div class="index-grid">
-  
-        <div class="index-card">
+<div class="index-grid grid-2"><div class="index-card">
           <div class="index-name">日経平均</div>
-          <div class="index-price">72,353.96</div>
-          <div class="index-change up">▲ +0.00%</div>
-        </div>
-        <div class="index-card">
+          <div class="index-price">68,763.98</div>
+          <div class="index-change down">▼ -1.47%</div>
+          <div class="index-sub">高:70219 安:68461</div>
+        </div><div class="index-card">
           <div class="index-name">TOPIX</div>
-          <div class="index-price">422.80</div>
-          <div class="index-change down">▼ -2.69%</div>
-        </div>
-        <div class="index-card">
+          <div class="index-price">418.70</div>
+          <div class="index-change down">▼ -0.97%</div>
+          <div class="index-sub">高:425 安:418</div>
+        </div><div class="index-card">
           <div class="index-name">グロース250</div>
-          <div class="index-price">551.50</div>
-          <div class="index-change down">▼ -3.75%</div>
-        </div>
-        <div class="index-card">
+          <div class="index-price">549.50</div>
+          <div class="index-change down">▼ -0.36%</div>
+          <div class="index-sub">高:560 安:549</div>
+        </div><div class="index-card">
           <div class="index-name">ドル円</div>
           <div class="index-price">161.55</div>
-          <div class="index-change up">▲ +0.07%</div>
-        </div>
-</div>
+          <div class="index-change down">▼ -0.01%</div>
+          <div class="index-sub">高:162 安:161</div>
+        </div></div>
 
-<!-- 米国市場 -->
 <div class="section-title">🇺🇸 米国市場（前日終値）</div>
-<div class="index-grid us">
-  
-        <div class="index-card small">
+<div class="index-grid grid-3"><div class="index-card small">
           <div class="index-name">ダウ平均</div>
           <div class="index-price">51,666.84</div>
           <div class="index-change down">▼ -0.09%</div>
-        </div>
-        <div class="index-card small">
+        </div><div class="index-card small">
           <div class="index-name">ナスダック</div>
           <div class="index-price">25,587.04</div>
           <div class="index-change down">▼ -2.21%</div>
-        </div>
-        <div class="index-card small">
+        </div><div class="index-card small">
           <div class="index-name">S&P500</div>
           <div class="index-price">7,365.46</div>
           <div class="index-change down">▼ -1.44%</div>
-        </div>
-</div>
+        </div></div>
+
+<div class="section-title">🌍 グローバル指標</div>
+<div class="index-grid grid-4"><div class="index-card small">
+          <div class="index-name">VIX恐怖指数</div>
+          <div class="index-price">19.49</div>
+          <div class="index-change up">▲ +12.79%</div>
+        </div><div class="index-card small">
+          <div class="index-name">金(Gold)</div>
+          <div class="index-price">4082.00</div>
+          <div class="index-change down">▼ -1.16%</div>
+        </div><div class="index-card small">
+          <div class="index-name">原油(WTI)</div>
+          <div class="index-price">72.70</div>
+          <div class="index-change down">▼ -0.70%</div>
+        </div><div class="index-card small">
+          <div class="index-name">米10年債利回</div>
+          <div class="index-price">4.49</div>
+          <div class="index-change up">▲ +0.94%</div>
+        </div></div>
 
 <hr class="divider">
 
-<!-- 変動率上位銘柄 -->
 <div class="card">
   <div class="card-header">
-    <span class="card-title">🔥 変動率上位銘柄</span>
-    <span class="badge">5万円デイトレ向け</span>
+    <span class="card-title">🔬 テクニカルスクリーニング結果</span>
+    <span class="badge">出来高・RSI・乖離率・52週位置</span>
   </div>
   <table>
-    <tr><th>銘柄</th><th>現値</th><th>変動率</th><th>出来高</th></tr>
-    
-        <tr>
-          <td>3672 オルトプラス</td>
-          <td class="price">25円</td>
-          <td class="down">▼ -7.41%</td>
-          <td class="vol">261,900</td>
-        </tr>
-        <tr>
-          <td>1570 日経レバETF</td>
-          <td class="price">79140円</td>
-          <td class="down">▼ -7.38%</td>
-          <td class="vol">4,573,991</td>
-        </tr>
-        <tr>
-          <td>4478 フリー</td>
-          <td class="price">1863円</td>
-          <td class="down">▼ -5.77%</td>
-          <td class="vol">497,600</td>
-        </tr>
-        <tr>
-          <td>2516 グロース250ETF</td>
-          <td class="price">552円</td>
-          <td class="down">▼ -3.75%</td>
-          <td class="vol">410,670</td>
-        </tr>
-        <tr>
-          <td>3765 ガンホー</td>
-          <td class="price">2183円</td>
-          <td class="down">▼ -2.11%</td>
-          <td class="vol">246,500</td>
-        </tr>
-        <tr>
-          <td>3697 SHIFT</td>
-          <td class="price">610円</td>
-          <td class="down">▼ -1.77%</td>
-          <td class="vol">4,187,900</td>
-        </tr>
-        <tr>
-          <td>9434 ソフトバンク</td>
-          <td class="price">206円</td>
-          <td class="down">▼ -1.53%</td>
-          <td class="vol">104,746,100</td>
-        </tr>
-        <tr>
-          <td>4565 そーせいグループ</td>
-          <td class="price">971円</td>
-          <td class="down">▼ -1.52%</td>
-          <td class="vol">599,300</td>
+    <tr><th>銘柄</th><th>現値</th><th>前日比</th><th>出来高比</th><th>RSI</th><th>25MA乖離</th><th>52週位置</th></tr>
+    <tr>
+          <td><span class="stock-name">1570 日経レバETF</span><br><span class="candle-label">🔴陰線</span></td>
+          <td class="price">76700円</td>
+          <td class="down">▼-3.1%</td>
+          <td class="">0.9倍</td>
+          <td class="">55.9</td>
+          <td>+4.6%</td>
+          <td>78%</td>
+        </tr><tr>
+          <td><span class="stock-name">8306 三菱UFJ</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
+          <td class="price">3203円</td>
+          <td class="down">▼-2.0%</td>
+          <td class="">0.4倍</td>
+          <td class="">54.4</td>
+          <td>+1.5%</td>
+          <td>77%</td>
+        </tr><tr>
+          <td><span class="stock-name">8316 三井住友FG</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
+          <td class="price">6341円</td>
+          <td class="down">▼-1.8%</td>
+          <td class="">0.5倍</td>
+          <td class="">54.5</td>
+          <td>+2.1%</td>
+          <td>78%</td>
+        </tr><tr>
+          <td><span class="stock-name">6920 レーザーテック</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
+          <td class="price">50170円</td>
+          <td class="down">▼-3.5%</td>
+          <td class="">0.8倍</td>
+          <td class="">57.2</td>
+          <td>+13.0%</td>
+          <td>69%</td>
+        </tr><tr>
+          <td><span class="stock-name">8035 東京エレクトロン</span><br><span class="candle-label">🔴陰線</span></td>
+          <td class="price">69100円</td>
+          <td class="down">▼-5.3%</td>
+          <td class="">0.8倍</td>
+          <td class="">58.7</td>
+          <td>+11.7%</td>
+          <td>75%</td>
+        </tr><tr>
+          <td><span class="stock-name">9984 ソフトバンクG</span><br><span class="candle-label">🔴陰線</span></td>
+          <td class="price">6412円</td>
+          <td class="down">▼-1.6%</td>
+          <td class="">0.4倍</td>
+          <td class="">45.9</td>
+          <td>-10.3%</td>
+          <td>53%</td>
+        </tr><tr>
+          <td><span class="stock-name">3697 SHIFT</span><br><span class="candle-label">🔴陰線</span></td>
+          <td class="price">620円</td>
+          <td class="up">▲+1.6%</td>
+          <td class="">0.5倍</td>
+          <td class="">42.4</td>
+          <td>-7.3%</td>
+          <td>10%</td>
+        </tr><tr>
+          <td><span class="stock-name">4478 フリー</span><br><span class="candle-label">🔴陰線</span></td>
+          <td class="price">1905円</td>
+          <td class="up">▲+2.3%</td>
+          <td class="">0.3倍</td>
+          <td class="">41.2</td>
+          <td>-7.7%</td>
+          <td>8%</td>
+        </tr><tr>
+          <td><span class="stock-name">2371 カカクコム</span><br><span class="candle-label">十字線(迷い)</span></td>
+          <td class="price">3312円</td>
+          <td class="down">▼-0.4%</td>
+          <td class="">0.4倍</td>
+          <td class="">57.9</td>
+          <td>-1.0%</td>
+          <td>84%</td>
+        </tr><tr>
+          <td><span class="stock-name">3765 ガンホー</span><br><span class="candle-label">🔴陰線</span></td>
+          <td class="price">2175円</td>
+          <td class="down">▼-0.4%</td>
+          <td class="">0.3倍</td>
+          <td class="">40.2</td>
+          <td>-2.3%</td>
+          <td>11%</td>
         </tr>
   </table>
+  <div class="legend">
+    <span class="legend-item">出来高比: 本日÷20日平均 ｜ RSI: 70↑=過熱 30↓=売られすぎ</span>
+    <span class="legend-item">52週位置: 100%=高値 0%=安値 ｜ 25MA乖離: 移動平均からの距離</span>
+  </div>
 </div>
 
-<!-- ニュース -->
 <div class="card">
   <div class="card-header">
-    <span class="card-title">📰 株関連ニュース</span>
-    <span class="badge">NHK・Yahoo・東洋経済・ITmedia</span>
+    <span class="card-title">📰 市場関連ニュース</span>
+    <span class="badge">NHK・Yahoo・東洋経済・Investing.com</span>
   </div>
-  
-        <a href="http://www3.nhk.or.jp/news/html/20260623/k10015157371000.html" target="_blank" class="news-item">
-          <span class="news-source" style="background:#e63946">NHK経済</span>
+  <a href="http://www3.nhk.or.jp/news/html/20260624/k10015158131000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#c0392b">NHK経済</span>
+          <span class="news-title">利上げ決定の日銀会合 追加利上げ早期に検討すべきの意見も</span>
+        </a><a href="http://www3.nhk.or.jp/news/html/20260624/k10015158071000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#c0392b">NHK経済</span>
+          <span class="news-title">株価 値下がり このところの上昇受け利益確定の売り注文</span>
+        </a><a href="http://www3.nhk.or.jp/news/html/20260624/k10015157741000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#c0392b">NHK経済</span>
+          <span class="news-title">ナスダックの株価指数2％超の大幅下落 日韓のハイテク株安波及</span>
+        </a><a href="http://www3.nhk.or.jp/news/html/20260623/k10015157371000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#c0392b">NHK経済</span>
           <span class="news-title">円相場 1ドル＝161円台で神経質な取引 介入への警戒続く</span>
-        </a>
-        <a href="http://www3.nhk.or.jp/news/html/20260623/k10015156891000.html" target="_blank" class="news-item">
-          <span class="news-source" style="background:#e63946">NHK経済</span>
+        </a><a href="http://www3.nhk.or.jp/news/html/20260623/k10015156891000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#c0392b">NHK経済</span>
           <span class="news-title">東京23区中古マンション 平均1億2800万円余 賃貸の家賃も上昇</span>
-        </a>
-        <a href="http://www3.nhk.or.jp/news/html/20260623/k10015157091000.html" target="_blank" class="news-item">
-          <span class="news-source" style="background:#e63946">NHK経済</span>
+        </a><a href="http://www3.nhk.or.jp/news/html/20260623/k10015157091000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#c0392b">NHK経済</span>
           <span class="news-title">日産株主総会 みずほFG出身の社外取締役の再任を否決</span>
-        </a>
-        <a href="http://www3.nhk.or.jp/news/html/20260623/k10015157011000.html" target="_blank" class="news-item">
-          <span class="news-source" style="background:#e63946">NHK経済</span>
-          <span class="news-title">株価 2500円超下落で7万円割れ 利益確保の売り膨らむ</span>
-        </a>
-        <a href="http://www3.nhk.or.jp/news/html/20260623/k10015156971000.html" target="_blank" class="news-item">
-          <span class="news-source" style="background:#e63946">NHK経済</span>
-          <span class="news-title">片山財務相 為替市場“断固たる措置 日米合意揺るぎない”</span>
-        </a>
-        <a href="https://news.yahoo.co.jp/pickup/6585420?source=rss" target="_blank" class="news-item">
+        </a><a href="https://news.yahoo.co.jp/pickup/6585420?source=rss" target="_blank" class="news-item">
           <span class="news-source" style="background:#6200ea">Yahoo!株式</span>
           <span class="news-title">クールジャパン機構 累損540億円</span>
-        </a>
-        <a href="https://news.yahoo.co.jp/pickup/6585333?source=rss" target="_blank" class="news-item">
+        </a><a href="https://news.yahoo.co.jp/pickup/6585464?source=rss" target="_blank" class="news-item">
           <span class="news-source" style="background:#6200ea">Yahoo!株式</span>
-          <span class="news-title">日産株主総会 永井取締役案を否決</span>
-        </a>
-        <a href="https://toyokeizai.net/articles/-/948997?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-title">任天堂の株価低迷 業界が暗い時代</span>
+        </a><a href="https://toyokeizai.net/articles/-/946750?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-source" style="background:#0077b6">東洋経済</span>
+          <span class="news-title">弱者同士が叩き合う｢マイノリティ支配｣の正体　私たちの怒りを操る｢文化戦争｣の罠と､仕掛けられた｢分断｣ゲーム | 政治・経済・投資 | 東洋経済オンライン</span>
+        </a><a href="https://toyokeizai.net/articles/-/949163?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-source" style="background:#0077b6">東洋経済</span>
+          <span class="news-title">【大型上場「スペースX」の実力】なぜ史上最大のIPOを実現できたのか／創業から24年で上場／売上高の6割を占める通信インフラとは？／イーロン・マスク氏の人物像／スペースXの将来を占う2つの注目ポイント | ビジネス | 東洋経済オンライン</span>
+        </a><a href="https://toyokeizai.net/articles/-/948986?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-source" style="background:#0077b6">東洋経済</span>
+          <span class="news-title">中小型の厳選注目株⑤洋上風力､国土強靱化､防衛…相場テーマ豊富なマリコン首位｢五洋建設｣に押し目買いの好機到来か | 政治・経済・投資 | 東洋経済オンライン</span>
+        </a><a href="https://toyokeizai.net/articles/-/945665?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-source" style="background:#0077b6">東洋経済</span>
+          <span class="news-title">｢人に指図されていたら､いい仕事はできない｣…欧州サッカー最前線の日本人が見た&quot;ドイツ最強代理人事務所&quot;の凄み | ライフ | 東洋経済オンライン</span>
+        </a><a href="https://toyokeizai.net/articles/-/947918?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-source" style="background:#0077b6">東洋経済</span>
+          <span class="news-title">知っておくべき銀行･証券会社･国が明かさない&quot;金融の本質&quot;　金融商品は｢あなたを豊かにする｣ために作られていない | ライフ | 東洋経済オンライン</span>
+        </a><a href="https://toyokeizai.net/articles/-/948997?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
           <span class="news-source" style="background:#0077b6">東洋経済</span>
           <span class="news-title">認知機能が衰えると自分名義の資産も自由に使えなくなる､高齢者マネー260兆円が凍り付く危険性 | 政治・経済・投資 | 東洋経済オンライン</span>
-        </a>
-        <a href="https://toyokeizai.net/articles/-/948762?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
-          <span class="news-source" style="background:#0077b6">東洋経済</span>
-          <span class="news-title">税金を投じても日本の防衛産業は強くならない ｢防衛公社｣｢国営工廠｣構想が見落とす統廃合と改革への意識の欠如 | 政治・経済・投資 | 東洋経済オンライン</span>
-        </a>
-        <a href="https://toyokeizai.net/articles/-/948441?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
-          <span class="news-source" style="background:#0077b6">東洋経済</span>
-          <span class="news-title">｢サイノス｣｢コスモスポーツ｣｢レパード｣…人気上昇中､脱定番だけど希少な国産ヘリテージカーに旧車ブームが波及 | ライフ | 東洋経済オンライン</span>
-        </a>
-        <a href="https://toyokeizai.net/articles/-/949007?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
-          <span class="news-source" style="background:#0077b6">東洋経済</span>
-          <span class="news-title">｢僕が知ってるかしわめしじゃない｣…9期連続赤字の老舗駅弁会社で&quot;資さん出身&quot;の新社長がまず《味を戻した》深い訳  | ライフ | 東洋経済オンライン</span>
-        </a>
-        <a href="https://toyokeizai.net/articles/-/949006?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
-          <span class="news-source" style="background:#0077b6">東洋経済</span>
-          <span class="news-title">グランプリ常連の｢名物駅弁｣が《1杯290円》で大行列…105年続く老舗が初めて出す&quot;できたてソウルフード&quot;は別格だった | ライフ | 東洋経済オンライン</span>
-        </a>
-        <a href="https://www.itmedia.co.jp/business/articles/2606/24/news059.html" target="_blank" class="news-item">
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581426" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">ｃｏｌｙ--- 年初来高値、ディズニーIPを使用したスマホゲームの事前登録受付を開始</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581422" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">Jトラスト---株主優待における宝塚大劇場公演の詳細決定</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581421" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">後場の日経平均は502円安でスタート、SUMCOや東エレクが下落</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581420" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">タメニー---ストップ高、「継続企業の前提に関する注記」記載解消、上場維持基準に適合</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581419" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">ヒガシHD Research Memo（6）：2027年3月期は増収増益で過去最高予想</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581418" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">ヒガシHD Research Memo（5）：2026年3月期は上方修正値を上回る大幅増収増益で過去最高</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1580093" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
+          <span class="news-title">株式市場の急落を解説：なぜ投資家は突然不安を抱いているのか</span>
+        </a><a href="https://jp.investing.com/news/commodities-news/article-1581416" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
+          <span class="news-title">金価格が4,000ドルに迫る、ドル高とFRB利上げ観測が重荷</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1580114" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
+          <span class="news-title">マイクロンテクノロジー株が本日急落している理由とは</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1580476" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
+          <span class="news-title">韓国レバレッジETF危機が世界的な半導体株売りを誘発</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581393" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
+          <span class="news-title">売り優勢も6万9500円付近でもみ合う展開</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1579905" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
+          <span class="news-title">SKハイニックス株が本日急落した理由とは</span>
+        </a><a href="https://www.itmedia.co.jp/business/articles/2606/24/news063.html" target="_blank" class="news-item">
           <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
-          <span class="news-title">「最初は壊れ過ぎてビビった」──1220億円投じたソフトバンク「AIスパコン」、それでもNVIDIAのGPUを選ぶワケ</span>
-        </a>
-        <a href="https://www.itmedia.co.jp/business/articles/2606/24/news027.html" target="_blank" class="news-item">
+          <span class="news-title">クマ被害の切り札になるか　AIで100メートル先を検知する新対策機器</span>
+        </a><a href="https://www.itmedia.co.jp/business/articles/2606/24/news062.html" target="_blank" class="news-item">
           <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
-          <span class="news-title">「賞金1000万円」コンテストに「AI番付」　サイバーエージェントが明かす、AIを使い倒させる仕組み作り</span>
-        </a>
-        <a href="https://www.itmedia.co.jp/business/articles/2606/24/news047.html" target="_blank" class="news-item">
+          <span class="news-title">中国スパコンが9年ぶり世界一　日本の富岳は？</span>
+        </a><a href="https://www.itmedia.co.jp/business/articles/2606/24/news016.html" target="_blank" class="news-item">
           <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
-          <span class="news-title">フジクラの「保守的見通し」とは何だったのか　業績予想という制度の盲点</span>
-        </a>
-        <a href="https://www.itmedia.co.jp/business/articles/2606/23/news113.html" target="_blank" class="news-item">
+          <span class="news-title">客単価1900円増　ムラサキスポーツが挑んだ「誰でもデータ活用」の仕組み</span>
+        </a><a href="https://www.itmedia.co.jp/business/articles/2606/24/news023.html" target="_blank" class="news-item">
           <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
-          <span class="news-title">セブン「のりなし」おにぎり発売　ツナマヨは“のり有り”より約40円安く</span>
-        </a>
-        <a href="https://www.itmedia.co.jp/business/articles/2606/23/news025.html" target="_blank" class="news-item">
-          <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
-          <span class="news-title">米スタバ、なぜ「絶好調」の日本事業を売るのか？　本国再建の原資に消える“勝ち筋”の先行き</span>
+          <span class="news-title">ラスボスは誰だ？――“DXの社内政治”を制覇する、NTTドコモ流「攻略ストーリー」の描き方</span>
         </a>
 </div>
 
-<!-- STEP 2: Gemini -->
 <div class="card">
   <div class="card-header">
     <span class="step-badge">2</span>
     <span class="card-title">Geminiに聞く → 結果を貼り付け</span>
   </div>
-  <div class="prompt-hint" id="gemini-hint">今日の日本株市場について教えてください。
-
-①本日の注目ニュース・材料（好材料・悪材料それぞれ）
-②強そうなセクター・テーマ（3つ）
-③弱そうなセクター・テーマ（3つ）
-④株価500〜600円前後（100株=5〜6万円）で買える、本日注目の銘柄を3〜5つ
-　- 銘柄名・コード・理由・好材料または悪材料
-⑤本日の市場全体の方向感（強気/弱気/中立）
-
-できるだけ具体的な銘柄名とコードで教えてください。</div>
-  <button class="btn-copy-hint" onclick="copyHint('gemini-hint', 'gemini-copied')">📋 上のプロンプトをコピーしてGeminiに貼り付ける</button>
+  <div class="prompt-box" id="gemini-hint">読み込み中...</div>
+  <button class="btn-copy-hint" onclick="copyPrompt('gemini')">📋 このプロンプトをコピーしてGeminiへ</button>
   <div class="toast-small" id="gemini-copied">✅ コピーしました！</div>
   <textarea id="gemini-input" placeholder="Geminiの回答をここに貼り付けてください"></textarea>
 </div>
 
-<!-- STEP 3: ChatGPT -->
 <div class="card">
   <div class="card-header">
     <span class="step-badge">3</span>
     <span class="card-title">ChatGPTに聞く → 結果を貼り付け</span>
   </div>
-  <div class="prompt-hint" id="chatgpt-hint">今日の日本株デイトレードについて分析してください。
-
-①米国市場・為替の動きが日本株に与える影響
-②本日動きそうなテーマ株・材料株（具体的な銘柄コードと銘柄名で）
-③株価500〜600円前後（100株5〜6万円）で買えるデイトレ向き銘柄
-　- 推奨理由・リスク・出来高の多さ
-④今日避けたほうがいいセクター・銘柄（理由付き）
-⑤初心者デイトレーダーへのアドバイス（欲張らず小さく勝つ方法）
-
-具体的な銘柄コードと数字で教えてください。</div>
-  <button class="btn-copy-hint" onclick="copyHint('chatgpt-hint', 'chatgpt-copied')">📋 上のプロンプトをコピーしてChatGPTに貼り付ける</button>
+  <div class="prompt-box" id="chatgpt-hint">読み込み中...</div>
+  <button class="btn-copy-hint" onclick="copyPrompt('chatgpt')">📋 このプロンプトをコピーしてChatGPTへ</button>
   <div class="toast-small" id="chatgpt-copied">✅ コピーしました！</div>
   <textarea id="chatgpt-input" placeholder="ChatGPTの回答をここに貼り付けてください"></textarea>
 </div>
 
-<!-- STEP 4: Claude最終分析 -->
 <div class="card">
   <div class="card-header">
     <span class="step-badge">4</span>
-    <span class="card-title">Claudeで最終分析</span>
+    <span class="card-title">Claude最終分析（利確・損切りライン付き）</span>
   </div>
-  <button class="btn btn-generate" onclick="generatePrompt()">✨ 最終プロンプトを生成してコピー</button>
+  <button class="btn btn-generate" onclick="generateFinalPrompt()">✨ 最終プロンプトを生成してコピー</button>
   <div class="toast" id="toast">✅ コピーしました！Claude.aiに貼り付けてください</div>
-  <div class="prompt-preview" id="prompt-preview"></div>
+  <div class="prompt-box" id="prompt-preview" style="display:none"></div>
   <a href="https://claude.ai" target="_blank" id="claude-link" style="display:none">
-    <button class="btn btn-claude">🤖 Claude.aiを開く →</button>
+    <button class="btn btn-claude" style="margin-top:8px">🤖 Claude.aiを開く →</button>
   </a>
 </div>
 
 <script>
-const MARKET_DATA = `【取得時刻】2026年06月24日 07:34
+const MARKET_DATA = `【取得時刻】2026年06月24日 13:50
 
 【日本市場】
-・日経平均: 72,353.96 (+0.00%)
-・TOPIX: 422.80 (-2.69%)
-・グロース250: 551.50 (-3.75%)
-・ドル円: 161.55 (+0.07%)
+・日経平均: 68,763.98 (-1.47%) | 高:70218.71 安:68461.10
+・TOPIX: 418.70 (-0.97%) | 高:425.10 安:417.70
+・グロース250: 549.50 (-0.36%) | 高:559.70 安:548.70
+・ドル円: 161.55 (-0.01%) | 高:161.64 安:161.46
 
 【米国市場（前日終値）】
 ・ダウ平均: 51,666.84 (-0.09%)
 ・ナスダック: 25,587.04 (-2.21%)
 ・S&P500: 7,365.46 (-1.44%)
 
-【変動率上位銘柄】
-・3672 オルトプラス: 25円 (-7.41%) 出来高:261,900
-・1570 日経レバETF: 79140円 (-7.38%) 出来高:4,573,991
-・4478 フリー: 1863円 (-5.77%) 出来高:497,600
-・2516 グロース250ETF: 552円 (-3.75%) 出来高:410,670
-・3765 ガンホー: 2183円 (-2.11%) 出来高:246,500
-・3697 SHIFT: 610円 (-1.77%) 出来高:4,187,900
-・9434 ソフトバンク: 206円 (-1.53%) 出来高:104,746,100
-・4565 そーせいグループ: 971円 (-1.52%) 出来高:599,300
+【グローバル指標】
+・VIX恐怖指数: 19.49 (+12.79%)
+・金(Gold): 4082.00 (-1.16%)
+・原油(WTI): 72.70 (-0.70%)
+・米10年債利回: 4.49 (+0.94%)
 
-【本日のニュース】
-・[NHK経済] 円相場 1ドル＝161円台で神経質な取引 介入への警戒続く
-・[NHK経済] 東京23区中古マンション 平均1億2800万円余 賃貸の家賃も上昇
-・[NHK経済] 日産株主総会 みずほFG出身の社外取締役の再任を否決
-・[NHK経済] 株価 2500円超下落で7万円割れ 利益確保の売り膨らむ
-・[NHK経済] 片山財務相 為替市場“断固たる措置 日米合意揺るぎない”
-・[Yahoo!株式] クールジャパン機構 累損540億円
-・[Yahoo!株式] 日産株主総会 永井取締役案を否決
-・[東洋経済] 認知機能が衰えると自分名義の資産も自由に使えなくなる､高齢者マネー260兆円が凍り付く危険性 | 政治・経済・投資 | 東洋経済オンライン
-・[東洋経済] 税金を投じても日本の防衛産業は強くならない ｢防衛公社｣｢国営工廠｣構想が見落とす統廃合と改革への意識の欠如 | 政治・経済・投資 | 東洋経済オンライン
-・[東洋経済] ｢サイノス｣｢コスモスポーツ｣｢レパード｣…人気上昇中､脱定番だけど希少な国産ヘリテージカーに旧車ブームが波及 | ライフ | 東洋経済オンライン
-・[東洋経済] ｢僕が知ってるかしわめしじゃない｣…9期連続赤字の老舗駅弁会社で"資さん出身"の新社長がまず《味を戻した》深い訳  | ライフ | 東洋経済オンライン
-・[東洋経済] グランプリ常連の｢名物駅弁｣が《1杯290円》で大行列…105年続く老舗が初めて出す"できたてソウルフード"は別格だった | ライフ | 東洋経済オンライン
-・[ITmediaビジネス] 「最初は壊れ過ぎてビビった」──1220億円投じたソフトバンク「AIスパコン」、それでもNVIDIAのGPUを選ぶワケ
-・[ITmediaビジネス] 「賞金1000万円」コンテストに「AI番付」　サイバーエージェントが明かす、AIを使い倒させる仕組み作り
-・[ITmediaビジネス] フジクラの「保守的見通し」とは何だったのか　業績予想という制度の盲点`;
+【スクリーニング結果（テクニカル分析済み）】
+・1570 日経レバETF: 76700円 (-3.08%) 出来高比:0.9倍 RSI:55.9 25MA乖離:+4.6% 52週位置:78% 🔴陰線
+・8306 三菱UFJ: 3203円 (-1.96%) 出来高比:0.4倍 RSI:54.4 25MA乖離:+1.5% 52週位置:77% 🔴大陰線(強い売り)
+・8316 三井住友FG: 6341円 (-1.81%) 出来高比:0.5倍 RSI:54.5 25MA乖離:+2.1% 52週位置:78% 🔴大陰線(強い売り)
+・6920 レーザーテック: 50170円 (-3.52%) 出来高比:0.8倍 RSI:57.2 25MA乖離:+13.0% 52週位置:69% 🔴大陰線(強い売り)
+・8035 東京エレクトロン: 69100円 (-5.29%) 出来高比:0.8倍 RSI:58.7 25MA乖離:+11.7% 52週位置:75% 🔴陰線
+・9984 ソフトバンクG: 6412円 (-1.55%) 出来高比:0.4倍 RSI:45.9 25MA乖離:-10.3% 52週位置:53% 🔴陰線
+・3697 SHIFT: 620円 (+1.64%) 出来高比:0.5倍 RSI:42.4 25MA乖離:-7.3% 52週位置:10% 🔴陰線
+・4478 フリー: 1905円 (+2.25%) 出来高比:0.3倍 RSI:41.2 25MA乖離:-7.7% 52週位置:8% 🔴陰線
+・2371 カカクコム: 3312円 (-0.39%) 出来高比:0.4倍 RSI:57.9 25MA乖離:-1.0% 52週位置:84% 十字線(迷い)
+・3765 ガンホー: 2175円 (-0.37%) 出来高比:0.3倍 RSI:40.2 25MA乖離:-2.3% 52週位置:11% 🔴陰線`;
 
-function generatePrompt() {
+function buildGeminiPrompt() {
+  const lines = MARKET_DATA.split('\n');
+  const nikkeiLine = lines.find(l => l.includes('日経平均')) || '';
+  const dollarLine = lines.find(l => l.includes('ドル円')) || '';
+  const dowLine = lines.find(l => l.includes('ダウ')) || '';
+  const vixLine = lines.find(l => l.includes('VIX')) || '';
+
+  const nikkeiPct = (nikkeiLine.match(/\(([+\-][\d.]+)%\)/) || ['',''])[1];
+  const dollarVal = (dollarLine.match(/([\d.]+)円/) || ['',''])[1];
+  const vixVal = (vixLine.match(/([\d.]+)/) || ['',''])[1];
+  const nikkeiDir = nikkeiPct.startsWith('+') ? '上昇' : '下落';
+  const vixLevel = parseFloat(vixVal) > 25 ? '高水準（市場不安定）' : parseFloat(vixVal) > 18 ? '中程度' : '低水準（市場安定）';
+
+  return `【本日の市場データ】
+${MARKET_DATA}
+
+上記のデータを踏まえ、プロの株式アナリストとして以下を教えてください。
+
+■ 今日の市場環境の核心
+・日経平均${nikkeiPct}%の背景にある本質的な要因は？
+・VIX${vixVal || '不明'}（${vixLevel}）が示す市場心理
+・ドル円${dollarVal}円水準で特に恩恵を受ける/ダメージを受けるセクター
+
+■ 本日の注目企業ニュース（好材料）
+・決算発表・業績修正・自社株買い・M&A・新製品など
+・銘柄コード・銘柄名・材料の内容・株価インパクト予想（大/中/小）
+
+■ 本日の注目企業ニュース（悪材料）
+・業績下方修正・不祥事・格下げなど
+・銘柄コード・銘柄名・材料・下落リスク度
+
+■ 今日強いセクター・テーマ（3つ）
+・テーマ名 → 具体的な理由 → 代表銘柄（コード付き）2〜3個
+
+■ 今日弱いセクター・テーマ（3つ）
+・テーマ名 → 理由 → 避けるべき銘柄
+
+■ 出来高急増が予想される銘柄
+・株価300〜700円前後（100株=3〜7万円）で買いやすい
+・なぜ今日出来高が増えると予想するのか根拠も
+
+■ 機関投資家・外国人投資家の動向
+・今週の外国人売買動向、機関の動きで気になる点
+
+具体的な銘柄コードと数字で答えてください。`;
+}
+
+function buildChatGPTPrompt() {
+  const lines = MARKET_DATA.split('\n');
+  const screenLines = lines.filter(l => l.includes('RSI') || l.includes('出来高比'));
+  const screenText = screenLines.slice(0, 5).join('\n');
+
+  return `【本日の市場データ・テクニカル分析結果】
+${MARKET_DATA}
+
+あなたはプロのテクニカルアナリスト兼デイトレーダーです。
+以下を分析してください。
+
+■ テクニカル的に今日狙える銘柄（スクリーニング結果を参照）
+・RSI・出来高急増・移動平均乖離率・52週位置を踏まえた銘柄選定
+・なぜその銘柄が今日動くと判断したのか技術的根拠
+
+■ 時間帯別エントリー戦略
+・9:00〜9:30（寄り付き）：どんな銘柄をどう狙うか
+・9:30〜11:30（前場）：押し目買いのタイミング
+・12:30〜15:00（後場）：見送るべきか、チャンスはあるか
+
+■ 今日のチャートパターン分析
+・大陽線・大陰線・十字線が出ている銘柄への対処法
+・52週高値付近の銘柄（ブレイクアウト狙いか、反落リスクか）
+・RSI70超の銘柄：追いかけるべきか見送るべきか
+
+■ リスクシナリオ
+・今日のトレードで最大のリスク要因
+・損切りを判断する具体的な条件（何円下落、何%下落）
+・「今日は休む」べき市場環境の条件
+
+■ 5〜6万円資金での具体的な銘柄提案（3つ）
+・銘柄名・コード・現在値・100株コスト
+・エントリーポイント（〇〇円台で指値 or 成行）
+・利確目標（第1目標〇〇円、第2目標〇〇円）
+・損切りライン（〇〇円割れで即撤退）
+・期待リスクリワード比
+
+■ 初心者デイトレーダーへの一言
+・今日の相場で絶対にやってはいけないこと1つ
+
+数字と根拠で具体的に答えてください。`;
+}
+
+function buildClaudePrompt() {
   const gemini = document.getElementById('gemini-input').value.trim();
   const chatgpt = document.getElementById('chatgpt-input').value.trim();
 
-  let prompt = `あなたは日本株専門のプロトレーダーです。以下の情報を総合的に分析し、本日のデイトレード戦略を教えてください。
+  let prompt = `あなたは20年以上の経験を持つ日本株専門のプロトレーダーです。
+ファンダメンタルとテクニカルの両面から分析し、私が今日の相場で勝てる確率を最大化してください。
 
-━━━━━━━━━━━━━━━━━━
-【情報①】本日の市場データ・ニュース（自動収集）
-━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━
+【情報①】本日の市場データ・テクニカル分析（自動収集）
+━━━━━━━━━━━━━━━━━━━━
 ${MARKET_DATA}
 `;
 
   if (gemini) {
     prompt += `
-━━━━━━━━━━━━━━━━━━
-【情報②】Geminiの分析
-━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━
+【情報②】Geminiの分析（ファンダメンタル・ニュース）
+━━━━━━━━━━━━━━━━━━━━
 ${gemini}
 `;
   }
 
   if (chatgpt) {
     prompt += `
-━━━━━━━━━━━━━━━━━━
-【情報③】ChatGPTの分析
-━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━
+【情報③】ChatGPTの分析（テクニカル・時間帯戦略）
+━━━━━━━━━━━━━━━━━━━━
 ${chatgpt}
 `;
   }
 
   prompt += `
-━━━━━━━━━━━━━━━━━━
-【分析依頼】
-━━━━━━━━━━━━━━━━━━
+━━━━━━━━━━━━━━━━━━━━
+【総合分析依頼】
+━━━━━━━━━━━━━━━━━━━━
 
-私は資金5万〜6万円のデイトレード初心者です。
-1日に少しずつ増やすことを目標にしています。大きく勝とうとせず、小さく確実に勝ちたいです。
+■ 1. 今日の市場の空気感（1〜2行）
+・強気/弱気/中立、その核心理由
 
-以下の項目を順番に教えてください：
+■ 2. 3つのAI情報の一致点と矛盾点
+・GeminiとChatGPTの分析が一致している部分（信頼度高）
+・矛盾している部分（どちらの判断が妥当か）
 
-■ 1. 今日の市場の空気感
-・強気/弱気/中立 とその理由を1〜2行で
+■ 3. 今日強いテーマ（上位3つ）
+・テーマ → 理由 → 代表銘柄コード
 
-■ 2. 米国市場・為替の影響
-・昨晩の米国市場が今日の日本株にどう影響するか
+■ 4. 今日弱いテーマ・完全に避けること（3つ）
 
-■ 3. 今日強いテーマ（3つ）
-・テーマ名 → 理由 → 関連する具体的銘柄コード
+■ 5. 本日のデイトレ推奨銘柄（3つ厳選）
+各銘柄を以下の形式で：
 
-■ 4. 今日弱いテーマ・避けるべきもの（3つ）
-・なぜ弱いのか理由も
+【銘柄名（コード）】
+・現在値: 〇〇円 / 100株コスト: 〇〇万円
+・推奨理由: （ファンダ・テクニカル両面から）
+・エントリータイミング: （寄り付き/前場/後場、何円台で）
+・第1利確目標: 〇〇円（+〇%、期待利益〇〇円/100株）
+・第2利確目標: 〇〇円（+〇%）
+・損切りライン: 〇〇円（-〇%、最大損失〇〇円/100株）
+・リスクリワード比: 〇:1
+・注意点・リスク: （正直に）
+・信頼度: ★★★★☆（5段階）
 
-■ 5. 本日のデイトレ推奨銘柄（3〜5つ）
-　各銘柄について以下を教えてください：
-　・銘柄名・コード・現在値
-　・なぜ今日動きそうか（好材料/悪材料/テーマ性）
-　・エントリーのタイミング目安（寄り付き/前場/後場/どのタイミングが狙い目か）
-　・利確目安（何円 or 何%上がったら売るか）
-　・損切りライン（何円 or 何%下がったら迷わず切るか）
-　・リスク・注意点（正直に）
+■ 6. 今日の「やってはいけない」行動リスト
 
-■ 6. 今日やってはいけないこと
-・初心者が陥りやすいNG行動
+■ 7. 総合戦略（2〜3行）
+・目標利益と最大損失許容額も含めて
 
-■ 7. 今日の総合戦略まとめ
-・1〜3行でシンプルに
+■ 8. 総合判断
+・「積極的に取引すべき日」「慎重に小さく」「今日は休む」のどれか
 
-※前提条件：
-- 資金: 5〜6万円（100株単位で買える500〜600円前後の銘柄を優先）
-- 目標: 1日500〜2000円の利益で十分
-- ルール: 損切りは必ず守る、欲張らない
-- レベル: 初心者、感情的になりやすい
-- 正直に「今日は休んだほうがいい」という判断もOK`;
+━━━━━━━━━━━━━━━━━━━━
+私のプロフィール：
+・資金: 5〜6万円
+・目標: 1日500〜3000円の利益（欲張らない）
+・ルール: 損切りは必ず守る
+・レベル: 初心者〜中級者
+・弱点: 含み損になると損切りできなくなりやすい
+━━━━━━━━━━━━━━━━━━━━`;
 
+  return prompt;
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('gemini-hint').innerText = buildGeminiPrompt();
+  document.getElementById('chatgpt-hint').innerText = buildChatGPTPrompt();
+});
+
+function copyPrompt(type) {
+  const text = type === 'gemini' ? buildGeminiPrompt() : buildChatGPTPrompt();
+  const toastId = type + '-copied';
+  navigator.clipboard.writeText(text).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = text; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+  });
+  const t = document.getElementById(toastId);
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+
+function generateFinalPrompt() {
+  const prompt = buildClaudePrompt();
   const preview = document.getElementById('prompt-preview');
   preview.textContent = prompt;
   preview.style.display = 'block';
   document.getElementById('claude-link').style.display = 'block';
-
   navigator.clipboard.writeText(prompt).then(showToast).catch(() => {
     const el = document.createElement('textarea');
-    el.value = prompt;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
+    el.value = prompt; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
     showToast();
   });
 }
@@ -581,119 +594,6 @@ function showToast() {
   t.style.display = 'block';
   setTimeout(() => t.style.display = 'none', 3000);
 }
-
-// ページ読み込み時にプロンプトを今日のデータで更新
-window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('gemini-hint').innerText = buildGeminiPrompt();
-  document.getElementById('chatgpt-hint').innerText = buildChatGPTPrompt();
-});
-
-function buildGeminiPrompt() {
-  const lines = MARKET_DATA.split('\n');
-  const nikkei = lines.find(l => l.includes('日経平均')) || '';
-  const dollar = lines.find(l => l.includes('ドル円')) || '';
-  const dow = lines.find(l => l.includes('ダウ')) || '';
-  const nasdaq = lines.find(l => l.includes('ナスダック')) || '';
-
-  // 上昇/下落の判定
-  const nikkeiUp = nikkei.includes('+');
-  const dowUp = dow.includes('+');
-  const nasdaqUp = nasdaq.includes('+');
-
-  const trend = nikkeiUp ? '上昇傾向' : '下落傾向';
-  const usTrend = (dowUp && nasdaqUp) ? '米国市場は前日上昇' : (!dowUp && !nasdaqUp) ? '米国市場は前日下落' : '米国市場は強弱まちまち';
-
-  return `【本日の市場データ】
-${MARKET_DATA}
-
-上記のデータを踏まえて、今日の日本株について教えてください。
-
-■ 今日の注目ニュース・材料
-・日経平均が${trend}している背景にある具体的なニュースや材料は？
-・${usTrend}が日本株に与える影響は？
-・今日の朝時点で出ている決算・業績修正・M&A・新製品などの企業ニュース
-
-■ 好材料のある銘柄（具体的に）
-・銘柄名・コード・好材料の内容・株価への影響度（大/中/小）
-
-■ 悪材料のある銘柄（具体的に）
-・銘柄名・コード・悪材料の内容・下落リスク度
-
-■ 今日強そうなセクター・テーマ（3つ）
-・テーマ名 → 理由 → 代表銘柄コードと銘柄名
-
-■ 今日弱そうなセクター・テーマ（3つ）
-・テーマ名 → 理由
-
-■ 株価500〜600円前後の注目銘柄（3〜5つ）
-・銘柄名・コード・現在値・注目理由・出来高の特徴
-
-できるだけ具体的な銘柄コードと数字で回答してください。`;
-}
-
-function buildChatGPTPrompt() {
-  const lines = MARKET_DATA.split('\n');
-  const nikkei = lines.find(l => l.includes('日経平均')) || '';
-  const dollar = lines.find(l => l.includes('ドル円')) || '';
-  const growth = lines.find(l => l.includes('グロース')) || '';
-
-  const nikkeiPct = (nikkei.match(/([\+\-][\d\.]+)%/) || ['',''])[1];
-  const dollarVal = (dollar.match(/([\d\.]+)/) || ['',''])[1];
-  const growthUp = growth.includes('+');
-
-  return `【本日の市場データ】
-${MARKET_DATA}
-
-上記を踏まえてデイトレード戦略を分析してください。
-
-■ 為替・金利の影響分析
-・ドル円${dollarVal}円という水準は輸出株・輸入株にどう影響するか
-・今日特に為替感応度が高い銘柄セクターは？
-
-■ グロース株の動き
-・グロース250が${growthUp ? '上昇' : '下落'}している中で、今日狙えるグロース銘柄は？
-・値動きが軽く出来高が増えそうな小型株（500〜600円前後）を具体的に
-
-■ 今日の値動きパターン予測
-・寄り付き直後（9:00〜9:30）に動きそうな銘柄
-・前場（10:00〜11:30）に狙い目になる銘柄
-・後場（12:30〜15:00）まで持ち越し不要な銘柄
-
-■ デイトレで使えるチャートパターン
-・今日の市場環境ではどんなエントリーパターンが有効か
-・避けるべきトレードパターン
-
-■ リスク管理アドバイス
-・今日の市場で特に注意すべきリスクイベント（経済指標発表時間など）
-・損切りを迷わず実行するための判断基準
-
-■ 今日の一言戦略
-・初心者が今日取るべき行動を1〜2行で
-
-具体的な銘柄コードと価格帯で回答してください。`;
-}
-
-function copyHint(hintId, toastId) {
-  const text = hintId === 'gemini-hint' ? buildGeminiPrompt() :
-               hintId === 'chatgpt-hint' ? buildChatGPTPrompt() :
-               document.getElementById(hintId).innerText;
-
-  // ヒント欄も更新して表示
-  document.getElementById(hintId).innerText = text;
-
-  navigator.clipboard.writeText(text).catch(() => {
-    const el = document.createElement('textarea');
-    el.value = text;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-  });
-  const t = document.getElementById(toastId);
-  t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 2500);
-}
 </script>
-
 </body>
 </html>

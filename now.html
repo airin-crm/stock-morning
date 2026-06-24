@@ -7,190 +7,276 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;background:#0d1117;color:#e6edf3;padding:14px;max-width:680px;margin:0 auto}
-    .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+    .top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
     h1{font-size:1.1rem}
-    .time{font-size:0.72rem;color:#8b949e}
-    .back-btn{display:inline-block;background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:5px 12px;border-radius:8px;font-size:0.78rem;text-decoration:none;margin-bottom:12px}
-    .market-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px}
-    .m-card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:10px}
-    .m-name{font-size:0.68rem;color:#8b949e;margin-bottom:2px}
-    .m-price{font-size:0.95rem;font-weight:bold}
-    .m-change{font-size:0.78rem;margin-top:1px}
+    .fetch-time{font-size:0.72rem;color:#8b949e}
+    .back-btn{display:inline-block;background:#21262d;border:1px solid #30363d;color:#e6edf3;padding:5px 12px;border-radius:8px;font-size:0.78rem;text-decoration:none;margin-bottom:10px}
+    /* 時間帯バナー */
+    .time-banner{border-radius:10px;padding:11px 14px;margin-bottom:12px;font-size:0.88rem;font-weight:bold;text-align:center}
+    .time-ok{background:#0d1f12;border:1px solid #238636;color:#3fb950}
+    .time-watch{background:#1a1500;border:1px solid #5a4500;color:#f0a500}
+    .time-danger{background:#1f0d0d;border:1px solid #6e1a1a;color:#f85149}
+    /* 指数 */
+    .market-row{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:12px}
+    .m-card{background:#161b22;border:1px solid #30363d;border-radius:9px;padding:9px 8px;text-align:center}
+    .m-name{font-size:0.65rem;color:#8b949e;margin-bottom:2px}
+    .m-price{font-size:0.88rem;font-weight:bold}
+    .m-change{font-size:0.75rem;margin-top:1px}
     .up{color:#3fb950}.down{color:#f85149}
+    /* アラート */
+    .alert-card{border-radius:10px;padding:11px 13px;margin-bottom:10px;border:1px solid}
+    .alert-card.danger{background:#1f0d0d;border-color:#6e1a1a}
+    .alert-card.warning{background:#1a1500;border-color:#5a4500}
+    .alert-card.safe{background:#0d1f12;border-color:#238636}
+    .alert-title{font-size:0.82rem;font-weight:bold;margin-bottom:6px}
+    .alert-card.danger .alert-title{color:#f85149}
+    .alert-card.warning .alert-title{color:#f0a500}
+    .alert-card.safe .alert-title{color:#3fb950}
+    .alert-item{font-size:0.78rem;padding:3px 0;line-height:1.5}
+    .earn-today{color:#f85149}.earn-soon{color:#f0a500}
+    .econ-today{color:#e6edf3}
+    /* テーブル */
     .card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:13px;margin-bottom:12px}
-    .card-title{font-size:0.9rem;font-weight:bold;margin-bottom:10px}
-    table{width:100%;border-collapse:collapse;font-size:0.75rem}
-    th{color:#8b949e;font-size:0.66rem;padding:3px 4px;border-bottom:1px solid #21262d;text-align:left;white-space:nowrap}
-    td{padding:6px 4px;border-bottom:1px solid #21262d;vertical-align:middle}
-    .s-name{font-weight:bold;font-size:0.78rem}
-    .code{font-size:0.62rem;color:#8b949e}
+    .card-title{font-size:0.88rem;font-weight:bold;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+    .badge{font-size:0.65rem;background:#21262d;color:#8b949e;padding:2px 7px;border-radius:10px}
+    table{width:100%;border-collapse:collapse;font-size:0.73rem}
+    th{color:#8b949e;font-size:0.65rem;padding:3px 3px;border-bottom:1px solid #21262d;text-align:left;white-space:nowrap}
+    td{padding:5px 3px;border-bottom:1px solid #21262d;vertical-align:middle}
+    .s-name{font-weight:bold;font-size:0.75rem}
+    .code{font-size:0.6rem;color:#8b949e}
     .price{font-weight:bold}
     .vol-hot{color:#f0a500;font-weight:bold}
     .rsi-hot{color:#f85149;font-weight:bold}
     .rsi-cold{color:#58a6ff;font-weight:bold}
+    .legend{font-size:0.6rem;color:#8b949e;margin-top:6px;line-height:1.7}
+    /* ニュース */
     .news-item{display:flex;align-items:flex-start;gap:7px;padding:7px 0;border-bottom:1px solid #21262d;text-decoration:none;color:inherit}
     .news-item:last-child{border-bottom:none}
     .ns{flex-shrink:0;font-size:0.6rem;color:#fff;padding:2px 5px;border-radius:4px;margin-top:2px;white-space:nowrap}
     .nt{font-size:0.8rem;line-height:1.4}
-    .btn{display:block;width:100%;padding:14px;border-radius:10px;border:none;font-size:0.95rem;font-weight:bold;cursor:pointer;margin-bottom:10px}
+    /* ボタン */
+    .btn{display:block;width:100%;padding:14px;border-radius:10px;border:none;font-size:0.93rem;font-weight:bold;cursor:pointer;margin-bottom:10px}
     .btn-gen{background:linear-gradient(135deg,#238636,#1a6128);color:#fff}
-    .btn-claude{background:linear-gradient(135deg,#1f6feb,#1158c7);color:#fff;text-decoration:none;text-align:center;display:block;padding:14px;border-radius:10px;font-size:0.95rem;font-weight:bold}
+    .btn-claude{background:linear-gradient(135deg,#1f6feb,#1158c7);color:#fff;text-decoration:none;text-align:center;display:block;padding:14px;border-radius:10px;font-size:0.93rem;font-weight:bold}
     .toast{display:none;background:#238636;color:#fff;padding:10px;border-radius:8px;text-align:center;font-size:0.85rem;margin-bottom:10px}
-    .legend{font-size:0.62rem;color:#8b949e;margin-top:6px;line-height:1.6}
-    .highlight{background:#1c2a1c;border:1px solid #3fb950;border-radius:8px;padding:10px;margin-bottom:12px;font-size:0.82rem;line-height:1.6}
-    .highlight-title{color:#3fb950;font-weight:bold;margin-bottom:4px;font-size:0.85rem}
   </style>
 </head>
 <body>
-
 <div class="top-bar">
   <h1>⚡ 今すぐチェック</h1>
-  <span class="time">更新: 16:25:05</span>
+  <span class="fetch-time">更新: 16:33:48</span>
 </div>
 <a href="index.html" class="back-btn">← 朝の分析に戻る</a>
 
+<!-- 時間帯バナー -->
+<div class="time-banner time-danger">🏁 取引終了(15:00) → 今日の振り返りをしましょう</div>
+
+<!-- 指数 -->
 <div class="market-row"><div class="m-card">
           <div class="m-name">日経平均</div>
           <div class="m-price">69,174.97</div>
           <div class="m-change down">▼-0.88%</div>
         </div><div class="m-card">
-          <div class="m-name">ドル円</div>
-          <div class="m-price">161.71</div>
-          <div class="m-change up">▲+0.08%</div>
-        </div><div class="m-card">
           <div class="m-name">グロース250</div>
           <div class="m-price">551.70</div>
           <div class="m-change up">▲+0.04%</div>
+        </div><div class="m-card">
+          <div class="m-name">ドル円</div>
+          <div class="m-price">161.69</div>
+          <div class="m-change up">▲+0.07%</div>
+        </div><div class="m-card">
+          <div class="m-name">ダウ先物</div>
+          <div class="m-price">52,029.00</div>
+          <div class="m-change down">▼-0.10%</div>
         </div></div>
 
+<!-- アラート -->
+<div class="alert-card safe"><div class="alert-title">✅ 本日は重大アラートなし</div></div>
+
+<!-- 銘柄テーブル -->
 <div class="card">
-  <div class="card-title">📊 監視銘柄リアルタイム</div>
+  <div class="card-title">📊 銘柄リアルタイム<span class="badge">VWAP・出来高・RSI・モメンタム</span></div>
   <table>
-    <tr><th>銘柄</th><th>現値</th><th>前日比</th><th>始値比</th><th>VWAP</th><th>出来高%</th><th>RSI</th><th>方向</th></tr>
+    <tr><th>銘柄</th><th>現値</th><th>前日比</th><th>VWAP</th><th>出来高%</th><th>RSI</th><th>方向</th><th>レンジ</th></tr>
     <tr>
-          <td class="s-name">グロース250ETF<br><span class="code">2516</span></td>
-          <td class="price">550円</td>
+          <td class="s-name">原油ETF<br><span class="code">1699</span></td>
+          <td class="price">559円</td>
           <td class="down">-0.2%</td>
-          <td class="down">-0.2%</td>
-          <td class="down">553.6</td>
-          <td class="vol-hot">115%</td>
+          <td class="up">559.2</td>
+          <td class="vol-hot">861%</td>
           <td class="">-</td>
           <td class="down">↓下落中</td>
+          <td class="rsi-hot" style="font-size:0.65rem">前日安値割れ⚠️</td>
         </tr><tr>
-          <td class="s-name">SHIFT<br><span class="code">3697</span></td>
-          <td class="price">616円</td>
-          <td class="up">+0.9%</td>
-          <td class="down">-0.4%</td>
-          <td class="down">623.3</td>
-          <td class="vol-hot">102%</td>
+          <td class="s-name">農産物ETF<br><span class="code">1687</span></td>
+          <td class="price">960円</td>
+          <td class="down">-2.3%</td>
+          <td class="down">966.3</td>
+          <td class="vol-hot">330%</td>
           <td class="">-</td>
           <td class="down">↓下落中</td>
+          <td class="rsi-hot" style="font-size:0.65rem">前日安値割れ⚠️</td>
+        </tr><tr>
+          <td class="s-name">オルトプラス<br><span class="code">3672</span></td>
+          <td class="price">27円</td>
+          <td class="up">+8.0%</td>
+          <td class="up">26.4</td>
+          <td class="">18%</td>
+          <td class="">-</td>
+          <td class="up">↑上昇中</td>
+          <td class="" style="font-size:0.65rem">前日レンジ内</td>
+        </tr><tr>
+          <td class="s-name">メディネット<br><span class="code">2370</span></td>
+          <td class="price">25円</td>
+          <td class="up">+4.2%</td>
+          <td class="up">24.5</td>
+          <td class="">15%</td>
+          <td class="">-</td>
+          <td class="up">↑上昇中</td>
+          <td class="" style="font-size:0.65rem">前日レンジ内</td>
+        </tr><tr>
+          <td class="s-name">東京エレクトロン<br><span class="code">8035</span></td>
+          <td class="price">70410円</td>
+          <td class="down">-3.5%</td>
+          <td class="down">70578.5</td>
+          <td class="vol-hot">89%</td>
+          <td class="">-</td>
+          <td class="down">↓下落中</td>
+          <td class="rsi-hot" style="font-size:0.65rem">前日安値割れ⚠️</td>
+        </tr><tr>
+          <td class="s-name">レーザーテック<br><span class="code">6920</span></td>
+          <td class="price">50880円</td>
+          <td class="down">-2.2%</td>
+          <td class="down">51283.5</td>
+          <td class="vol-hot">82%</td>
+          <td class="">-</td>
+          <td class="down">↓下落中</td>
+          <td class="rsi-hot" style="font-size:0.65rem">前日安値割れ⚠️</td>
+        </tr><tr>
+          <td class="s-name">日経インバースETF<br><span class="code">1571</span></td>
+          <td class="price">287円</td>
+          <td class="up">+0.7%</td>
+          <td class="up">286.4</td>
+          <td class="vol-hot">113%</td>
+          <td class="">-</td>
+          <td class="down">↓下落中</td>
+          <td class="vol-hot" style="font-size:0.65rem">前日高値突破🔥</td>
         </tr><tr>
           <td class="s-name">日経レバETF<br><span class="code">1570</span></td>
           <td class="price">77750円</td>
           <td class="down">-1.8%</td>
-          <td class="down">-0.4%</td>
           <td class="down">78031.4</td>
           <td class="vol-hot">89%</td>
           <td class="">-</td>
           <td class="up">↑上昇中</td>
-        </tr><tr>
-          <td class="s-name">イー・ガーディアン<br><span class="code">6050</span></td>
-          <td class="price">1660円</td>
-          <td class="up">+0.1%</td>
-          <td class="up">+0.1%</td>
-          <td class="up">1656.7</td>
-          <td class="vol-hot">98%</td>
-          <td class="">-</td>
-          <td class="down">↓下落中</td>
+          <td class="rsi-hot" style="font-size:0.65rem">前日安値割れ⚠️</td>
         </tr><tr>
           <td class="s-name">インソース<br><span class="code">6200</span></td>
           <td class="price">572円</td>
-          <td class="down">-1.0%</td>
           <td class="down">-1.0%</td>
           <td class="down">578.9</td>
           <td class="vol-hot">88%</td>
           <td class="">-</td>
           <td class="down">↓下落中</td>
+          <td class="rsi-hot" style="font-size:0.65rem">前日安値割れ⚠️</td>
         </tr><tr>
-          <td class="s-name">オルトプラス<br><span class="code">3672</span></td>
-          <td class="price">27円</td>
-          <td class="up">+8.0%</td>
-          <td class="up">+3.8%</td>
-          <td class="up">26.4</td>
-          <td class="">18%</td>
+          <td class="s-name">SHIFT<br><span class="code">3697</span></td>
+          <td class="price">616円</td>
+          <td class="up">+0.9%</td>
+          <td class="down">623.3</td>
+          <td class="vol-hot">102%</td>
+          <td class="">-</td>
+          <td class="down">↓下落中</td>
+          <td class="" style="font-size:0.65rem">前日レンジ内</td>
+        </tr><tr>
+          <td class="s-name">グロース250ETF<br><span class="code">2516</span></td>
+          <td class="price">550円</td>
+          <td class="down">-0.2%</td>
+          <td class="down">553.6</td>
+          <td class="vol-hot">115%</td>
+          <td class="">-</td>
+          <td class="down">↓下落中</td>
+          <td class="rsi-hot" style="font-size:0.65rem">前日安値割れ⚠️</td>
+        </tr><tr>
+          <td class="s-name">純金信託<br><span class="code">1540</span></td>
+          <td class="price">19710円</td>
+          <td class="down">-1.3%</td>
+          <td class="up">19691.5</td>
+          <td class="vol-hot">80%</td>
           <td class="">-</td>
           <td class="up">↑上昇中</td>
+          <td class="rsi-hot" style="font-size:0.65rem">前日安値割れ⚠️</td>
         </tr><tr>
-          <td class="s-name">三菱UFJ<br><span class="code">8306</span></td>
-          <td class="price">3218円</td>
-          <td class="down">-1.5%</td>
-          <td class="down">-1.2%</td>
-          <td class="down">3229.4</td>
-          <td class="">60%</td>
+          <td class="s-name">イー・ガーディアン<br><span class="code">6050</span></td>
+          <td class="price">1660円</td>
+          <td class="up">+0.1%</td>
+          <td class="up">1656.7</td>
+          <td class="vol-hot">98%</td>
           <td class="">-</td>
-          <td class="up">↑上昇中</td>
+          <td class="down">↓下落中</td>
+          <td class="" style="font-size:0.65rem">前日レンジ内</td>
         </tr><tr>
           <td class="s-name">ガンホー<br><span class="code">3765</span></td>
           <td class="price">2155円</td>
           <td class="down">-1.3%</td>
-          <td class="down">-1.7%</td>
           <td class="down">2168.5</td>
           <td class="">57%</td>
           <td class="">-</td>
           <td class="down">↓下落中</td>
+          <td class="rsi-hot" style="font-size:0.65rem">前日安値割れ⚠️</td>
         </tr><tr>
-          <td class="s-name">エムスリー<br><span class="code">2413</span></td>
-          <td class="price">1708円</td>
-          <td class="down">-0.1%</td>
-          <td class="down">-0.1%</td>
-          <td class="down">1712.7</td>
-          <td class="">57%</td>
+          <td class="s-name">三菱UFJ<br><span class="code">8306</span></td>
+          <td class="price">3218円</td>
+          <td class="down">-1.5%</td>
+          <td class="down">3229.4</td>
+          <td class="">60%</td>
           <td class="">-</td>
-          <td class="down">↓下落中</td>
+          <td class="up">↑上昇中</td>
+          <td class="rsi-hot" style="font-size:0.65rem">前日安値割れ⚠️</td>
+        </tr><tr>
+          <td class="s-name">フリー<br><span class="code">4478</span></td>
+          <td class="price">1912円</td>
+          <td class="up">+2.6%</td>
+          <td class="up">1910.2</td>
+          <td class="">30%</td>
+          <td class="">-</td>
+          <td class="up">↑上昇中</td>
+          <td class="" style="font-size:0.65rem">前日レンジ内</td>
         </tr><tr>
           <td class="s-name">そーせいG<br><span class="code">4565</span></td>
           <td class="price">967円</td>
-          <td class="down">-0.4%</td>
           <td class="down">-0.4%</td>
           <td class="down">977.5</td>
           <td class="">54%</td>
           <td class="">-</td>
           <td class="down">↓下落中</td>
+          <td class="" style="font-size:0.65rem">前日レンジ内</td>
         </tr><tr>
-          <td class="s-name">メディネット<br><span class="code">2370</span></td>
-          <td class="price">25円</td>
-          <td class="up">+4.2%</td>
-          <td class="up">+0.0%</td>
-          <td class="up">24.5</td>
-          <td class="">15%</td>
+          <td class="s-name">エムスリー<br><span class="code">2413</span></td>
+          <td class="price">1708円</td>
+          <td class="down">-0.1%</td>
+          <td class="down">1712.8</td>
+          <td class="">57%</td>
           <td class="">-</td>
-          <td class="up">↑上昇中</td>
-        </tr><tr>
-          <td class="s-name">フリー<br><span class="code">4478</span></td>
-          <td class="price">1912円</td>
-          <td class="up">+2.6%</td>
-          <td class="up">+0.6%</td>
-          <td class="up">1910.2</td>
-          <td class="">30%</td>
-          <td class="">-</td>
-          <td class="up">↑上昇中</td>
+          <td class="down">↓下落中</td>
+          <td class="" style="font-size:0.65rem">前日レンジ内</td>
         </tr><tr>
           <td class="s-name">ソフトバンク<br><span class="code">9434</span></td>
           <td class="price">206円</td>
           <td class="up">+0.0%</td>
-          <td class="down">-0.3%</td>
           <td class="down">205.9</td>
           <td class="">38%</td>
           <td class="">-</td>
           <td class="down">↓下落中</td>
+          <td class="" style="font-size:0.65rem">前日レンジ内</td>
         </tr>
   </table>
   <div class="legend">
-    出来高%: 前日出来高に対する本日のペース（80%超=勢いあり）｜ VWAP上=機関買い優勢
+    出来高%: 前日出来高に対する本日のペース（80%超=勢いあり）｜ VWAP上=機関買い優勢 ｜ 前日高値突破=ブレイクアウト
   </div>
 </div>
 
+<!-- ニュース -->
 <div class="card">
   <div class="card-title">📰 直近ニュース</div>
   <a href="http://www3.nhk.or.jp/news/html/20260624/k10015158241000.html" target="_blank" class="news-item">
@@ -205,15 +291,15 @@
         </a><a href="http://www3.nhk.or.jp/news/html/20260623/k10015157371000.html" target="_blank" class="news-item">
           <span class="ns" style="background:#c0392b">NHK経済</span>
           <span class="nt">円相場 1ドル＝161円台で神経質な取引 介入への警戒続く</span>
+        </a><a href="http://www3.nhk.or.jp/news/html/20260623/k10015156891000.html" target="_blank" class="news-item">
+          <span class="ns" style="background:#c0392b">NHK経済</span>
+          <span class="nt">東京23区中古マンション 平均1億2800万円余 賃貸の家賃も上昇</span>
         </a><a href="https://news.yahoo.co.jp/pickup/6585420?source=rss" target="_blank" class="news-item">
           <span class="ns" style="background:#6200ea">Yahoo!株式</span>
           <span class="nt">クールジャパン機構 累損540億円</span>
         </a><a href="https://news.yahoo.co.jp/pickup/6585464?source=rss" target="_blank" class="news-item">
           <span class="ns" style="background:#6200ea">Yahoo!株式</span>
           <span class="nt">任天堂の株価低迷 業界が暗い時代</span>
-        </a><a href="https://news.yahoo.co.jp/pickup/6585357?source=rss" target="_blank" class="news-item">
-          <span class="ns" style="background:#6200ea">Yahoo!株式</span>
-          <span class="nt">YKKが「買いたたき」 公取委勧告</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1581529" target="_blank" class="news-item">
           <span class="ns" style="background:#ff6b35">Investing.com</span>
           <span class="nt">欧州株式、世界的なテック株急落とFRBへの警戒感で伸び悩む</span>
@@ -226,45 +312,79 @@
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1581502" target="_blank" class="news-item">
           <span class="ns" style="background:#ff6b35">Investing.com</span>
           <span class="nt">ミライアル株式会社：2027年1月期第1四半期決算説明会文字起こし（6）</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1581501" target="_blank" class="news-item">
+          <span class="ns" style="background:#ff6b35">Investing.com</span>
+          <span class="nt">キャセイパシフィック株が3%上昇、旅客数増加と燃油サーチャージ引き下げが追い風</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1580093" target="_blank" class="news-item">
+          <span class="ns" style="background:#e67e22">Investing.com経済</span>
+          <span class="nt">株式市場の急落を解説：なぜ投資家は突然不安を抱いているのか</span>
+        </a><a href="https://jp.investing.com/news/forex-news/article-1581456" target="_blank" class="news-item">
+          <span class="ns" style="background:#e67e22">Investing.com経済</span>
+          <span class="nt">日経平均VIは大幅に上昇、米マイクロン決算も警戒</span>
+        </a><a href="https://jp.investing.com/news/forex-news/article-1581467" target="_blank" class="news-item">
+          <span class="ns" style="background:#e67e22">Investing.com経済</span>
+          <span class="nt">日経平均は191円安、米マイクロン決算などに関心</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1580114" target="_blank" class="news-item">
+          <span class="ns" style="background:#e67e22">Investing.com経済</span>
+          <span class="nt">マイクロンテクノロジー株が本日急落している理由とは</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1580476" target="_blank" class="news-item">
+          <span class="ns" style="background:#e67e22">Investing.com経済</span>
+          <span class="nt">韓国レバレッジETF危機が世界的な半導体株売りを誘発</span>
         </a>
 </div>
 
+<!-- Claude相談 -->
 <div class="card">
-  <div class="card-title">⚡ 今からClaudeに相談する</div>
-  <button class="btn btn-gen" onclick="genPrompt()">✨ 今すぐ分析プロンプトを生成</button>
+  <div class="card-title">⚡ 今からClaudeに相談</div>
+  <button class="btn btn-gen" onclick="genPrompt()">✨ 今すぐ分析プロンプトを生成・コピー</button>
   <div class="toast" id="toast">✅ コピーしました！Claude.aiに貼り付けてください</div>
   <a href="https://claude.ai/project/019eee77-ec0f-76d0-9445-b731633c66ca" target="_blank" id="claude-link" style="display:none">
-    <span class="btn-claude">🤖 Claude.aiを開く →</span>
+    <span class="btn-claude">🤖 Claude.aiプロジェクトを開く →</span>
   </a>
 </div>
 
 <script>
-const NOW_DATA = `【現在時刻】2026年06月24日 16:25
+const NOW_DATA = `【現在時刻】2026年06月24日 16:33
 
 【現在の主要指数】
 ・日経平均: 69,174.97 (-0.88%)
-・ドル円: 161.71 (+0.08%)
 ・グロース250: 551.70 (+0.04%)
+・ドル円: 161.69 (+0.07%)
+・ダウ先物: 52,029.00 (-0.10%)
 
-【現在の監視銘柄リアルタイムデータ】
-・2516 グロース250ETF: 550円 前日比-0.2% 始値比-0.2% VWAP:553.6(VWAP下（弱い）) 出来高ペース:115% ↓下落中 
-・3697 SHIFT: 616円 前日比+0.9% 始値比-0.4% VWAP:623.3(VWAP下（弱い）) 出来高ペース:102% ↓下落中 
-・1570 日経レバETF: 77750円 前日比-1.8% 始値比-0.4% VWAP:78031.4(VWAP下（弱い）) 出来高ペース:89% ↑上昇中 
-・6050 イー・ガーディアン: 1660円 前日比+0.1% 始値比+0.1% VWAP:1656.7(VWAP上（強い）) 出来高ペース:98% ↓下落中 
-・6200 インソース: 572円 前日比-1.0% 始値比-1.0% VWAP:578.9(VWAP下（弱い）) 出来高ペース:88% ↓下落中 
-・3672 オルトプラス: 27円 前日比+8.0% 始値比+3.8% VWAP:26.4(VWAP上（強い）) 出来高ペース:18% ↑上昇中 
-・8306 三菱UFJ: 3218円 前日比-1.5% 始値比-1.2% VWAP:3229.4(VWAP下（弱い）) 出来高ペース:60% ↑上昇中 
-・3765 ガンホー: 2155円 前日比-1.3% 始値比-1.7% VWAP:2168.5(VWAP下（弱い）) 出来高ペース:57% ↓下落中 
-・2413 エムスリー: 1708円 前日比-0.1% 始値比-0.1% VWAP:1712.7(VWAP下（弱い）) 出来高ペース:57% ↓下落中 
-・4565 そーせいG: 967円 前日比-0.4% 始値比-0.4% VWAP:977.5(VWAP下（弱い）) 出来高ペース:54% ↓下落中 
-・2370 メディネット: 25円 前日比+4.2% 始値比+0.0% VWAP:24.5(VWAP上（強い）) 出来高ペース:15% ↑上昇中 
-・4478 フリー: 1912円 前日比+2.6% 始値比+0.6% VWAP:1910.2(VWAP上（強い）) 出来高ペース:30% ↑上昇中 
-・9434 ソフトバンク: 206円 前日比+0.0% 始値比-0.3% VWAP:205.9(VWAP下（弱い）) 出来高ペース:38% ↓下落中 `;
-const NOW_TIME = "2026年06月24日 16:25";
+【現在の銘柄データ（リアルタイム）】
+・1699 原油ETF: 559円 前日比-0.2% VWAP:559.2(VWAP上(強)) 出来高ペース:861% ↓下落中(0.3%) 前日安値割れ⚠️  RSI短期:49.1
+・1687 農産物ETF: 960円 前日比-2.3% VWAP:966.3(VWAP下(弱)) 出来高ペース:330% ↓下落中(0.0%) 前日安値割れ⚠️  RSI短期:47.6
+・3672 オルトプラス: 27円 前日比+8.0% VWAP:26.4(VWAP上(強)) 出来高ペース:18% ↑上昇中(3.9%) 前日レンジ内  RSI短期:61.1
+・2370 メディネット: 25円 前日比+4.2% VWAP:24.5(VWAP上(強)) 出来高ペース:15% ↑上昇中(4.2%) 前日レンジ内  RSI短期:58.4
+・8035 東京エレクトロン: 70410円 前日比-3.5% VWAP:70578.5(VWAP下(弱)) 出来高ペース:89% ↓下落中(0.1%) 前日安値割れ⚠️  RSI短期:49.9
+・6920 レーザーテック: 50880円 前日比-2.2% VWAP:51283.5(VWAP下(弱)) 出来高ペース:82% ↓下落中(0.2%) 前日安値割れ⚠️  RSI短期:38.2
+・1571 日経インバースETF: 287円 前日比+0.7% VWAP:286.4(VWAP上(強)) 出来高ペース:113% ↓下落中(0.0%) 前日高値突破🔥  RSI短期:51.9
+・1570 日経レバETF: 77750円 前日比-1.8% VWAP:78031.4(VWAP下(弱)) 出来高ペース:89% ↑上昇中(0.0%) 前日安値割れ⚠️  RSI短期:43.6
+・6200 インソース: 572円 前日比-1.0% VWAP:578.9(VWAP下(弱)) 出来高ペース:88% ↓下落中(0.5%) 前日安値割れ⚠️  RSI短期:13.0
+・3697 SHIFT: 616円 前日比+0.9% VWAP:623.3(VWAP下(弱)) 出来高ペース:102% ↓下落中(0.1%) 前日レンジ内  RSI短期:35.0
+・2516 グロース250ETF: 550円 前日比-0.2% VWAP:553.6(VWAP下(弱)) 出来高ペース:115% ↓下落中(0.0%) 前日安値割れ⚠️  RSI短期:37.6
+・1540 純金信託: 19710円 前日比-1.3% VWAP:19691.5(VWAP上(強)) 出来高ペース:80% ↑上昇中(0.4%) 前日安値割れ⚠️  RSI短期:65.4
+・6050 イー・ガーディアン: 1660円 前日比+0.1% VWAP:1656.7(VWAP上(強)) 出来高ペース:98% ↓下落中(0.2%) 前日レンジ内  RSI短期:52.0
+・3765 ガンホー: 2155円 前日比-1.3% VWAP:2168.5(VWAP下(弱)) 出来高ペース:57% ↓下落中(0.4%) 前日安値割れ⚠️  RSI短期:22.3
+・8306 三菱UFJ: 3218円 前日比-1.5% VWAP:3229.4(VWAP下(弱)) 出来高ペース:60% ↑上昇中(0.1%) 前日安値割れ⚠️  RSI短期:56.7
+・4478 フリー: 1912円 前日比+2.6% VWAP:1910.2(VWAP上(強)) 出来高ペース:30% ↑上昇中(0.1%) 前日レンジ内  RSI短期:51.9
+・4565 そーせいG: 967円 前日比-0.4% VWAP:977.5(VWAP下(弱)) 出来高ペース:54% ↓下落中(0.2%) 前日レンジ内  RSI短期:29.4
+・2413 エムスリー: 1708円 前日比-0.1% VWAP:1712.8(VWAP下(弱)) 出来高ペース:57% ↓下落中(0.1%) 前日レンジ内  RSI短期:29.4
+・9434 ソフトバンク: 206円 前日比+0.0% VWAP:205.9(VWAP下(弱)) 出来高ペース:38% ↓下落中(0.1%) 前日レンジ内  RSI短期:24.4`;
+const NOW_TIME = "2026年06月24日 16:33";
+const HOUR = 16;
+const MIN = 34;
 
 function genPrompt() {
+  const totalMin = HOUR * 60 + MIN;
+  let timeAdvice = '';
+  if (totalMin < 9*60+20) timeAdvice = '※現在9:20前のため、エントリーは禁止です。まず様子見してください。';
+  else if (totalMin >= 14*60+30) timeAdvice = '※引け30分前。新規エントリーは避け、保有中のものを整理することを優先してください。';
+  else if (totalMin >= 15*60) timeAdvice = '※取引終了時間です。今日の振り返りをしましょう。';
+
   const prompt = `あなたは日本株専門のプロトレーダーです。
-現在${NOW_TIME}の時点のデータです。今から買うとしたらどうすべきか教えてください。
+現在${NOW_TIME}のリアルタイムデータです。今から買うとしたらどうすべきか教えてください。
 
 ${NOW_DATA}
 
@@ -272,24 +392,37 @@ ${NOW_DATA}
 【今すぐの判断依頼】
 ━━━━━━━━━━━━━━
 
-■ 1. 現時点の市場の勢い（強い/弱い/迷っている）
+■ 1. 現時点の市場のトレンド
+・強い/弱い/迷っている を1行で
+・VWAP上の銘柄が多いか少ないか
 
-■ 2. 今から買えそうな銘柄（1〜3つに絞る）
+■ 2. 今から狙える銘柄（1〜2つに厳選）
 各銘柄：
 ・銘柄名・コード・現在値
-・今すぐ買うべき根拠（VWAP・出来高・モメンタムの観点）
+・今すぐ買う根拠（VWAP・出来高・モメンタム・前日高値突破など）
 ・エントリー価格（今すぐ成行 or 〇〇円で指値）
 ・利確目標（第1: 〇〇円、第2: 〇〇円）
 ・損切りライン（〇〇円割れで即撤退）
-・残り取引時間を考慮したリスク
+・期待リスクリワード比
+・信頼度 ★〜★★★★★
 
-■ 3. 今日残りの時間帯の注意点
-・${NOW_TIME}から引けまでに気をつけること
-・引けに向けて強くなる/弱くなる傾向
+■ 3. 今の時間帯で気をつけること
+・${NOW_TIME}から引けまでの注意点
+・今日の残り時間を考えたリスク管理
 
-■ 4. 今から手を出さない方がいい理由があるなら正直に
+■ 4. 「触らない方がいい」理由があれば正直に
 
-前提：資金5〜6万円・初心者・損切り苦手・欲張らない`;
+${timeAdvice}
+
+━━━━━━━━━━━━━━
+私のルール：
+・資金: 10万円
+・エントリー: 9:20以降のみ
+・1回の最大損失: 2,000〜3,000円で損切り
+・1日の最大損失: 5,000円で終了・今日は撤退
+・目標: 1日1,000〜3,000円（欲張らない）
+・弱点: 含み損で損切りできなくなりやすい
+━━━━━━━━━━━━━━`;
 
   navigator.clipboard.writeText(prompt).then(() => {
     document.getElementById('toast').style.display = 'block';
@@ -298,10 +431,8 @@ ${NOW_DATA}
   }).catch(() => {
     const el = document.createElement('textarea');
     el.value = prompt;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
+    document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
     document.getElementById('toast').style.display = 'block';
     document.getElementById('claude-link').style.display = 'block';
     setTimeout(() => document.getElementById('toast').style.display = 'none', 3000);

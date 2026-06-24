@@ -57,35 +57,78 @@
     .divider{border:none;border-top:1px solid #21262d;margin:14px 0}
     .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
     .legend-item{font-size:0.65rem;color:#8b949e}
+    /* ナビ */
+    .nav{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
+    .nav-btn{display:block;padding:10px 4px;border-radius:10px;border:none;background:#21262d;color:#e6edf3;font-size:0.78rem;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none;transition:background .15s}
+    .nav-btn.active{background:#1f6feb;color:#fff}
+    .nav-btn:active{opacity:.7}
+    /* タブコンテンツ */
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+    /* ウォッチリスト */
+    .watch-form{display:flex;gap:8px;margin-bottom:10px}
+    .watch-input{flex:1;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;padding:9px;font-size:0.85rem}
+    .watch-input:focus{outline:none;border-color:#58a6ff}
+    .watch-add-btn{padding:9px 14px;background:#238636;color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.85rem}
+    .watch-list{list-style:none}
+    .watch-item{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #21262d;font-size:0.85rem}
+    .watch-del{background:none;border:none;color:#f85149;cursor:pointer;font-size:1rem;padding:2px 6px}
+    .watch-memo{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;padding:9px;font-size:0.82rem;resize:vertical;min-height:70px;font-family:inherit;margin-top:6px}
+    .watch-memo:focus{outline:none;border-color:#58a6ff}
+    /* 振り返り */
+    .reflection-card{background:#1a1f2e;border:1px solid #1f6feb33;border-radius:12px;padding:13px;margin-bottom:12px}
+    .reflection-title{font-size:0.88rem;font-weight:bold;color:#58a6ff;margin-bottom:8px}
+    .refl-label{font-size:0.75rem;color:#8b949e;margin:8px 0 4px}
+    .refl-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .refl-input{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;padding:8px;font-size:0.82rem;font-family:inherit}
+    .refl-input:focus{outline:none;border-color:#58a6ff}
+    .refl-textarea{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;padding:9px;font-size:0.82rem;resize:vertical;min-height:60px;font-family:inherit}
+    .refl-textarea:focus{outline:none;border-color:#58a6ff}
+    .refl-save-btn{display:block;width:100%;padding:10px;background:#1f6feb;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:bold;cursor:pointer;margin-top:10px}
+    .refl-history{margin-top:10px}
+    .refl-entry{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:10px;margin-bottom:8px;font-size:0.78rem;line-height:1.6}
+    .refl-date{font-size:0.7rem;color:#8b949e;margin-bottom:4px}
+    .refl-del{float:right;background:none;border:none;color:#8b949e;cursor:pointer;font-size:0.75rem}
+    .win{color:#3fb950}.loss{color:#f85149}.even{color:#8b949e}
   </style>
 </head>
 <body>
 
 <header>
   <h1>📈 株朝活 PRO</h1>
-  <span class="time">2026年06月24日 13:50</span>
+  <span class="time">2026年06月24日 14:10</span>
 </header>
+
+<!-- ナビゲーション -->
+<div class="nav">
+  <button class="nav-btn active" onclick="switchTab('morning', this)">🌅 朝の分析</button>
+  <button class="nav-btn" onclick="switchTab('watch', this)">⭐ ウォッチリスト</button>
+  <a href="now.html" class="nav-btn">⚡ 今すぐ</a>
+</div>
+
+<!-- 朝の分析タブ -->
+<div id="tab-morning" class="tab-content active">
 
 <div class="section-title">🇯🇵 日本市場</div>
 <div class="index-grid grid-2"><div class="index-card">
           <div class="index-name">日経平均</div>
-          <div class="index-price">68,763.98</div>
-          <div class="index-change down">▼ -1.47%</div>
+          <div class="index-price">69,070.06</div>
+          <div class="index-change down">▼ -1.03%</div>
           <div class="index-sub">高:70219 安:68461</div>
         </div><div class="index-card">
           <div class="index-name">TOPIX</div>
-          <div class="index-price">418.70</div>
-          <div class="index-change down">▼ -0.97%</div>
+          <div class="index-price">419.50</div>
+          <div class="index-change down">▼ -0.78%</div>
           <div class="index-sub">高:425 安:418</div>
         </div><div class="index-card">
           <div class="index-name">グロース250</div>
-          <div class="index-price">549.50</div>
-          <div class="index-change down">▼ -0.36%</div>
+          <div class="index-price">551.10</div>
+          <div class="index-change down">▼ -0.07%</div>
           <div class="index-sub">高:560 安:549</div>
         </div><div class="index-card">
           <div class="index-name">ドル円</div>
-          <div class="index-price">161.55</div>
-          <div class="index-change down">▼ -0.01%</div>
+          <div class="index-price">161.54</div>
+          <div class="index-change down">▼ -0.02%</div>
           <div class="index-sub">高:162 安:161</div>
         </div></div>
 
@@ -111,16 +154,16 @@
           <div class="index-change up">▲ +12.79%</div>
         </div><div class="index-card small">
           <div class="index-name">金(Gold)</div>
-          <div class="index-price">4082.00</div>
-          <div class="index-change down">▼ -1.16%</div>
+          <div class="index-price">4080.50</div>
+          <div class="index-change down">▼ -1.20%</div>
         </div><div class="index-card small">
           <div class="index-name">原油(WTI)</div>
-          <div class="index-price">72.70</div>
-          <div class="index-change down">▼ -0.70%</div>
+          <div class="index-price">72.77</div>
+          <div class="index-change down">▼ -0.60%</div>
         </div><div class="index-card small">
           <div class="index-name">米10年債利回</div>
-          <div class="index-price">4.49</div>
-          <div class="index-change up">▲ +0.94%</div>
+          <div class="index-price">4.45</div>
+          <div class="index-change down">▼ -0.27%</div>
         </div></div>
 
 <hr class="divider">
@@ -133,61 +176,53 @@
   <table>
     <tr><th>銘柄</th><th>現値</th><th>前日比</th><th>出来高比</th><th>RSI</th><th>25MA乖離</th><th>52週位置</th></tr>
     <tr>
-          <td><span class="stock-name">1570 日経レバETF</span><br><span class="candle-label">🔴陰線</span></td>
-          <td class="price">76700円</td>
-          <td class="down">▼-3.1%</td>
-          <td class="">0.9倍</td>
-          <td class="">55.9</td>
-          <td>+4.6%</td>
-          <td>78%</td>
-        </tr><tr>
           <td><span class="stock-name">8306 三菱UFJ</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
-          <td class="price">3203円</td>
-          <td class="down">▼-2.0%</td>
+          <td class="price">3209円</td>
+          <td class="down">▼-1.8%</td>
           <td class="">0.4倍</td>
-          <td class="">54.4</td>
-          <td>+1.5%</td>
-          <td>77%</td>
+          <td class="">54.8</td>
+          <td>+1.6%</td>
+          <td>78%</td>
         </tr><tr>
           <td><span class="stock-name">8316 三井住友FG</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
-          <td class="price">6341円</td>
-          <td class="down">▼-1.8%</td>
+          <td class="price">6345円</td>
+          <td class="down">▼-1.7%</td>
           <td class="">0.5倍</td>
-          <td class="">54.5</td>
-          <td>+2.1%</td>
+          <td class="">54.6</td>
+          <td>+2.2%</td>
           <td>78%</td>
         </tr><tr>
-          <td><span class="stock-name">6920 レーザーテック</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
-          <td class="price">50170円</td>
-          <td class="down">▼-3.5%</td>
-          <td class="">0.8倍</td>
-          <td class="">57.2</td>
-          <td>+13.0%</td>
-          <td>69%</td>
-        </tr><tr>
           <td><span class="stock-name">8035 東京エレクトロン</span><br><span class="candle-label">🔴陰線</span></td>
-          <td class="price">69100円</td>
-          <td class="down">▼-5.3%</td>
+          <td class="price">69520円</td>
+          <td class="down">▼-4.7%</td>
           <td class="">0.8倍</td>
-          <td class="">58.7</td>
-          <td>+11.7%</td>
-          <td>75%</td>
+          <td class="">59.4</td>
+          <td>+12.4%</td>
+          <td>76%</td>
         </tr><tr>
-          <td><span class="stock-name">9984 ソフトバンクG</span><br><span class="candle-label">🔴陰線</span></td>
-          <td class="price">6412円</td>
-          <td class="down">▼-1.6%</td>
-          <td class="">0.4倍</td>
-          <td class="">45.9</td>
-          <td>-10.3%</td>
-          <td>53%</td>
+          <td><span class="stock-name">2370 メディネット</span><br><span class="candle-label">🟢大陽線(強い買い)</span></td>
+          <td class="price">25円</td>
+          <td class="up">▲+4.2%</td>
+          <td class="">0.3倍</td>
+          <td class="">41.5</td>
+          <td>-5.6%</td>
+          <td>17%</td>
+        </tr><tr>
+          <td><span class="stock-name">1570 日経レバETF</span><br><span class="candle-label">🔴陰線</span></td>
+          <td class="price">77350円</td>
+          <td class="down">▼-2.3%</td>
+          <td class="">0.9倍</td>
+          <td class="">56.9</td>
+          <td>+5.5%</td>
+          <td>79%</td>
         </tr><tr>
           <td><span class="stock-name">3697 SHIFT</span><br><span class="candle-label">🔴陰線</span></td>
           <td class="price">620円</td>
           <td class="up">▲+1.6%</td>
           <td class="">0.5倍</td>
-          <td class="">42.4</td>
+          <td class="">42.3</td>
           <td>-7.3%</td>
-          <td>10%</td>
+          <td>9%</td>
         </tr><tr>
           <td><span class="stock-name">4478 フリー</span><br><span class="candle-label">🔴陰線</span></td>
           <td class="price">1905円</td>
@@ -197,21 +232,29 @@
           <td>-7.7%</td>
           <td>8%</td>
         </tr><tr>
-          <td><span class="stock-name">2371 カカクコム</span><br><span class="candle-label">十字線(迷い)</span></td>
-          <td class="price">3312円</td>
+          <td><span class="stock-name">2371 カカクコム</span><br><span class="candle-label">🟢陽線</span></td>
+          <td class="price">3315円</td>
+          <td class="down">▼-0.3%</td>
+          <td class="">0.5倍</td>
+          <td class="">58.3</td>
+          <td>-0.9%</td>
+          <td>85%</td>
+        </tr><tr>
+          <td><span class="stock-name">3765 ガンホー</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
+          <td class="price">2174円</td>
           <td class="down">▼-0.4%</td>
           <td class="">0.4倍</td>
-          <td class="">57.9</td>
-          <td>-1.0%</td>
-          <td>84%</td>
-        </tr><tr>
-          <td><span class="stock-name">3765 ガンホー</span><br><span class="candle-label">🔴陰線</span></td>
-          <td class="price">2175円</td>
-          <td class="down">▼-0.4%</td>
-          <td class="">0.3倍</td>
-          <td class="">40.2</td>
+          <td class="">40.1</td>
           <td>-2.3%</td>
-          <td>11%</td>
+          <td>10%</td>
+        </tr><tr>
+          <td><span class="stock-name">6050 イー・ガーディアン</span><br><span class="candle-label">🟢大陽線(強い買い)</span></td>
+          <td class="price">1664円</td>
+          <td class="up">▲+0.4%</td>
+          <td class="">0.8倍</td>
+          <td class="">53.4</td>
+          <td>+0.9%</td>
+          <td>53%</td>
         </tr>
   </table>
   <div class="legend">
@@ -225,12 +268,12 @@
     <span class="card-title">📰 市場関連ニュース</span>
     <span class="badge">NHK・Yahoo・東洋経済・Investing.com</span>
   </div>
-  <a href="http://www3.nhk.or.jp/news/html/20260624/k10015158131000.html" target="_blank" class="news-item">
+  <a href="http://www3.nhk.or.jp/news/html/20260624/k10015158071000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#c0392b">NHK経済</span>
+          <span class="news-title">株価 一時1000円以上値下がり 当面の利益確定へ売り注文広がる</span>
+        </a><a href="http://www3.nhk.or.jp/news/html/20260624/k10015158131000.html" target="_blank" class="news-item">
           <span class="news-source" style="background:#c0392b">NHK経済</span>
           <span class="news-title">利上げ決定の日銀会合 追加利上げ早期に検討すべきの意見も</span>
-        </a><a href="http://www3.nhk.or.jp/news/html/20260624/k10015158071000.html" target="_blank" class="news-item">
-          <span class="news-source" style="background:#c0392b">NHK経済</span>
-          <span class="news-title">株価 値下がり このところの上昇受け利益確定の売り注文</span>
         </a><a href="http://www3.nhk.or.jp/news/html/20260624/k10015157741000.html" target="_blank" class="news-item">
           <span class="news-source" style="background:#c0392b">NHK経済</span>
           <span class="news-title">ナスダックの株価指数2％超の大幅下落 日韓のハイテク株安波及</span>
@@ -267,6 +310,12 @@
         </a><a href="https://toyokeizai.net/articles/-/948997?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
           <span class="news-source" style="background:#0077b6">東洋経済</span>
           <span class="news-title">認知機能が衰えると自分名義の資産も自由に使えなくなる､高齢者マネー260兆円が凍り付く危険性 | 政治・経済・投資 | 東洋経済オンライン</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581433" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">Orchestra Holdings---期末配当30円へ増額、株主優待継続方針</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581431" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">ポールトゥウィンHD--- SynX、AI導入支援ビジネス拡大へ向けたパートナー連携を強化</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1581426" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
           <span class="news-title">ｃｏｌｙ--- 年初来高値、ディズニーIPを使用したスマホゲームの事前登録受付を開始</span>
@@ -279,12 +328,6 @@
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1581420" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
           <span class="news-title">タメニー---ストップ高、「継続企業の前提に関する注記」記載解消、上場維持基準に適合</span>
-        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581419" target="_blank" class="news-item">
-          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
-          <span class="news-title">ヒガシHD Research Memo（6）：2027年3月期は増収増益で過去最高予想</span>
-        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581418" target="_blank" class="news-item">
-          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
-          <span class="news-title">ヒガシHD Research Memo（5）：2026年3月期は上方修正値を上回る大幅増収増益で過去最高</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1580093" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
           <span class="news-title">株式市場の急落を解説：なぜ投資家は突然不安を抱いているのか</span>
@@ -353,14 +396,69 @@
   </a>
 </div>
 
+</div><!-- /tab-morning -->
+
+<!-- ウォッチリスト + 振り返りタブ -->
+<div id="tab-watch" class="tab-content">
+
+  <!-- 振り返り -->
+  <div class="reflection-card">
+    <div class="reflection-title">📝 前日の振り返り</div>
+    <div class="refl-row">
+      <div>
+        <div class="refl-label">結果</div>
+        <select class="refl-input" id="refl-result">
+          <option value="">選択</option>
+          <option value="win">✅ 勝ち</option>
+          <option value="loss">❌ 負け</option>
+          <option value="even">➖ トントン</option>
+          <option value="rest">😴 休み</option>
+        </select>
+      </div>
+      <div>
+        <div class="refl-label">損益（円）</div>
+        <input type="number" class="refl-input" id="refl-pnl" placeholder="例: +1200 / -800">
+      </div>
+    </div>
+    <div class="refl-label">取引した銘柄</div>
+    <input type="text" class="refl-input" id="refl-stock" placeholder="例: 9434 ソフトバンク" style="width:100%">
+    <div class="refl-label">気づき・反省・よかった点</div>
+    <textarea class="refl-textarea" id="refl-note" placeholder="例: 損切りできず含み損を抱えてしまった。次は〇〇円で必ず切る。"></textarea>
+    <button class="refl-save-btn" onclick="saveReflection()">💾 保存する</button>
+  </div>
+
+  <!-- 振り返り履歴 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📊 振り返り履歴</span></div>
+    <div class="refl-history" id="refl-history">履歴なし</div>
+    <button class="btn-copy-hint" onclick="copyReflHistory()" style="margin-top:8px">📋 履歴をClaudeプロンプトにコピー</button>
+    <div class="toast-small" id="refl-copied">✅ コピーしました！</div>
+  </div>
+
+  <!-- ウォッチリスト -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">⭐ ウォッチリスト</span><span class="badge">気になる銘柄を登録</span></div>
+    <div class="watch-form">
+      <input type="text" class="watch-input" id="watch-code" placeholder="コード例: 9434.T">
+      <input type="text" class="watch-input" id="watch-name" placeholder="銘柄名">
+      <button class="watch-add-btn" onclick="addWatch()">追加</button>
+    </div>
+    <ul class="watch-list" id="watch-list"></ul>
+    <div class="refl-label" style="margin-top:10px">ウォッチ中の銘柄メモ</div>
+    <textarea class="watch-memo" id="watch-memo" placeholder="気になる理由、注目材料、エントリー条件など自由に"></textarea>
+    <button class="btn-copy-hint" onclick="saveWatchMemo()" style="margin-top:6px">💾 メモを保存</button>
+  </div>
+
+</div><!-- /tab-watch -->
+
 <script>
-const MARKET_DATA = `【取得時刻】2026年06月24日 13:50
+const MARKET_DATA = `【取得時刻】2026年06月24日 14:10
 
 【日本市場】
-・日経平均: 68,763.98 (-1.47%) | 高:70218.71 安:68461.10
-・TOPIX: 418.70 (-0.97%) | 高:425.10 安:417.70
-・グロース250: 549.50 (-0.36%) | 高:559.70 安:548.70
-・ドル円: 161.55 (-0.01%) | 高:161.64 安:161.46
+・日経平均: 69,070.06 (-1.03%) | 高:70218.71 安:68461.10
+・TOPIX: 419.50 (-0.78%) | 高:425.10 安:417.70
+・グロース250: 551.10 (-0.07%) | 高:559.70 安:548.70
+・ドル円: 161.54 (-0.02%) | 高:161.64 安:161.46
 
 【米国市場（前日終値）】
 ・ダウ平均: 51,666.84 (-0.09%)
@@ -369,21 +467,21 @@ const MARKET_DATA = `【取得時刻】2026年06月24日 13:50
 
 【グローバル指標】
 ・VIX恐怖指数: 19.49 (+12.79%)
-・金(Gold): 4082.00 (-1.16%)
-・原油(WTI): 72.70 (-0.70%)
-・米10年債利回: 4.49 (+0.94%)
+・金(Gold): 4080.50 (-1.20%)
+・原油(WTI): 72.77 (-0.60%)
+・米10年債利回: 4.45 (-0.27%)
 
 【スクリーニング結果（テクニカル分析済み）】
-・1570 日経レバETF: 76700円 (-3.08%) 出来高比:0.9倍 RSI:55.9 25MA乖離:+4.6% 52週位置:78% 🔴陰線
-・8306 三菱UFJ: 3203円 (-1.96%) 出来高比:0.4倍 RSI:54.4 25MA乖離:+1.5% 52週位置:77% 🔴大陰線(強い売り)
-・8316 三井住友FG: 6341円 (-1.81%) 出来高比:0.5倍 RSI:54.5 25MA乖離:+2.1% 52週位置:78% 🔴大陰線(強い売り)
-・6920 レーザーテック: 50170円 (-3.52%) 出来高比:0.8倍 RSI:57.2 25MA乖離:+13.0% 52週位置:69% 🔴大陰線(強い売り)
-・8035 東京エレクトロン: 69100円 (-5.29%) 出来高比:0.8倍 RSI:58.7 25MA乖離:+11.7% 52週位置:75% 🔴陰線
-・9984 ソフトバンクG: 6412円 (-1.55%) 出来高比:0.4倍 RSI:45.9 25MA乖離:-10.3% 52週位置:53% 🔴陰線
-・3697 SHIFT: 620円 (+1.64%) 出来高比:0.5倍 RSI:42.4 25MA乖離:-7.3% 52週位置:10% 🔴陰線
+・8306 三菱UFJ: 3209円 (-1.78%) 出来高比:0.4倍 RSI:54.8 25MA乖離:+1.6% 52週位置:78% 🔴大陰線(強い売り)
+・8316 三井住友FG: 6345円 (-1.75%) 出来高比:0.5倍 RSI:54.6 25MA乖離:+2.2% 52週位置:78% 🔴大陰線(強い売り)
+・8035 東京エレクトロン: 69520円 (-4.71%) 出来高比:0.8倍 RSI:59.4 25MA乖離:+12.4% 52週位置:76% 🔴陰線
+・2370 メディネット: 25円 (+4.17%) 出来高比:0.3倍 RSI:41.5 25MA乖離:-5.6% 52週位置:17% 🟢大陽線(強い買い)
+・1570 日経レバETF: 77350円 (-2.26%) 出来高比:0.9倍 RSI:56.9 25MA乖離:+5.5% 52週位置:79% 🔴陰線
+・3697 SHIFT: 620円 (+1.61%) 出来高比:0.5倍 RSI:42.3 25MA乖離:-7.3% 52週位置:9% 🔴陰線
 ・4478 フリー: 1905円 (+2.25%) 出来高比:0.3倍 RSI:41.2 25MA乖離:-7.7% 52週位置:8% 🔴陰線
-・2371 カカクコム: 3312円 (-0.39%) 出来高比:0.4倍 RSI:57.9 25MA乖離:-1.0% 52週位置:84% 十字線(迷い)
-・3765 ガンホー: 2175円 (-0.37%) 出来高比:0.3倍 RSI:40.2 25MA乖離:-2.3% 52週位置:11% 🔴陰線`;
+・2371 カカクコム: 3315円 (-0.30%) 出来高比:0.5倍 RSI:58.3 25MA乖離:-0.9% 52週位置:85% 🟢陽線
+・3765 ガンホー: 2174円 (-0.41%) 出来高比:0.4倍 RSI:40.1 25MA乖離:-2.3% 52週位置:10% 🔴大陰線(強い売り)
+・6050 イー・ガーディアン: 1664円 (+0.36%) 出来高比:0.8倍 RSI:53.4 25MA乖離:+0.9% 52週位置:53% 🟢大陽線(強い買い)`;
 
 function buildGeminiPrompt() {
   const lines = MARKET_DATA.split('\n');
@@ -557,9 +655,128 @@ ${chatgpt}
   return prompt;
 }
 
+// ===== タブ切替 =====
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ===== ウォッチリスト =====
+function loadWatchList() {
+  return JSON.parse(localStorage.getItem('watchlist') || '[]');
+}
+function saveWatchList(list) {
+  localStorage.setItem('watchlist', JSON.stringify(list));
+}
+function renderWatchList() {
+  const list = loadWatchList();
+  const ul = document.getElementById('watch-list');
+  if (!list.length) { ul.innerHTML = '<li style="color:#8b949e;font-size:0.83rem;padding:8px 0">まだ登録されていません</li>'; return; }
+  ul.innerHTML = list.map((item, i) =>
+    `<li class="watch-item">
+      <span>⭐ ${item.name} <span style="color:#8b949e;font-size:0.75rem">(${item.code})</span></span>
+      <button class="watch-del" onclick="delWatch(${i})">✕</button>
+    </li>`
+  ).join('');
+}
+function addWatch() {
+  const code = document.getElementById('watch-code').value.trim();
+  const name = document.getElementById('watch-name').value.trim() || code;
+  if (!code) return;
+  const list = loadWatchList();
+  if (!list.find(x => x.code === code)) {
+    list.push({code, name});
+    saveWatchList(list);
+  }
+  document.getElementById('watch-code').value = '';
+  document.getElementById('watch-name').value = '';
+  renderWatchList();
+}
+function delWatch(i) {
+  const list = loadWatchList();
+  list.splice(i, 1);
+  saveWatchList(list);
+  renderWatchList();
+}
+function saveWatchMemo() {
+  localStorage.setItem('watchMemo', document.getElementById('watch-memo').value);
+  alert('メモを保存しました');
+}
+
+// ===== 振り返り =====
+function loadReflections() {
+  return JSON.parse(localStorage.getItem('reflections') || '[]');
+}
+function saveReflection() {
+  const result = document.getElementById('refl-result').value;
+  const pnl = document.getElementById('refl-pnl').value;
+  const stock = document.getElementById('refl-stock').value.trim();
+  const note = document.getElementById('refl-note').value.trim();
+  if (!result && !note) { alert('結果か気づきを入力してください'); return; }
+  const list = loadReflections();
+  const today = new Date().toLocaleDateString('ja-JP');
+  list.unshift({date: today, result, pnl, stock, note});
+  localStorage.setItem('reflections', JSON.stringify(list.slice(0, 30)));
+  document.getElementById('refl-result').value = '';
+  document.getElementById('refl-pnl').value = '';
+  document.getElementById('refl-stock').value = '';
+  document.getElementById('refl-note').value = '';
+  renderReflections();
+}
+function renderReflections() {
+  const list = loadReflections();
+  const el = document.getElementById('refl-history');
+  if (!list.length) { el.innerHTML = '<div style="color:#8b949e;font-size:0.83rem">まだ記録がありません</div>'; return; }
+  const resultLabel = {win:'✅ 勝ち', loss:'❌ 負け', even:'➖ トントン', rest:'😴 休み', '': '-'};
+  el.innerHTML = list.slice(0,10).map((r, i) => {
+    const cls = r.result === 'win' ? 'win' : r.result === 'loss' ? 'loss' : 'even';
+    const pnlStr = r.pnl ? (parseInt(r.pnl) > 0 ? `+${r.pnl}円` : `${r.pnl}円`) : '';
+    return `<div class="refl-entry">
+      <div class="refl-date">${r.date} <span class="${cls}">${resultLabel[r.result] || '-'}</span>${pnlStr ? ' <strong>' + pnlStr + '</strong>' : ''}${r.stock ? ' | ' + r.stock : ''}
+        <button class="refl-del" onclick="delRefl(${i})">削除</button>
+      </div>
+      ${r.note ? '<div>' + r.note + '</div>' : ''}
+    </div>`;
+  }).join('');
+}
+function delRefl(i) {
+  const list = loadReflections();
+  list.splice(i, 1);
+  localStorage.setItem('reflections', JSON.stringify(list));
+  renderReflections();
+}
+function copyReflHistory() {
+  const list = loadReflections();
+  if (!list.length) { alert('振り返り履歴がありません'); return; }
+  const resultLabel = {win:'勝ち', loss:'負け', even:'トントン', rest:'休み', '': ''};
+  let text = '【過去の振り返り記録】\n';
+  list.slice(0, 10).forEach(r => {
+    text += `${r.date}: ${resultLabel[r.result] || ''}`;
+    if (r.pnl) text += ` ${r.pnl}円`;
+    if (r.stock) text += ` [${r.stock}]`;
+    if (r.note) text += ` → ${r.note}`;
+    text += '\n';
+  });
+  text += '\n上記の過去の負けパターン・成功パターンも踏まえて、今日の戦略を教えてください。';
+  navigator.clipboard.writeText(text).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = text; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+  });
+  const t = document.getElementById('refl-copied');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('gemini-hint').innerText = buildGeminiPrompt();
   document.getElementById('chatgpt-hint').innerText = buildChatGPTPrompt();
+  renderWatchList();
+  renderReflections();
+  const memo = localStorage.getItem('watchMemo');
+  if (memo) document.getElementById('watch-memo').value = memo;
 });
 
 function copyPrompt(type) {

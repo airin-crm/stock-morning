@@ -55,6 +55,13 @@
     .btn-copy-hint:active{opacity:.7}
     .toast-small{display:none;color:#3fb950;font-size:0.78rem;margin-bottom:6px}
     .divider{border:none;border-top:1px solid #21262d;margin:14px 0}
+    .sec-badges{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px}
+    .sec-badge{font-size:0.68rem;padding:3px 7px;border-radius:6px;font-weight:bold}
+    .sec-badge.up{background:#0d1f12;color:#3fb950;border:1px solid #238636}
+    .sec-badge.down{background:#1f0d0d;color:#f85149;border:1px solid #6e1a1a}
+    .rank-label{font-size:0.68rem;color:#8b949e;margin-bottom:4px;font-weight:bold}
+    .rank-item{font-size:0.75rem;padding:3px 0;border-bottom:1px solid #21262d}
+    .rank-item.up{color:#3fb950}.rank-item.down{color:#f85149}.rank-item.vol{color:#f0a500}
     .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
     .legend-item{font-size:0.65rem;color:#8b949e}
     /* ナビ */
@@ -109,7 +116,7 @@
 
 <header>
   <h1>📈 株朝活 PRO</h1>
-  <span class="time">2026年06月24日 14:45</span>
+  <span class="time">2026年06月24日 15:57</span>
 </header>
 
 <!-- ナビゲーション -->
@@ -125,23 +132,23 @@
 <div class="section-title">🇯🇵 日本市場</div>
 <div class="index-grid grid-2"><div class="index-card">
           <div class="index-name">日経平均</div>
-          <div class="index-price">69,487.88</div>
-          <div class="index-change down">▼ -0.43%</div>
+          <div class="index-price">69,174.97</div>
+          <div class="index-change down">▼ -0.88%</div>
           <div class="index-sub">高:70219 安:68461</div>
         </div><div class="index-card">
           <div class="index-name">TOPIX</div>
-          <div class="index-price">421.10</div>
-          <div class="index-change down">▼ -0.40%</div>
+          <div class="index-price">419.90</div>
+          <div class="index-change down">▼ -0.69%</div>
           <div class="index-sub">高:425 安:418</div>
         </div><div class="index-card">
           <div class="index-name">グロース250</div>
-          <div class="index-price">553.90</div>
-          <div class="index-change up">▲ +0.44%</div>
+          <div class="index-price">551.70</div>
+          <div class="index-change up">▲ +0.04%</div>
           <div class="index-sub">高:560 安:549</div>
         </div><div class="index-card">
           <div class="index-name">ドル円</div>
-          <div class="index-price">161.58</div>
-          <div class="index-change up">▲ +0.01%</div>
+          <div class="index-price">161.70</div>
+          <div class="index-change up">▲ +0.08%</div>
           <div class="index-sub">高:162 安:161</div>
         </div></div>
 
@@ -167,17 +174,32 @@
           <div class="index-change up">▲ +12.79%</div>
         </div><div class="index-card small">
           <div class="index-name">金(Gold)</div>
-          <div class="index-price">4098.20</div>
-          <div class="index-change down">▼ -0.77%</div>
+          <div class="index-price">4111.30</div>
+          <div class="index-change down">▼ -0.45%</div>
         </div><div class="index-card small">
           <div class="index-name">原油(WTI)</div>
-          <div class="index-price">72.71</div>
-          <div class="index-change down">▼ -0.68%</div>
+          <div class="index-price">72.52</div>
+          <div class="index-change down">▼ -0.94%</div>
         </div><div class="index-card small">
           <div class="index-name">米10年債利回</div>
           <div class="index-price">4.45</div>
           <div class="index-change down">▼ -0.27%</div>
         </div></div>
+
+<!-- 前日まとめ -->
+<div class="card" style="margin-top:14px">
+  <div class="card-header">
+    <span class="card-title">📅 前日の東証まとめ</span>
+    <span class="badge">セクター騰落・値動き上位</span>
+  </div>
+  <div class="section-title" style="margin-top:0">セクター騰落</div>
+  <div class="sec-badges"><span class="sec-badge up">医薬品 +0.9%</span><span class="sec-badge up">小売 +0.6%</span><span class="sec-badge down">自動車・輸送機 -0.1%</span><span class="sec-badge down">情報通信 -0.1%</span><span class="sec-badge down">電機・精密 -0.3%</span><span class="sec-badge down">商社・卸売 -0.9%</span><span class="sec-badge down">銀行 -1.1%</span><span class="sec-badge down">素材・化学 -1.2%</span><span class="sec-badge down">建設・不動産 -1.5%</span><span class="sec-badge down">食品 -1.5%</span></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px">
+    <div><div class="rank-label">📈 値上がり上位</div><div class="rank-item up">▲4478 フリー <strong>+2.9%</strong></div><div class="rank-item up">▲6758 ソニーG <strong>+2.9%</strong></div><div class="rank-item up">▲9984 ソフトバンクG <strong>+1.3%</strong></div><div class="rank-item up">▲3697 SHIFT <strong>+1.0%</strong></div><div class="rank-item up">▲4385 メルカリ <strong>+0.9%</strong></div></div>
+    <div><div class="rank-label">📉 値下がり上位</div><div class="rank-item down">▼8035 東京エレクトロン <strong>-4.2%</strong></div><div class="rank-item down">▼6920 レーザーテック <strong>-2.7%</strong></div><div class="rank-item down">▼8306 三菱UFJ <strong>-1.9%</strong></div><div class="rank-item down">▼1570 日経レバETF <strong>-1.9%</strong></div><div class="rank-item down">▼3765 ガンホー <strong>-1.2%</strong></div></div>
+    <div><div class="rank-label">🔥 出来高急増</div><div class="rank-item vol">🔥3697 SHIFT 出来高比1.3倍</div><div class="rank-item vol">🔥2516 グロース250ETF 出来高比1.2倍</div><div class="rank-item vol">🔥7974 任天堂 出来高比1.2倍</div><div class="rank-item vol">🔥6758 ソニーG 出来高比1.1倍</div><div class="rank-item vol">🔥7203 トヨタ 出来高比1.1倍</div></div>
+  </div>
+</div>
 
 <hr class="divider">
 
@@ -190,49 +212,57 @@
     <tr><th>銘柄</th><th>現値</th><th>前日比</th><th>出来高比</th><th>RSI</th><th>25MA乖離</th><th>52週位置</th></tr>
     <tr>
           <td><span class="stock-name">8306 三菱UFJ</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
-          <td class="price">3210円</td>
-          <td class="down">▼-1.7%</td>
-          <td class="">0.4倍</td>
-          <td class="">54.9</td>
-          <td>+1.7%</td>
+          <td class="price">3205円</td>
+          <td class="down">▼-1.9%</td>
+          <td class="">0.6倍</td>
+          <td class="">54.5</td>
+          <td>+1.5%</td>
           <td>78%</td>
         </tr><tr>
           <td><span class="stock-name">8316 三井住友FG</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
-          <td class="price">6361円</td>
-          <td class="down">▼-1.5%</td>
-          <td class="">0.5倍</td>
-          <td class="">55.1</td>
-          <td>+2.4%</td>
+          <td class="price">6356円</td>
+          <td class="down">▼-1.6%</td>
+          <td class="">0.8倍</td>
+          <td class="">54.9</td>
+          <td>+2.3%</td>
           <td>79%</td>
         </tr><tr>
+          <td><span class="stock-name">8035 東京エレクトロン</span><br><span class="candle-label">🔴陰線</span></td>
+          <td class="price">69900円</td>
+          <td class="down">▼-4.2%</td>
+          <td class="">1.1倍</td>
+          <td class="">60.0</td>
+          <td>+13.0%</td>
+          <td>77%</td>
+        </tr><tr>
+          <td><span class="stock-name">1570 日経レバETF</span><br><span class="candle-label">🔴陰線</span></td>
+          <td class="price">77660円</td>
+          <td class="down">▼-1.9%</td>
+          <td class="">1.2倍</td>
+          <td class="">57.5</td>
+          <td>+5.9%</td>
+          <td>80%</td>
+        </tr><tr>
           <td><span class="stock-name">4478 フリー</span><br><span class="candle-label">🔴陰線</span></td>
-          <td class="price">1908円</td>
-          <td class="up">▲+2.4%</td>
-          <td class="">0.3倍</td>
-          <td class="">41.4</td>
-          <td>-7.6%</td>
-          <td>8%</td>
-        </tr><tr>
-          <td><span class="stock-name">2371 カカクコム</span><br><span class="candle-label">🟢陽線</span></td>
-          <td class="price">3314円</td>
-          <td class="down">▼-0.3%</td>
-          <td class="">0.5倍</td>
-          <td class="">58.2</td>
-          <td>-1.0%</td>
-          <td>84%</td>
-        </tr><tr>
-          <td><span class="stock-name">3765 ガンホー</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
-          <td class="price">2174円</td>
-          <td class="down">▼-0.4%</td>
+          <td class="price">1917円</td>
+          <td class="up">▲+2.9%</td>
           <td class="">0.4倍</td>
-          <td class="">40.1</td>
-          <td>-2.3%</td>
-          <td>10%</td>
+          <td class="">42.0</td>
+          <td>-7.2%</td>
+          <td>9%</td>
+        </tr><tr>
+          <td><span class="stock-name">2371 カカクコム</span><br><span class="candle-label">🔴陰のカラカサ(反転期待)</span></td>
+          <td class="price">3305円</td>
+          <td class="down">▼-0.6%</td>
+          <td class="">0.7倍</td>
+          <td class="">57.0</td>
+          <td>-1.2%</td>
+          <td>84%</td>
         </tr><tr>
           <td><span class="stock-name">6050 イー・ガーディアン</span><br><span class="candle-label">🟢陽線</span></td>
           <td class="price">1660円</td>
           <td class="up">▲+0.1%</td>
-          <td class="">0.9倍</td>
+          <td class="">1.1倍</td>
           <td class="">52.0</td>
           <td>+0.7%</td>
           <td>50%</td>
@@ -246,28 +276,20 @@
           <td>4%</td>
         </tr><tr>
           <td><span class="stock-name">4385 メルカリ</span><br><span class="candle-label">十字線(迷い)</span></td>
-          <td class="price">3950円</td>
-          <td class="up">▲+1.3%</td>
-          <td class="">0.8倍</td>
-          <td class="">52.5</td>
-          <td>+0.3%</td>
-          <td>57%</td>
-        </tr><tr>
-          <td><span class="stock-name">8035 東京エレクトロン</span><br><span class="candle-label">🔴陰線</span></td>
-          <td class="price">70630円</td>
-          <td class="down">▼-3.2%</td>
-          <td class="">0.9倍</td>
-          <td class="">61.3</td>
-          <td>+14.1%</td>
-          <td>79%</td>
-        </tr><tr>
-          <td><span class="stock-name">6861 キーエンス</span><br><span class="candle-label">🟢大陽線(強い買い)</span></td>
-          <td class="price">76750円</td>
-          <td class="up">▲+1.4%</td>
-          <td class="">0.5倍</td>
-          <td class="">53.1</td>
+          <td class="price">3935円</td>
+          <td class="up">▲+0.9%</td>
+          <td class="">1.0倍</td>
+          <td class="">51.8</td>
           <td>-0.0%</td>
-          <td>75%</td>
+          <td>56%</td>
+        </tr><tr>
+          <td><span class="stock-name">6920 レーザーテック</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
+          <td class="price">50610円</td>
+          <td class="down">▼-2.7%</td>
+          <td class="">1.0倍</td>
+          <td class="">58.0</td>
+          <td>+13.9%</td>
+          <td>71%</td>
         </tr>
   </table>
   <div class="legend">
@@ -281,7 +303,13 @@
     <span class="card-title">📰 市場関連ニュース</span>
     <span class="badge">NHK・Yahoo・東洋経済・Investing.com</span>
   </div>
-  <a href="http://www3.nhk.or.jp/news/html/20260624/k10015158071000.html" target="_blank" class="news-item">
+  <a href="http://www3.nhk.or.jp/news/html/20260624/k10015158271000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#c0392b">NHK経済</span>
+          <span class="news-title">ソフトバンクG 孫社長 “あと10年か15年は頑張る”</span>
+        </a><a href="http://www3.nhk.or.jp/news/html/20260624/k10015158241000.html" target="_blank" class="news-item">
+          <span class="news-source" style="background:#c0392b">NHK経済</span>
+          <span class="news-title">ガソリン価格 全国平均169.8円 政府補助金で170円水準続く</span>
+        </a><a href="http://www3.nhk.or.jp/news/html/20260624/k10015158071000.html" target="_blank" class="news-item">
           <span class="news-source" style="background:#c0392b">NHK経済</span>
           <span class="news-title">株価 一時1000円以上値下がり 当面の利益確定へ売り注文広がる</span>
         </a><a href="http://www3.nhk.or.jp/news/html/20260624/k10015158131000.html" target="_blank" class="news-item">
@@ -293,18 +321,15 @@
         </a><a href="http://www3.nhk.or.jp/news/html/20260623/k10015157371000.html" target="_blank" class="news-item">
           <span class="news-source" style="background:#c0392b">NHK経済</span>
           <span class="news-title">円相場 1ドル＝161円台で神経質な取引 介入への警戒続く</span>
-        </a><a href="http://www3.nhk.or.jp/news/html/20260623/k10015156891000.html" target="_blank" class="news-item">
-          <span class="news-source" style="background:#c0392b">NHK経済</span>
-          <span class="news-title">東京23区中古マンション 平均1億2800万円余 賃貸の家賃も上昇</span>
-        </a><a href="http://www3.nhk.or.jp/news/html/20260623/k10015157091000.html" target="_blank" class="news-item">
-          <span class="news-source" style="background:#c0392b">NHK経済</span>
-          <span class="news-title">日産株主総会 みずほFG出身の社外取締役の再任を否決</span>
         </a><a href="https://news.yahoo.co.jp/pickup/6585420?source=rss" target="_blank" class="news-item">
           <span class="news-source" style="background:#6200ea">Yahoo!株式</span>
           <span class="news-title">クールジャパン機構 累損540億円</span>
         </a><a href="https://news.yahoo.co.jp/pickup/6585464?source=rss" target="_blank" class="news-item">
           <span class="news-source" style="background:#6200ea">Yahoo!株式</span>
           <span class="news-title">任天堂の株価低迷 業界が暗い時代</span>
+        </a><a href="https://toyokeizai.net/articles/-/949084?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
+          <span class="news-source" style="background:#0077b6">東洋経済</span>
+          <span class="news-title">【独自】牧野フライスに新たな買収提案で気になる｢TOBの想定価格｣…ニデックの提案から始まった争奪戦は二転三転 | ビジネス | 東洋経済オンライン</span>
         </a><a href="https://toyokeizai.net/articles/-/946750?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
           <span class="news-source" style="background:#0077b6">東洋経済</span>
           <span class="news-title">弱者同士が叩き合う｢マイノリティ支配｣の正体　私たちの怒りを操る｢文化戦争｣の罠と､仕掛けられた｢分断｣ゲーム | 政治・経済・投資 | 東洋経済オンライン</span>
@@ -320,30 +345,30 @@
         </a><a href="https://toyokeizai.net/articles/-/947918?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
           <span class="news-source" style="background:#0077b6">東洋経済</span>
           <span class="news-title">知っておくべき銀行･証券会社･国が明かさない&quot;金融の本質&quot;　金融商品は｢あなたを豊かにする｣ために作られていない | ライフ | 東洋経済オンライン</span>
-        </a><a href="https://toyokeizai.net/articles/-/948997?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
-          <span class="news-source" style="background:#0077b6">東洋経済</span>
-          <span class="news-title">認知機能が衰えると自分名義の資産も自由に使えなくなる､高齢者マネー260兆円が凍り付く危険性 | 政治・経済・投資 | 東洋経済オンライン</span>
-        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581462" target="_blank" class="news-item">
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581503" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
-          <span class="news-title">中国AI企業・智譜、香港で数十億ドル規模の株式売却を検討－ブルームバーグ</span>
-        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581440" target="_blank" class="news-item">
+          <span class="news-title">ミライアル株式会社：2027年1月期第1四半期決算説明会文字起こし（8）</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581502" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
-          <span class="news-title">出来高変化率ランキング（13時台）～サンリオ、イントランスなどがランクイン</span>
-        </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1581439" target="_blank" class="news-item">
+          <span class="news-title">ミライアル株式会社：2027年1月期第1四半期決算説明会文字起こし（6）</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1581501" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
-          <span class="news-title">Nvidia禁輸チップ、中国闇市場で価格が半年で2倍以上に高騰</span>
-        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581433" target="_blank" class="news-item">
+          <span class="news-title">キャセイパシフィック株が3%上昇、旅客数増加と燃油サーチャージ引き下げが追い風</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1581498" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
-          <span class="news-title">Orchestra Holdings---期末配当30円へ増額、株主優待継続方針</span>
-        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581431" target="_blank" class="news-item">
+          <span class="news-title">シュローダー欧州REITが資産価値下落を受け清算計画を発表</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581493" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
-          <span class="news-title">ポールトゥウィンHD--- SynX、AI導入支援ビジネス拡大へ向けたパートナー連携を強化</span>
-        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581426" target="_blank" class="news-item">
+          <span class="news-title">バークレイズ、テレコム・イタリア取引でPoste Italianeを格上げ、目標株価を63%引き上げ</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581488" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
-          <span class="news-title">ｃｏｌｙ--- 年初来高値、ディズニーIPを使用したスマホゲームの事前登録受付を開始</span>
+          <span class="news-title">ベレンバーグ、英国銀行株に年15%リターンを予測―最注目銘柄を選定</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1580093" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
           <span class="news-title">株式市場の急落を解説：なぜ投資家は突然不安を抱いているのか</span>
+        </a><a href="https://jp.investing.com/news/forex-news/article-1581467" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
+          <span class="news-title">日経平均は191円安、米マイクロン決算などに関心</span>
         </a><a href="https://jp.investing.com/news/forex-news/article-1581456" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
           <span class="news-title">日経平均VIは大幅に上昇、米マイクロン決算も警戒</span>
@@ -353,12 +378,9 @@
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1580476" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
           <span class="news-title">韓国レバレッジETF危機が世界的な半導体株売りを誘発</span>
-        </a><a href="https://jp.investing.com/news/commodities-news/article-1581416" target="_blank" class="news-item">
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1579905" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
-          <span class="news-title">金価格が4,000ドルに迫る、ドル高とFRB利上げ観測が重荷</span>
-        </a><a href="https://jp.investing.com/news/forex-news/article-1581432" target="_blank" class="news-item">
-          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
-          <span class="news-title">日経平均は788円安、米マイクロン決算控え積極的な買いは手控えムード</span>
+          <span class="news-title">SKハイニックス株が本日急落した理由とは</span>
         </a><a href="https://www.itmedia.co.jp/business/articles/2606/24/news063.html" target="_blank" class="news-item">
           <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
           <span class="news-title">クマ被害の切り札になるか　AIで100メートル先を検知する新対策機器</span>
@@ -484,13 +506,13 @@
 </div><!-- /tab-watch -->
 
 <script>
-const MARKET_DATA = `【取得時刻】2026年06月24日 14:45
+const MARKET_DATA = `【取得時刻】2026年06月24日 15:57
 
 【日本市場】
-・日経平均: 69,487.88 (-0.43%) | 高:70218.71 安:68461.10
-・TOPIX: 421.10 (-0.40%) | 高:425.10 安:417.70
-・グロース250: 553.90 (+0.44%) | 高:559.70 安:548.70
-・ドル円: 161.58 (+0.01%) | 高:161.64 安:161.46
+・日経平均: 69,174.97 (-0.88%) | 高:70218.71 安:68461.10
+・TOPIX: 419.90 (-0.69%) | 高:425.10 安:417.70
+・グロース250: 551.70 (+0.04%) | 高:559.70 安:548.70
+・ドル円: 161.70 (+0.08%) | 高:161.71 安:161.46
 
 【米国市場（前日終値）】
 ・ダウ平均: 51,666.84 (-0.09%)
@@ -499,21 +521,28 @@ const MARKET_DATA = `【取得時刻】2026年06月24日 14:45
 
 【グローバル指標】
 ・VIX恐怖指数: 19.49 (+12.79%)
-・金(Gold): 4098.20 (-0.77%)
-・原油(WTI): 72.71 (-0.68%)
+・金(Gold): 4111.30 (-0.45%)
+・原油(WTI): 72.52 (-0.94%)
 ・米10年債利回: 4.45 (-0.27%)
 
 【スクリーニング結果（テクニカル分析済み）】
-・8306 三菱UFJ: 3210円 (-1.74%) 出来高比:0.4倍 RSI:54.9 25MA乖離:+1.7% 52週位置:78% 🔴大陰線(強い売り)
-・8316 三井住友FG: 6361円 (-1.50%) 出来高比:0.5倍 RSI:55.1 25MA乖離:+2.4% 52週位置:79% 🔴大陰線(強い売り)
-・4478 フリー: 1908円 (+2.42%) 出来高比:0.3倍 RSI:41.4 25MA乖離:-7.6% 52週位置:8% 🔴陰線
-・2371 カカクコム: 3314円 (-0.33%) 出来高比:0.5倍 RSI:58.2 25MA乖離:-1.0% 52週位置:84% 🟢陽線
-・3765 ガンホー: 2174円 (-0.41%) 出来高比:0.4倍 RSI:40.1 25MA乖離:-2.3% 52週位置:10% 🔴大陰線(強い売り)
-・6050 イー・ガーディアン: 1660円 (+0.12%) 出来高比:0.9倍 RSI:52.0 25MA乖離:+0.7% 52週位置:50% 🟢陽線
+・8306 三菱UFJ: 3205円 (-1.90%) 出来高比:0.6倍 RSI:54.5 25MA乖離:+1.5% 52週位置:78% 🔴大陰線(強い売り)
+・8316 三井住友FG: 6356円 (-1.58%) 出来高比:0.8倍 RSI:54.9 25MA乖離:+2.3% 52週位置:79% 🔴大陰線(強い売り)
+・8035 東京エレクトロン: 69900円 (-4.19%) 出来高比:1.1倍 RSI:60.0 25MA乖離:+13.0% 52週位置:77% 🔴陰線
+・1570 日経レバETF: 77660円 (-1.87%) 出来高比:1.2倍 RSI:57.5 25MA乖離:+5.9% 52週位置:80% 🔴陰線
+・4478 フリー: 1917円 (+2.90%) 出来高比:0.4倍 RSI:42.0 25MA乖離:-7.2% 52週位置:9% 🔴陰線
+・2371 カカクコム: 3305円 (-0.60%) 出来高比:0.7倍 RSI:57.0 25MA乖離:-1.2% 52週位置:84% 🔴陰のカラカサ(反転期待)
+・6050 イー・ガーディアン: 1660円 (+0.12%) 出来高比:1.1倍 RSI:52.0 25MA乖離:+0.7% 52週位置:50% 🟢陽線
 ・3672 オルトプラス: 26円 (+4.00%) 出来高比:0.2倍 RSI:35.6 25MA乖離:-7.8% 52週位置:4% 十字線(迷い)
-・4385 メルカリ: 3950円 (+1.28%) 出来高比:0.8倍 RSI:52.5 25MA乖離:+0.3% 52週位置:57% 十字線(迷い)
-・8035 東京エレクトロン: 70630円 (-3.19%) 出来高比:0.9倍 RSI:61.3 25MA乖離:+14.1% 52週位置:79% 🔴陰線
-・6861 キーエンス: 76750円 (+1.41%) 出来高比:0.5倍 RSI:53.1 25MA乖離:-0.0% 52週位置:75% 🟢大陽線(強い買い)`;
+・4385 メルカリ: 3935円 (+0.90%) 出来高比:1.0倍 RSI:51.8 25MA乖離:-0.0% 52週位置:56% 十字線(迷い)
+・6920 レーザーテック: 50610円 (-2.67%) 出来高比:1.0倍 RSI:58.0 25MA乖離:+13.9% 52週位置:71% 🔴大陰線(強い売り)
+
+【前日（昨日）の東証まとめ】
+▲強かったセクター: 医薬品(+0.9%)、小売(+0.6%)
+▼弱かったセクター: 銀行(-1.1%)、素材・化学(-1.2%)、建設・不動産(-1.5%)、食品(-1.5%)
+値上がり上位: 4478 フリー(+2.9%)、6758 ソニーG(+2.9%)、9984 ソフトバンクG(+1.3%)、3697 SHIFT(+1.0%)、4385 メルカリ(+0.9%)
+値下がり上位: 8035 東京エレクトロン(-4.2%)、6920 レーザーテック(-2.7%)、8306 三菱UFJ(-1.9%)、1570 日経レバETF(-1.9%)、3765 ガンホー(-1.2%)
+出来高急増: 3697 SHIFT(出来高比1.3倍)、2516 グロース250ETF(出来高比1.2倍)、7974 任天堂(出来高比1.2倍)、6758 ソニーG(出来高比1.1倍)、7203 トヨタ(出来高比1.1倍)`;
 
 function buildGeminiPrompt() {
   const lines = MARKET_DATA.split('\n');

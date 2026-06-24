@@ -90,13 +90,26 @@
     .refl-date{font-size:0.7rem;color:#8b949e;margin-bottom:4px}
     .refl-del{float:right;background:none;border:none;color:#8b949e;cursor:pointer;font-size:0.75rem}
     .win{color:#3fb950}.loss{color:#f85149}.even{color:#8b949e}
+    .refl-row3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}
+    .pnl-preview{padding:10px 12px;border-radius:8px;margin:8px 0;font-size:0.88rem;font-weight:bold;min-height:36px;text-align:center;background:#0d1117;border:1px solid #30363d}
+    .pnl-win{color:#3fb950;border-color:#238636;background:#0d1f12}
+    .pnl-loss{color:#f85149;border-color:#6e1a1a;background:#1f0d0d}
+    .pnl-zero{color:#8b949e}
+    .trade-row{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:start;padding:8px 0;border-bottom:1px solid #21262d;font-size:0.8rem}
+    .trade-date{color:#8b949e;font-size:0.72rem;white-space:nowrap}
+    .trade-stock{font-weight:bold}
+    .trade-detail{font-size:0.72rem;color:#8b949e;margin-top:2px}
+    .trade-pnl{font-weight:bold;text-align:right;white-space:nowrap}
+    .trade-del{background:none;border:none;color:#484f58;cursor:pointer;font-size:0.8rem;padding:0 4px}
+    .trade-del:hover{color:#f85149}
+    .trade-note{grid-column:1/-1;font-size:0.75rem;color:#8b949e;padding:2px 0 4px;border-top:1px dashed #21262d;margin-top:2px}
   </style>
 </head>
 <body>
 
 <header>
   <h1>📈 株朝活 PRO</h1>
-  <span class="time">2026年06月24日 14:20</span>
+  <span class="time">2026年06月24日 14:29</span>
 </header>
 
 <!-- ナビゲーション -->
@@ -112,23 +125,23 @@
 <div class="section-title">🇯🇵 日本市場</div>
 <div class="index-grid grid-2"><div class="index-card">
           <div class="index-name">日経平均</div>
-          <div class="index-price">69,187.30</div>
-          <div class="index-change down">▼ -0.86%</div>
+          <div class="index-price">69,383.25</div>
+          <div class="index-change down">▼ -0.58%</div>
           <div class="index-sub">高:70219 安:68461</div>
         </div><div class="index-card">
           <div class="index-name">TOPIX</div>
-          <div class="index-price">420.00</div>
-          <div class="index-change down">▼ -0.66%</div>
+          <div class="index-price">420.50</div>
+          <div class="index-change down">▼ -0.54%</div>
           <div class="index-sub">高:425 安:418</div>
         </div><div class="index-card">
           <div class="index-name">グロース250</div>
-          <div class="index-price">551.80</div>
-          <div class="index-change up">▲ +0.05%</div>
+          <div class="index-price">552.90</div>
+          <div class="index-change up">▲ +0.25%</div>
           <div class="index-sub">高:560 安:549</div>
         </div><div class="index-card">
           <div class="index-name">ドル円</div>
-          <div class="index-price">161.59</div>
-          <div class="index-change up">▲ +0.01%</div>
+          <div class="index-price">161.60</div>
+          <div class="index-change up">▲ +0.02%</div>
           <div class="index-sub">高:162 安:161</div>
         </div></div>
 
@@ -154,8 +167,8 @@
           <div class="index-change up">▲ +12.79%</div>
         </div><div class="index-card small">
           <div class="index-name">金(Gold)</div>
-          <div class="index-price">4084.70</div>
-          <div class="index-change down">▼ -1.09%</div>
+          <div class="index-price">4083.10</div>
+          <div class="index-change down">▼ -1.13%</div>
         </div><div class="index-card small">
           <div class="index-name">原油(WTI)</div>
           <div class="index-price">72.64</div>
@@ -177,84 +190,84 @@
     <tr><th>銘柄</th><th>現値</th><th>前日比</th><th>出来高比</th><th>RSI</th><th>25MA乖離</th><th>52週位置</th></tr>
     <tr>
           <td><span class="stock-name">8306 三菱UFJ</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
-          <td class="price">3212円</td>
-          <td class="down">▼-1.7%</td>
+          <td class="price">3209円</td>
+          <td class="down">▼-1.8%</td>
           <td class="">0.4倍</td>
-          <td class="">55.1</td>
-          <td>+1.7%</td>
+          <td class="">54.8</td>
+          <td>+1.6%</td>
           <td>78%</td>
         </tr><tr>
           <td><span class="stock-name">8316 三井住友FG</span><br><span class="candle-label">🔴大陰線(強い売り)</span></td>
-          <td class="price">6361円</td>
-          <td class="down">▼-1.5%</td>
+          <td class="price">6365円</td>
+          <td class="down">▼-1.4%</td>
           <td class="">0.5倍</td>
-          <td class="">55.1</td>
-          <td>+2.4%</td>
-          <td>79%</td>
-        </tr><tr>
-          <td><span class="stock-name">4385 メルカリ</span><br><span class="candle-label">十字線(迷い)</span></td>
-          <td class="price">3960円</td>
-          <td class="up">▲+1.5%</td>
-          <td class="">0.8倍</td>
-          <td class="">53.0</td>
-          <td>+0.6%</td>
-          <td>58%</td>
-        </tr><tr>
-          <td><span class="stock-name">8035 東京エレクトロン</span><br><span class="candle-label">🔴陰線</span></td>
-          <td class="price">69640円</td>
-          <td class="down">▼-4.6%</td>
-          <td class="">0.8倍</td>
-          <td class="">59.6</td>
-          <td>+12.6%</td>
-          <td>76%</td>
-        </tr><tr>
-          <td><span class="stock-name">1570 日経レバETF</span><br><span class="candle-label">🔴陰線</span></td>
-          <td class="price">77600円</td>
-          <td class="down">▼-1.9%</td>
-          <td class="">1.0倍</td>
-          <td class="">57.4</td>
-          <td>+5.8%</td>
+          <td class="">55.2</td>
+          <td>+2.5%</td>
           <td>80%</td>
         </tr><tr>
           <td><span class="stock-name">3697 SHIFT</span><br><span class="candle-label">🔴陰線</span></td>
-          <td class="price">621円</td>
-          <td class="up">▲+1.8%</td>
+          <td class="price">620円</td>
+          <td class="up">▲+1.6%</td>
           <td class="">0.5倍</td>
-          <td class="">42.5</td>
-          <td>-7.2%</td>
+          <td class="">42.4</td>
+          <td>-7.3%</td>
           <td>10%</td>
         </tr><tr>
           <td><span class="stock-name">4478 フリー</span><br><span class="candle-label">🔴陰線</span></td>
-          <td class="price">1911円</td>
+          <td class="price">1912円</td>
           <td class="up">▲+2.6%</td>
           <td class="">0.3倍</td>
           <td class="">41.6</td>
-          <td>-7.5%</td>
+          <td>-7.4%</td>
           <td>8%</td>
         </tr><tr>
-          <td><span class="stock-name">2371 カカクコム</span><br><span class="candle-label">十字線(迷い)</span></td>
-          <td class="price">3310円</td>
-          <td class="down">▼-0.5%</td>
-          <td class="">0.5倍</td>
-          <td class="">57.6</td>
-          <td>-1.1%</td>
-          <td>84%</td>
-        </tr><tr>
-          <td><span class="stock-name">3765 ガンホー</span><br><span class="candle-label">🔴陰線</span></td>
-          <td class="price">2176円</td>
+          <td><span class="stock-name">2371 カカクコム</span><br><span class="candle-label">🟢陽線</span></td>
+          <td class="price">3315円</td>
           <td class="down">▼-0.3%</td>
-          <td class="">0.4倍</td>
-          <td class="">40.3</td>
-          <td>-2.2%</td>
-          <td>11%</td>
+          <td class="">0.5倍</td>
+          <td class="">58.3</td>
+          <td>-0.9%</td>
+          <td>85%</td>
         </tr><tr>
-          <td><span class="stock-name">6050 イー・ガーディアン</span><br><span class="candle-label">🟢大陽線(強い買い)</span></td>
-          <td class="price">1664円</td>
-          <td class="up">▲+0.4%</td>
+          <td><span class="stock-name">6050 イー・ガーディアン</span><br><span class="candle-label">🟢陽線</span></td>
+          <td class="price">1660円</td>
+          <td class="up">▲+0.1%</td>
+          <td class="">0.9倍</td>
+          <td class="">52.0</td>
+          <td>+0.7%</td>
+          <td>50%</td>
+        </tr><tr>
+          <td><span class="stock-name">3672 オルトプラス</span><br><span class="candle-label">十字線(迷い)</span></td>
+          <td class="price">26円</td>
+          <td class="up">▲+4.0%</td>
+          <td class="">0.2倍</td>
+          <td class="">35.6</td>
+          <td>-7.8%</td>
+          <td>4%</td>
+        </tr><tr>
+          <td><span class="stock-name">4385 メルカリ</span><br><span class="candle-label">十字線(迷い)</span></td>
+          <td class="price">3952円</td>
+          <td class="up">▲+1.3%</td>
           <td class="">0.8倍</td>
-          <td class="">53.4</td>
-          <td>+0.9%</td>
-          <td>53%</td>
+          <td class="">52.6</td>
+          <td>+0.4%</td>
+          <td>58%</td>
+        </tr><tr>
+          <td><span class="stock-name">8035 東京エレクトロン</span><br><span class="candle-label">🔴陰線</span></td>
+          <td class="price">70360円</td>
+          <td class="down">▼-3.6%</td>
+          <td class="">0.8倍</td>
+          <td class="">60.8</td>
+          <td>+13.7%</td>
+          <td>78%</td>
+        </tr><tr>
+          <td><span class="stock-name">6861 キーエンス</span><br><span class="candle-label">🟢大陽線(強い買い)</span></td>
+          <td class="price">76680円</td>
+          <td class="up">▲+1.3%</td>
+          <td class="">0.5倍</td>
+          <td class="">52.9</td>
+          <td>-0.1%</td>
+          <td>75%</td>
         </tr>
   </table>
   <div class="legend">
@@ -310,6 +323,9 @@
         </a><a href="https://toyokeizai.net/articles/-/948997?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
           <span class="news-source" style="background:#0077b6">東洋経済</span>
           <span class="news-title">認知機能が衰えると自分名義の資産も自由に使えなくなる､高齢者マネー260兆円が凍り付く危険性 | 政治・経済・投資 | 東洋経済オンライン</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581440" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">出来高変化率ランキング（13時台）～サンリオ、イントランスなどがランクイン</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1581439" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
           <span class="news-title">Nvidia禁輸チップ、中国闇市場で価格が半年で2倍以上に高騰</span>
@@ -325,9 +341,6 @@
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1581422" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
           <span class="news-title">Jトラスト---株主優待における宝塚大劇場公演の詳細決定</span>
-        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581421" target="_blank" class="news-item">
-          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
-          <span class="news-title">後場の日経平均は502円安でスタート、SUMCOや東エレクが下落</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1580093" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
           <span class="news-title">株式市場の急落を解説：なぜ投資家は突然不安を抱いているのか</span>
@@ -398,41 +411,56 @@
 
 </div><!-- /tab-morning -->
 
-<!-- ウォッチリスト + 振り返りタブ -->
+<!-- ウォッチリスト + 取引ログタブ -->
 <div id="tab-watch" class="tab-content">
 
-  <!-- 振り返り -->
+  <!-- 取引ログ入力 -->
   <div class="reflection-card">
-    <div class="reflection-title">📝 前日の振り返り</div>
-    <div class="refl-row">
+    <div class="reflection-title">📒 取引ログを記録</div>
+
+    <!-- 日付 -->
+    <div class="refl-label">日付</div>
+    <input type="date" class="refl-input" id="refl-date" style="width:100%">
+
+    <!-- 銘柄 -->
+    <div class="refl-label">銘柄</div>
+    <input type="text" class="refl-input" id="refl-stock" placeholder="例: 9434 ソフトバンク" style="width:100%">
+
+    <!-- 買値・売値・株数 -->
+    <div class="refl-row3">
       <div>
-        <div class="refl-label">結果</div>
-        <select class="refl-input" id="refl-result">
-          <option value="">選択</option>
-          <option value="win">✅ 勝ち</option>
-          <option value="loss">❌ 負け</option>
-          <option value="even">➖ トントン</option>
-          <option value="rest">😴 休み</option>
-        </select>
+        <div class="refl-label">買値（円）</div>
+        <input type="number" class="refl-input" id="refl-buy" placeholder="例: 210" oninput="calcPnl()">
       </div>
       <div>
-        <div class="refl-label">損益（円）</div>
-        <input type="number" class="refl-input" id="refl-pnl" placeholder="例: +1200 / -800">
+        <div class="refl-label">売値（円）</div>
+        <input type="number" class="refl-input" id="refl-sell" placeholder="例: 215" oninput="calcPnl()">
+      </div>
+      <div>
+        <div class="refl-label">株数</div>
+        <input type="number" class="refl-input" id="refl-shares" placeholder="100" value="100" oninput="calcPnl()">
       </div>
     </div>
-    <div class="refl-label">取引した銘柄</div>
-    <input type="text" class="refl-input" id="refl-stock" placeholder="例: 9434 ソフトバンク" style="width:100%">
-    <div class="refl-label">気づき・反省・よかった点</div>
-    <textarea class="refl-textarea" id="refl-note" placeholder="例: 損切りできず含み損を抱えてしまった。次は〇〇円で必ず切る。"></textarea>
+
+    <!-- 自動計算された損益 -->
+    <div class="pnl-preview" id="pnl-preview"></div>
+
+    <!-- メモ -->
+    <div class="refl-label">メモ（任意）</div>
+    <textarea class="refl-textarea" id="refl-note" placeholder="例: 損切りできなかった。上がると思って粘ってしまった。次回は〇〇円で必ず切る。"></textarea>
+
     <button class="refl-save-btn" onclick="saveReflection()">💾 保存する</button>
   </div>
 
-  <!-- 振り返り履歴 -->
+  <!-- 取引履歴 -->
   <div class="card">
-    <div class="card-header"><span class="card-title">📊 振り返り履歴</span></div>
+    <div class="card-header">
+      <span class="card-title">📊 取引履歴</span>
+      <span class="badge" id="trade-summary">集計中...</span>
+    </div>
     <div class="refl-history" id="refl-history">履歴なし</div>
-    <button class="btn-copy-hint" onclick="copyReflHistory()" style="margin-top:8px">📋 履歴をClaudeプロンプトにコピー</button>
-    <div class="toast-small" id="refl-copied">✅ コピーしました！</div>
+    <button class="btn-copy-hint" onclick="copyReflHistory()" style="margin-top:8px">📋 履歴をClaudeに渡してパターン分析</button>
+    <div class="toast-small" id="refl-copied">✅ コピーしました！Claude.aiに貼り付けてください</div>
   </div>
 
   <!-- ウォッチリスト -->
@@ -444,7 +472,7 @@
       <button class="watch-add-btn" onclick="addWatch()">追加</button>
     </div>
     <ul class="watch-list" id="watch-list"></ul>
-    <div class="refl-label" style="margin-top:10px">ウォッチ中の銘柄メモ</div>
+    <div class="refl-label" style="margin-top:10px">メモ</div>
     <textarea class="watch-memo" id="watch-memo" placeholder="気になる理由、注目材料、エントリー条件など自由に"></textarea>
     <button class="btn-copy-hint" onclick="saveWatchMemo()" style="margin-top:6px">💾 メモを保存</button>
   </div>
@@ -452,13 +480,13 @@
 </div><!-- /tab-watch -->
 
 <script>
-const MARKET_DATA = `【取得時刻】2026年06月24日 14:20
+const MARKET_DATA = `【取得時刻】2026年06月24日 14:29
 
 【日本市場】
-・日経平均: 69,187.30 (-0.86%) | 高:70218.71 安:68461.10
-・TOPIX: 420.00 (-0.66%) | 高:425.10 安:417.70
-・グロース250: 551.80 (+0.05%) | 高:559.70 安:548.70
-・ドル円: 161.59 (+0.01%) | 高:161.64 安:161.46
+・日経平均: 69,383.25 (-0.58%) | 高:70218.71 安:68461.10
+・TOPIX: 420.50 (-0.54%) | 高:425.10 安:417.70
+・グロース250: 552.90 (+0.25%) | 高:559.70 安:548.70
+・ドル円: 161.60 (+0.02%) | 高:161.64 安:161.46
 
 【米国市場（前日終値）】
 ・ダウ平均: 51,666.84 (-0.09%)
@@ -467,21 +495,21 @@ const MARKET_DATA = `【取得時刻】2026年06月24日 14:20
 
 【グローバル指標】
 ・VIX恐怖指数: 19.49 (+12.79%)
-・金(Gold): 4084.70 (-1.09%)
+・金(Gold): 4083.10 (-1.13%)
 ・原油(WTI): 72.64 (-0.78%)
 ・米10年債利回: 4.45 (-0.27%)
 
 【スクリーニング結果（テクニカル分析済み）】
-・8306 三菱UFJ: 3212円 (-1.68%) 出来高比:0.4倍 RSI:55.1 25MA乖離:+1.7% 52週位置:78% 🔴大陰線(強い売り)
-・8316 三井住友FG: 6361円 (-1.50%) 出来高比:0.5倍 RSI:55.1 25MA乖離:+2.4% 52週位置:79% 🔴大陰線(強い売り)
-・4385 メルカリ: 3960円 (+1.54%) 出来高比:0.8倍 RSI:53.0 25MA乖離:+0.6% 52週位置:58% 十字線(迷い)
-・8035 東京エレクトロン: 69640円 (-4.55%) 出来高比:0.8倍 RSI:59.6 25MA乖離:+12.6% 52週位置:76% 🔴陰線
-・1570 日経レバETF: 77600円 (-1.95%) 出来高比:1.0倍 RSI:57.4 25MA乖離:+5.8% 52週位置:80% 🔴陰線
-・3697 SHIFT: 621円 (+1.75%) 出来高比:0.5倍 RSI:42.5 25MA乖離:-7.2% 52週位置:10% 🔴陰線
-・4478 フリー: 1911円 (+2.58%) 出来高比:0.3倍 RSI:41.6 25MA乖離:-7.5% 52週位置:8% 🔴陰線
-・2371 カカクコム: 3310円 (-0.45%) 出来高比:0.5倍 RSI:57.6 25MA乖離:-1.1% 52週位置:84% 十字線(迷い)
-・3765 ガンホー: 2176円 (-0.32%) 出来高比:0.4倍 RSI:40.3 25MA乖離:-2.2% 52週位置:11% 🔴陰線
-・6050 イー・ガーディアン: 1664円 (+0.36%) 出来高比:0.8倍 RSI:53.4 25MA乖離:+0.9% 52週位置:53% 🟢大陽線(強い買い)`;
+・8306 三菱UFJ: 3209円 (-1.78%) 出来高比:0.4倍 RSI:54.8 25MA乖離:+1.6% 52週位置:78% 🔴大陰線(強い売り)
+・8316 三井住友FG: 6365円 (-1.44%) 出来高比:0.5倍 RSI:55.2 25MA乖離:+2.5% 52週位置:80% 🔴大陰線(強い売り)
+・3697 SHIFT: 620円 (+1.64%) 出来高比:0.5倍 RSI:42.4 25MA乖離:-7.3% 52週位置:10% 🔴陰線
+・4478 フリー: 1912円 (+2.63%) 出来高比:0.3倍 RSI:41.6 25MA乖離:-7.4% 52週位置:8% 🔴陰線
+・2371 カカクコム: 3315円 (-0.30%) 出来高比:0.5倍 RSI:58.3 25MA乖離:-0.9% 52週位置:85% 🟢陽線
+・6050 イー・ガーディアン: 1660円 (+0.12%) 出来高比:0.9倍 RSI:52.0 25MA乖離:+0.7% 52週位置:50% 🟢陽線
+・3672 オルトプラス: 26円 (+4.00%) 出来高比:0.2倍 RSI:35.6 25MA乖離:-7.8% 52週位置:4% 十字線(迷い)
+・4385 メルカリ: 3952円 (+1.33%) 出来高比:0.8倍 RSI:52.6 25MA乖離:+0.4% 52週位置:58% 十字線(迷い)
+・8035 東京エレクトロン: 70360円 (-3.56%) 出来高比:0.8倍 RSI:60.8 25MA乖離:+13.7% 52週位置:78% 🔴陰線
+・6861 キーエンス: 76680円 (+1.32%) 出来高比:0.5倍 RSI:52.9 25MA乖離:-0.1% 52週位置:75% 🟢大陽線(強い買い)`;
 
 function buildGeminiPrompt() {
   const lines = MARKET_DATA.split('\n');
@@ -705,61 +733,132 @@ function saveWatchMemo() {
   alert('メモを保存しました');
 }
 
-// ===== 振り返り =====
+// ===== 損益自動計算 =====
+function calcPnl() {
+  const buy = parseFloat(document.getElementById('refl-buy').value) || 0;
+  const sell = parseFloat(document.getElementById('refl-sell').value) || 0;
+  const shares = parseInt(document.getElementById('refl-shares').value) || 100;
+  const el = document.getElementById('pnl-preview');
+  if (!buy || !sell) { el.textContent = '買値と売値を入力すると損益が自動計算されます'; el.className = 'pnl-preview pnl-zero'; return; }
+  const pnl = (sell - buy) * shares;
+  const pct = ((sell - buy) / buy * 100).toFixed(2);
+  if (pnl > 0) {
+    el.textContent = `✅ 利益 +${pnl.toLocaleString()}円 (+${pct}%) / ${shares}株`;
+    el.className = 'pnl-preview pnl-win';
+  } else if (pnl < 0) {
+    el.textContent = `❌ 損失 ${pnl.toLocaleString()}円 (${pct}%) / ${shares}株`;
+    el.className = 'pnl-preview pnl-loss';
+  } else {
+    el.textContent = `➖ トントン / ${shares}株`;
+    el.className = 'pnl-preview pnl-zero';
+  }
+}
+
+// ===== 取引ログ =====
 function loadReflections() {
   return JSON.parse(localStorage.getItem('reflections') || '[]');
 }
+
 function saveReflection() {
-  const result = document.getElementById('refl-result').value;
-  const pnl = document.getElementById('refl-pnl').value;
+  const date = document.getElementById('refl-date').value;
   const stock = document.getElementById('refl-stock').value.trim();
+  const buy = parseFloat(document.getElementById('refl-buy').value) || 0;
+  const sell = parseFloat(document.getElementById('refl-sell').value) || 0;
+  const shares = parseInt(document.getElementById('refl-shares').value) || 100;
   const note = document.getElementById('refl-note').value.trim();
-  if (!result && !note) { alert('結果か気づきを入力してください'); return; }
+
+  if (!date || !stock) { alert('日付と銘柄は必須です'); return; }
+
+  const pnl = buy && sell ? Math.round((sell - buy) * shares) : null;
+  const result = pnl === null ? 'memo' : pnl > 0 ? 'win' : pnl < 0 ? 'loss' : 'even';
+
   const list = loadReflections();
-  const today = new Date().toLocaleDateString('ja-JP');
-  list.unshift({date: today, result, pnl, stock, note});
-  localStorage.setItem('reflections', JSON.stringify(list.slice(0, 30)));
-  document.getElementById('refl-result').value = '';
-  document.getElementById('refl-pnl').value = '';
+  list.unshift({ date, stock, buy, sell, shares, pnl, result, note });
+  localStorage.setItem('reflections', JSON.stringify(list.slice(0, 100)));
+
+  // フォームリセット
   document.getElementById('refl-stock').value = '';
+  document.getElementById('refl-buy').value = '';
+  document.getElementById('refl-sell').value = '';
+  document.getElementById('refl-shares').value = '100';
   document.getElementById('refl-note').value = '';
+  document.getElementById('pnl-preview').textContent = '';
+  document.getElementById('pnl-preview').className = 'pnl-preview';
+
   renderReflections();
 }
+
 function renderReflections() {
   const list = loadReflections();
   const el = document.getElementById('refl-history');
-  if (!list.length) { el.innerHTML = '<div style="color:#8b949e;font-size:0.83rem">まだ記録がありません</div>'; return; }
-  const resultLabel = {win:'✅ 勝ち', loss:'❌ 負け', even:'➖ トントン', rest:'😴 休み', '': '-'};
-  el.innerHTML = list.slice(0,10).map((r, i) => {
-    const cls = r.result === 'win' ? 'win' : r.result === 'loss' ? 'loss' : 'even';
-    const pnlStr = r.pnl ? (parseInt(r.pnl) > 0 ? `+${r.pnl}円` : `${r.pnl}円`) : '';
-    return `<div class="refl-entry">
-      <div class="refl-date">${r.date} <span class="${cls}">${resultLabel[r.result] || '-'}</span>${pnlStr ? ' <strong>' + pnlStr + '</strong>' : ''}${r.stock ? ' | ' + r.stock : ''}
-        <button class="refl-del" onclick="delRefl(${i})">削除</button>
-      </div>
-      ${r.note ? '<div>' + r.note + '</div>' : ''}
+  const summary = document.getElementById('trade-summary');
+
+  if (!list.length) {
+    el.innerHTML = '<div style="color:#8b949e;font-size:0.83rem;padding:8px 0">まだ記録がありません</div>';
+    summary.textContent = '記録なし';
+    return;
+  }
+
+  // 集計
+  const trades = list.filter(r => r.pnl !== null);
+  const totalPnl = trades.reduce((s, r) => s + (r.pnl || 0), 0);
+  const wins = trades.filter(r => r.result === 'win').length;
+  const total = trades.length;
+  const winRate = total ? Math.round(wins / total * 100) : 0;
+  const sign = totalPnl >= 0 ? '+' : '';
+  summary.textContent = `${total}回 勝率${winRate}% 累計${sign}${totalPnl.toLocaleString()}円`;
+  summary.style.color = totalPnl >= 0 ? '#3fb950' : '#f85149';
+
+  el.innerHTML = list.map((r, i) => {
+    const pnlStr = r.pnl !== null
+      ? `<span class="${r.pnl >= 0 ? 'win' : 'loss'}">${r.pnl >= 0 ? '+' : ''}${r.pnl.toLocaleString()}円</span>`
+      : '<span class="even">メモ</span>';
+    const detailParts = [];
+    if (r.buy) detailParts.push(`買: ${r.buy}円`);
+    if (r.sell) detailParts.push(`売: ${r.sell}円`);
+    if (r.shares) detailParts.push(`${r.shares}株`);
+    if (r.buy && r.sell) detailParts.push(`(${((r.sell-r.buy)/r.buy*100).toFixed(1)}%)`);
+    return `<div class="trade-row">
+      <span class="trade-date">${r.date}</span>
+      <div><div class="trade-stock">${r.stock}</div><div class="trade-detail">${detailParts.join(' | ')}</div></div>
+      <span class="trade-pnl">${pnlStr}</span>
+      <button class="trade-del" onclick="delRefl(${i})">✕</button>
+      ${r.note ? '<div class="trade-note">' + r.note + '</div>' : ''}
     </div>`;
   }).join('');
 }
+
 function delRefl(i) {
   const list = loadReflections();
   list.splice(i, 1);
   localStorage.setItem('reflections', JSON.stringify(list));
   renderReflections();
 }
+
 function copyReflHistory() {
   const list = loadReflections();
-  if (!list.length) { alert('振り返り履歴がありません'); return; }
-  const resultLabel = {win:'勝ち', loss:'負け', even:'トントン', rest:'休み', '': ''};
-  let text = '【過去の振り返り記録】\n';
-  list.slice(0, 10).forEach(r => {
-    text += `${r.date}: ${resultLabel[r.result] || ''}`;
-    if (r.pnl) text += ` ${r.pnl}円`;
-    if (r.stock) text += ` [${r.stock}]`;
-    if (r.note) text += ` → ${r.note}`;
+  if (!list.length) { alert('取引履歴がありません'); return; }
+
+  const trades = list.filter(r => r.pnl !== null);
+  const totalPnl = trades.reduce((s, r) => s + (r.pnl || 0), 0);
+  const wins = trades.filter(r => r.result === 'win').length;
+  const winRate = trades.length ? Math.round(wins / trades.length * 100) : 0;
+
+  let text = `【取引履歴・パターン分析依頼】\n`;
+  text += `総取引数: ${trades.length}回 / 勝率: ${winRate}% / 累計損益: ${totalPnl >= 0 ? '+' : ''}${totalPnl.toLocaleString()}円\n\n`;
+  text += `【取引一覧】\n`;
+  list.slice(0, 20).forEach(r => {
+    text += `${r.date} ${r.stock}`;
+    if (r.buy && r.sell) text += ` 買:${r.buy}円→売:${r.sell}円 ${r.shares}株 ${r.pnl >= 0 ? '+' : ''}${r.pnl}円`;
+    if (r.note) text += ` [${r.note}]`;
     text += '\n';
   });
-  text += '\n上記の過去の負けパターン・成功パターンも踏まえて、今日の戦略を教えてください。';
+  text += `\n上記の取引履歴を分析して以下を教えてください：
+・私の負けパターン（どんな時に負けているか）
+・私の勝ちパターン（どんな時に勝っているか）
+・改善すべき最優先の習慣1つ
+・今日の相場で活かせるアドバイス`;
+
   navigator.clipboard.writeText(text).catch(() => {
     const el = document.createElement('textarea');
     el.value = text; document.body.appendChild(el); el.select();
@@ -767,7 +866,7 @@ function copyReflHistory() {
   });
   const t = document.getElementById('refl-copied');
   t.style.display = 'block';
-  setTimeout(() => t.style.display = 'none', 2500);
+  setTimeout(() => t.style.display = 'none', 3000);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -777,6 +876,12 @@ window.addEventListener('DOMContentLoaded', () => {
   renderReflections();
   const memo = localStorage.getItem('watchMemo');
   if (memo) document.getElementById('watch-memo').value = memo;
+  // 日付を今日に初期設定
+  const today = new Date();
+  const y = today.getFullYear();
+  const m = String(today.getMonth()+1).padStart(2,'0');
+  const d = String(today.getDate()).padStart(2,'0');
+  document.getElementById('refl-date').value = `${y}-${m}-${d}`;
 });
 
 function copyPrompt(type) {

@@ -62,6 +62,20 @@
     .rank-label{font-size:0.68rem;color:#8b949e;margin-bottom:4px;font-weight:bold}
     .rank-item{font-size:0.75rem;padding:3px 0;border-bottom:1px solid #21262d}
     .rank-item.up{color:#3fb950}.rank-item.down{color:#f85149}.rank-item.vol{color:#f0a500}
+    .alert-card{border-radius:10px;padding:11px 13px;margin-bottom:10px;border:1px solid}
+    .alert-card.danger{background:#1f0d0d;border-color:#6e1a1a}
+    .alert-card.warning{background:#1a1500;border-color:#5a4500}
+    .alert-card.safe{background:#0d1f12;border-color:#238636}
+    .alert-title{font-size:0.82rem;font-weight:bold;margin-bottom:7px}
+    .alert-card.danger .alert-title{color:#f85149}
+    .alert-card.warning .alert-title{color:#f0a500}
+    .alert-card.safe .alert-title{color:#3fb950}
+    .alert-item{font-size:0.78rem;padding:4px 0;border-bottom:1px solid #21262d;line-height:1.4}
+    .alert-item:last-child{border-bottom:none}
+    .alert-badge{display:inline-block;font-size:0.7rem;font-weight:bold;margin-right:6px}
+    .earn-today{color:#f85149}.earn-soon{color:#f0a500}
+    .econ-today{color:#f85149;font-weight:bold}.econ-week{color:#e6edf3}
+    .alert-date{color:#8b949e;font-size:0.72rem;margin-left:6px}
     .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
     .legend-item{font-size:0.65rem;color:#8b949e}
     /* ナビ */
@@ -116,7 +130,7 @@
 
 <header>
   <h1>📈 株朝活 PRO</h1>
-  <span class="time">2026年06月24日 16:10</span>
+  <span class="time">2026年06月24日 16:17</span>
 </header>
 
 <!-- ナビゲーション -->
@@ -147,7 +161,7 @@
           <div class="index-sub">高:560 安:549</div>
         </div><div class="index-card">
           <div class="index-name">ドル円</div>
-          <div class="index-price">161.70</div>
+          <div class="index-price">161.71</div>
           <div class="index-change up">▲ +0.08%</div>
           <div class="index-sub">高:162 安:161</div>
         </div></div>
@@ -174,17 +188,20 @@
           <div class="index-change up">▲ +12.79%</div>
         </div><div class="index-card small">
           <div class="index-name">金(Gold)</div>
-          <div class="index-price">4104.10</div>
-          <div class="index-change down">▼ -0.62%</div>
+          <div class="index-price">4105.70</div>
+          <div class="index-change down">▼ -0.59%</div>
         </div><div class="index-card small">
           <div class="index-name">原油(WTI)</div>
-          <div class="index-price">72.60</div>
-          <div class="index-change down">▼ -0.83%</div>
+          <div class="index-price">72.31</div>
+          <div class="index-change down">▼ -1.23%</div>
         </div><div class="index-card small">
           <div class="index-name">米10年債利回</div>
           <div class="index-price">4.45</div>
           <div class="index-change down">▼ -0.27%</div>
         </div></div>
+
+<!-- アラート -->
+<div class="alert-card warning"><div class="alert-title">📅 今週の重要経済指標</div><div class="alert-item econ-week">🟡 2026-06-22  [EUR] ECB President Lagarde Speaks</div><div class="alert-item econ-week">🟡 2026-06-22  [EUR] ECB President Lagarde Speaks</div><div class="alert-item econ-week">🟡 2026-06-23  [EUR] French Flash Manufacturing PMI</div><div class="alert-item econ-week">🟡 2026-06-23  [EUR] French Flash Services PMI</div><div class="alert-item econ-week">🟡 2026-06-23  [EUR] German Flash Manufacturing PMI</div><div class="alert-item econ-week">🟡 2026-06-23  [EUR] German Flash Services PMI</div></div>
 
 <!-- 前日まとめ -->
 <div class="card" style="margin-top:14px">
@@ -345,6 +362,9 @@
         </a><a href="https://toyokeizai.net/articles/-/947918?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
           <span class="news-source" style="background:#0077b6">東洋経済</span>
           <span class="news-title">知っておくべき銀行･証券会社･国が明かさない&quot;金融の本質&quot;　金融商品は｢あなたを豊かにする｣ために作られていない | ライフ | 東洋経済オンライン</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581529" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">欧州株式、世界的なテック株急落とFRBへの警戒感で伸び悩む</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1581517" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
           <span class="news-title">日経平均は続落、利食い売り優勢で軟調もみ合い展開</span>
@@ -360,18 +380,15 @@
         </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1581498" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
           <span class="news-title">シュローダー欧州REITが資産価値下落を受け清算計画を発表</span>
-        </a><a href="https://jp.investing.com/news/stock-market-news/article-1581493" target="_blank" class="news-item">
-          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
-          <span class="news-title">バークレイズ、テレコム・イタリア取引でPoste Italianeを格上げ、目標株価を63%引き上げ</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1580093" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
           <span class="news-title">株式市場の急落を解説：なぜ投資家は突然不安を抱いているのか</span>
-        </a><a href="https://jp.investing.com/news/forex-news/article-1581467" target="_blank" class="news-item">
-          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
-          <span class="news-title">日経平均は191円安、米マイクロン決算などに関心</span>
         </a><a href="https://jp.investing.com/news/forex-news/article-1581456" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
           <span class="news-title">日経平均VIは大幅に上昇、米マイクロン決算も警戒</span>
+        </a><a href="https://jp.investing.com/news/forex-news/article-1581467" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
+          <span class="news-title">日経平均は191円安、米マイクロン決算などに関心</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1580114" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
           <span class="news-title">マイクロンテクノロジー株が本日急落している理由とは</span>
@@ -478,6 +495,12 @@
     <button class="refl-save-btn" onclick="saveReflection()">💾 保存する</button>
   </div>
 
+  <!-- グラフ -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📈 累積損益グラフ</span></div>
+    <canvas id="pnl-chart" height="120" style="width:100%"></canvas>
+  </div>
+
   <!-- 取引履歴 -->
   <div class="card">
     <div class="card-header">
@@ -506,13 +529,13 @@
 </div><!-- /tab-watch -->
 
 <script>
-const MARKET_DATA = `【取得時刻】2026年06月24日 16:10
+const MARKET_DATA = `【取得時刻】2026年06月24日 16:17
 
 【日本市場】
 ・日経平均: 69,174.97 (-0.88%) | 高:70218.71 安:68461.10
 ・TOPIX: 419.90 (-0.69%) | 高:425.10 安:417.70
 ・グロース250: 551.70 (+0.04%) | 高:559.70 安:548.70
-・ドル円: 161.70 (+0.08%) | 高:161.73 安:161.46
+・ドル円: 161.71 (+0.08%) | 高:161.73 安:161.46
 
 【米国市場（前日終値）】
 ・ダウ平均: 51,666.84 (-0.09%)
@@ -521,8 +544,8 @@ const MARKET_DATA = `【取得時刻】2026年06月24日 16:10
 
 【グローバル指標】
 ・VIX恐怖指数: 19.49 (+12.79%)
-・金(Gold): 4104.10 (-0.62%)
-・原油(WTI): 72.60 (-0.83%)
+・金(Gold): 4105.70 (-0.59%)
+・原油(WTI): 72.31 (-1.23%)
 ・米10年債利回: 4.45 (-0.27%)
 
 【スクリーニング結果（テクニカル分析済み）】
@@ -536,6 +559,20 @@ const MARKET_DATA = `【取得時刻】2026年06月24日 16:10
 ・2371 カカクコム: 3305円 (-0.60%) 出来高比:0.7倍 RSI:57.0 25MA乖離:-1.2% 52週位置:84% 🔴陰のカラカサ(反転期待)
 ・6050 イー・ガーディアン: 1660円 (+0.12%) 出来高比:1.1倍 RSI:52.0 25MA乖離:+0.7% 52週位置:50% 🟢陽線
 ・3672 オルトプラス: 26円 (+4.00%) 出来高比:0.2倍 RSI:35.6 25MA乖離:-7.8% 52週位置:4% 十字線(迷い)
+
+【決算発表】今後7日以内の決算発表なし（比較的安全）
+
+【📅 今週の重要経済指標（日本株に影響大）】
+・🟡2026-06-22  [EUR] ECB President Lagarde Speaks 
+・🟡2026-06-22  [EUR] ECB President Lagarde Speaks 
+・🟡2026-06-23  [EUR] French Flash Manufacturing PMI 
+・🟡2026-06-23  [EUR] French Flash Services PMI 
+・🟡2026-06-23  [EUR] German Flash Manufacturing PMI 
+・🟡2026-06-23  [EUR] German Flash Services PMI 
+・🟡2026-06-23  [USD] Flash Manufacturing PMI 
+・🟡2026-06-23  [USD] Flash Services PMI 
+・🟡2026-06-23  [USD] President Trump Speaks 
+・🔴2026-06-25  [USD] Core PCE Price Index m/m 
 
 【前日（昨日）の東証まとめ】
 ▲強かったセクター: 医薬品(+0.9%)、小売(+0.6%)
@@ -899,6 +936,7 @@ function saveReflection() {
   document.getElementById('pnl-preview').className = 'pnl-preview';
 
   renderReflections();
+  renderPnlChart();
 }
 
 function renderReflections() {
@@ -946,6 +984,7 @@ function delRefl(i) {
   list.splice(i, 1);
   localStorage.setItem('reflections', JSON.stringify(list));
   renderReflections();
+  renderPnlChart();
 }
 
 function copyReflHistory() {
@@ -987,6 +1026,7 @@ window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('chatgpt-hint').innerText = buildChatGPTPrompt();
   renderWatchList();
   renderReflections();
+  renderPnlChart();
   const memo = localStorage.getItem('watchMemo');
   if (memo) document.getElementById('watch-memo').value = memo;
   // 日付を今日に初期設定
@@ -1028,6 +1068,88 @@ function showToast() {
   const t = document.getElementById('toast');
   t.style.display = 'block';
   setTimeout(() => t.style.display = 'none', 3000);
+}
+
+function renderPnlChart() {
+  const canvas = document.getElementById('pnl-chart');
+  if (!canvas) return;
+  const list = loadReflections().filter(r => r.pnl !== null).reverse(); // 古い順
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 300;
+  const H = 120;
+  canvas.width = W;
+  canvas.height = H;
+  ctx.clearRect(0, 0, W, H);
+
+  if (list.length < 2) {
+    ctx.fillStyle = '#8b949e';
+    ctx.font = '13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('取引を2件以上記録するとグラフが表示されます', W/2, H/2);
+    return;
+  }
+
+  // 累積損益を計算
+  let cumulative = 0;
+  const points = [0];
+  list.forEach(r => { cumulative += r.pnl; points.push(cumulative); });
+
+  const maxVal = Math.max(...points, 1);
+  const minVal = Math.min(...points, -1);
+  const range = maxVal - minVal || 1;
+  const pad = {t:15, b:20, l:45, r:10};
+  const cW = W - pad.l - pad.r;
+  const cH = H - pad.t - pad.b;
+
+  const toX = i => pad.l + (i / (points.length - 1)) * cW;
+  const toY = v => pad.t + cH - ((v - minVal) / range) * cH;
+  const zeroY = toY(0);
+
+  // ゼロライン
+  ctx.strokeStyle = '#30363d';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(pad.l, zeroY); ctx.lineTo(W - pad.r, zeroY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 塗りつぶし
+  const lastPnl = points[points.length - 1];
+  const grad = ctx.createLinearGradient(0, pad.t, 0, H - pad.b);
+  if (lastPnl >= 0) {
+    grad.addColorStop(0, 'rgba(63,185,80,0.3)');
+    grad.addColorStop(1, 'rgba(63,185,80,0)');
+  } else {
+    grad.addColorStop(0, 'rgba(248,81,73,0)');
+    grad.addColorStop(1, 'rgba(248,81,73,0.3)');
+  }
+  ctx.beginPath();
+  ctx.moveTo(toX(0), zeroY);
+  points.forEach((v, i) => ctx.lineTo(toX(i), toY(v)));
+  ctx.lineTo(toX(points.length - 1), zeroY);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // ライン
+  ctx.strokeStyle = lastPnl >= 0 ? '#3fb950' : '#f85149';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  points.forEach((v, i) => i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v)));
+  ctx.stroke();
+
+  // Y軸ラベル
+  ctx.fillStyle = '#8b949e';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(`+${maxVal.toLocaleString()}`, pad.l - 4, pad.t + 4);
+  ctx.fillText(`${minVal.toLocaleString()}`, pad.l - 4, H - pad.b);
+  ctx.fillText('0', pad.l - 4, zeroY + 4);
+
+  // 最終値
+  ctx.textAlign = 'left';
+  ctx.fillStyle = lastPnl >= 0 ? '#3fb950' : '#f85149';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.fillText(`${lastPnl >= 0 ? '+' : ''}${lastPnl.toLocaleString()}円`, toX(points.length-1) - 35, toY(lastPnl) - 6);
 }
 </script>
 </body>

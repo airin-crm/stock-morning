@@ -150,7 +150,7 @@
 
 <header>
   <h1>📈 株朝活 PRO</h1>
-  <span class="time">2026年06月26日 16:14</span>
+  <span class="time">2026年06月26日 16:18</span>
 </header>
 
 <!-- ナビゲーション -->
@@ -184,7 +184,7 @@
         </div><div class="index-card">
           <div class="index-name">ドル円</div>
           <div class="index-price">161.66</div>
-          <div class="index-change down">▼ -0.07%</div>
+          <div class="index-change down">▼ -0.06%</div>
           <div class="index-sub">高:162 安:162</div>
         </div></div>
 
@@ -210,12 +210,12 @@
           <div class="index-change up">▲ +1.40%</div>
         </div><div class="index-card small">
           <div class="index-name">金(Gold)</div>
-          <div class="index-price">4045.30</div>
-          <div class="index-change up">▲ +0.37%</div>
+          <div class="index-price">4046.30</div>
+          <div class="index-change up">▲ +0.39%</div>
         </div><div class="index-card small">
           <div class="index-name">原油(WTI)</div>
-          <div class="index-price">70.43</div>
-          <div class="index-change down">▼ -2.07%</div>
+          <div class="index-price">70.44</div>
+          <div class="index-change down">▼ -2.06%</div>
         </div><div class="index-card small">
           <div class="index-name">米10年債利回</div>
           <div class="index-price">4.45</div>
@@ -746,13 +746,13 @@ function switchTab(tab, btn) {
   } catch(e) { console.error('switchTab error:', e); }
 }
 
-const MARKET_DATA = `【取得時刻】2026年06月26日 16:14
+const MARKET_DATA = `【取得時刻】2026年06月26日 16:18
 
 【日本市場】
 ・日経平均: 69,360.88 (-4.15%) | 高:71786.28 安:68639.84
 ・TOPIX: 420.40 (-1.29%) | 高:425.20 安:417.00
 ・グロース250: 539.50 (-2.72%) | 高:550.80 安:538.00
-・ドル円: 161.66 (-0.07%) | 高:161.85 安:161.52
+・ドル円: 161.66 (-0.06%) | 高:161.85 安:161.52
 
 【米国市場（前日終値）】
 ・ダウ平均: 51,920.62 (+0.14%)
@@ -761,8 +761,8 @@ const MARKET_DATA = `【取得時刻】2026年06月26日 16:14
 
 【グローバル指標】
 ・VIX恐怖指数: 18.89 (+1.40%)
-・金(Gold): 4045.30 (+0.37%)
-・原油(WTI): 70.43 (-2.07%)
+・金(Gold): 4046.30 (+0.39%)
+・原油(WTI): 70.44 (-2.06%)
 ・米10年債利回: 4.45 (+0.00%)
 
 【スクリーニング結果（テクニカル分析済み）】
@@ -1569,56 +1569,41 @@ function copyStatsToClaudePrompt() {
   const preds = JSON.parse(localStorage.getItem('predictions') || '[]');
   if (!stats) { alert('統計データがありません'); return; }
 
-  let text = '【📊 私の取引統計データ（Claudeへの分析依頼）】
-
-';
+  let lines2 = ['【📊 私の取引統計データ（Claudeへの分析依頼）】', ''];
 
   // エントリー理由別
-  text += '■ エントリー理由別勝率
-';
+  lines2.push('■ エントリー理由別勝率');
   Object.entries(stats.byReason).sort((a,b)=>b[1].total-a[1].total).forEach(([k,v]) => {
     const wr = Math.round(v.wins/v.total*100);
     const ev = Math.round(v.pnl/v.total);
-    text += `・${k}: 勝率${wr}% (${v.total}回) 平均損益${ev>=0?'+':''}${ev}円
-`;
+    lines2.push('・' + k + ': 勝率' + wr + '% (' + v.total + '回) 平均損益' + (ev>=0?'+':'') + ev + '円');
   });
 
   // 時間帯別
-  text += '
-■ 時間帯別勝率
-';
+  lines2.push('', '■ 時間帯別勝率');
   Object.entries(stats.byTime).sort((a,b)=>b[1].total-a[1].total).forEach(([k,v]) => {
     const wr = Math.round(v.wins/v.total*100);
-    text += `・${k}: 勝率${wr}% (${v.total}回)
-`;
+    lines2.push('・' + k + ': 勝率' + wr + '% (' + v.total + '回)');
   });
 
   // 地合い別
-  text += '
-■ 地合い別勝率
-';
+  lines2.push('', '■ 地合い別勝率');
   Object.entries(stats.byMarket).sort((a,b)=>b[1].total-a[1].total).forEach(([k,v]) => {
     const wr = Math.round(v.wins/v.total*100);
-    text += `・${k}: 勝率${wr}% (${v.total}回)
-`;
+    lines2.push('・' + k + ': 勝率' + wr + '% (' + v.total + '回)');
   });
 
   // 地合い予測精度
   const judged = preds.filter(p => p.actual);
   if (judged.length) {
     const correct = judged.filter(p => p.type === p.actual);
-    text += `
-■ AI地合い予測正答率: ${Math.round(correct.length/judged.length*100)}% (${judged.length}件)
-`;
+    lines2.push('', '■ AI地合い予測正答率: ' + Math.round(correct.length/judged.length*100) + '% (' + judged.length + '件)');
   }
 
-  text += `
-上記の私の統計データを踏まえて：
-1. 私が最も得意な条件・パターン
-2. 今すぐ改善すべき弱点
-3. 今日の市場環境で私が勝てる確率が高い条件
-4. やめるべきトレードパターン
-を具体的に教えてください。`;
+  lines2.push('', '上記の私の統計データを踏まえて：', '1. 私が最も得意な条件・パターン', '2. 今すぐ改善すべき弱点', '3. 今日の市場環境で私が勝てる確率が高い条件', '4. やめるべきトレードパターン', 'を具体的に教えてください。');
+
+  let text = lines2.join('
+');
 
   navigator.clipboard.writeText(text).catch(() => {
     const el = document.createElement('textarea');

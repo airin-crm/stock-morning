@@ -78,6 +78,19 @@
     .alert-date{color:#8b949e;font-size:0.72rem;margin-left:6px}
     .legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
     .legend-item{font-size:0.65rem;color:#8b949e}
+    /* メンタルチェック */
+    .mental-card{background:linear-gradient(135deg,#0d1f2d,#1a1f2e);border:1px solid #1f6feb55;border-radius:12px;padding:13px;margin-bottom:12px}
+    .mental-title{font-size:0.9rem;font-weight:bold;color:#58a6ff;margin-bottom:10px}
+    .mental-row{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:8px}
+    .mental-item label{font-size:0.72rem;color:#8b949e;display:block;margin-bottom:4px}
+    .star-rating{display:flex;gap:4px}
+    .star{font-size:1.3rem;cursor:pointer;opacity:0.3;transition:opacity .15s}
+    .star.active{opacity:1}
+    .mental-btn{display:block;width:100%;padding:10px;background:#1f6feb;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:bold;cursor:pointer;margin-top:8px}
+    .mental-status{font-size:0.78rem;padding:8px 10px;border-radius:8px;margin-top:6px;display:none;text-align:center;font-weight:bold}
+    .mental-ok{background:#0d1f12;color:#3fb950;border:1px solid #238636}
+    .mental-warn{background:#1a1500;color:#f0a500;border:1px solid #5a4500}
+    .mental-stop{background:#1f0d0d;color:#f85149;border:1px solid #6e1a1a}
     /* ナビ */
     .nav{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:14px}
     .nav-btn{display:block;padding:10px 4px;border-radius:10px;border:none;background:#21262d;color:#e6edf3;font-size:0.78rem;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none;transition:background .15s}
@@ -130,7 +143,7 @@
 
 <header>
   <h1>📈 株朝活 PRO</h1>
-  <span class="time">2026年06月26日 11:50</span>
+  <span class="time">2026年06月26日 11:56</span>
 </header>
 
 <!-- ナビゲーション -->
@@ -142,6 +155,39 @@
 
 <!-- 朝の分析タブ -->
 <div id="tab-morning" class="tab-content active">
+
+<!-- 🧠 メンタルチェック -->
+<div class="mental-card">
+  <div class="mental-title">🧠 今日のメンタルチェック（毎朝入力）</div>
+  <div class="mental-row">
+    <div class="mental-item">
+      <label>😴 昨晩の睡眠</label>
+      <div class="star-rating" id="stars-sleep" data-key="sleep">
+        <span class="star" data-v="1">⭐</span><span class="star" data-v="2">⭐</span><span class="star" data-v="3">⭐</span><span class="star" data-v="4">⭐</span><span class="star" data-v="5">⭐</span>
+      </div>
+    </div>
+    <div class="mental-item">
+      <label>💰 昨日の取引結果</label>
+      <div class="star-rating" id="stars-yesterday" data-key="yesterday">
+        <span class="star" data-v="1">😭</span><span class="star" data-v="2">😞</span><span class="star" data-v="3">😐</span><span class="star" data-v="4">😊</span><span class="star" data-v="5">🎉</span>
+      </div>
+    </div>
+    <div class="mental-item">
+      <label>🧘 今の気分・集中度</label>
+      <div class="star-rating" id="stars-focus" data-key="focus">
+        <span class="star" data-v="1">⭐</span><span class="star" data-v="2">⭐</span><span class="star" data-v="3">⭐</span><span class="star" data-v="4">⭐</span><span class="star" data-v="5">⭐</span>
+      </div>
+    </div>
+    <div class="mental-item">
+      <label>🔥 今日の取引意欲</label>
+      <div class="star-rating" id="stars-motivation" data-key="motivation">
+        <span class="star" data-v="1">⭐</span><span class="star" data-v="2">⭐</span><span class="star" data-v="3">⭐</span><span class="star" data-v="4">⭐</span><span class="star" data-v="5">⭐</span>
+      </div>
+    </div>
+  </div>
+  <div id="mental-status" class="mental-status"></div>
+  <button class="mental-btn" onclick="saveMental()">✅ メンタル状態を保存してClaudeに反映</button>
+</div>
 
 <div class="section-title">🇯🇵 日本市場</div>
 <div class="index-grid grid-2"><div class="index-card">
@@ -161,8 +207,8 @@
           <div class="index-sub">高:551 安:542</div>
         </div><div class="index-card">
           <div class="index-name">ドル円</div>
-          <div class="index-price">161.79</div>
-          <div class="index-change up">▲ +0.02%</div>
+          <div class="index-price">161.77</div>
+          <div class="index-change up">▲ +0.00%</div>
           <div class="index-sub">高:162 安:162</div>
         </div></div>
 
@@ -188,12 +234,12 @@
           <div class="index-change up">▲ +1.40%</div>
         </div><div class="index-card small">
           <div class="index-name">金(Gold)</div>
-          <div class="index-price">4011.00</div>
-          <div class="index-change up">▲ +0.52%</div>
+          <div class="index-price">4006.10</div>
+          <div class="index-change up">▲ +0.40%</div>
         </div><div class="index-card small">
           <div class="index-name">原油(WTI)</div>
-          <div class="index-price">71.07</div>
-          <div class="index-change up">▲ +1.04%</div>
+          <div class="index-price">70.99</div>
+          <div class="index-change up">▲ +0.92%</div>
         </div><div class="index-card small">
           <div class="index-name">米10年債利回</div>
           <div class="index-price">4.39</div>
@@ -426,6 +472,12 @@
         </a><a href="https://toyokeizai.net/articles/-/949441?utm_source=rss&utm_medium=http&utm_campaign=link_back" target="_blank" class="news-item">
           <span class="news-source" style="background:#0077b6">東洋経済</span>
           <span class="news-title">講談社がサッカーベンチャー｢グリーンカード｣に出資…目標は｢すべての部活､アマチュアチームにスポンサーをつける｣ | 政治・経済・投資 | 東洋経済オンライン</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1584464" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">児玉化 Research Memo（2）：メプロHDの買収により業容・事業ポートフォリオを拡大</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1584462" target="_blank" class="news-item">
+          <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
+          <span class="news-title">児玉化 Research Memo（1）：2026年3月期は買収により事業領域を拡大し、非連続な増収増益</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-93CH-1584461" target="_blank" class="news-item">
           <span class="news-source" style="background:#ff6b35">Investing.com株式</span>
           <span class="news-title">ソフトバンク株が急落、OpenAIのIPO延期報道が直撃</span>
@@ -447,12 +499,12 @@
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1583713" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
           <span class="news-title">アップル、チップ不足でMacとiPadの価格を引き上げ、株価5%急落</span>
-        </a><a href="https://jp.investing.com/news/forex-news/article-1583239" target="_blank" class="news-item">
-          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
-          <span class="news-title">日経平均テクニカル：3日ぶり急反発、大陽線で史上最高値</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1584428" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
           <span class="news-title">ソフトバンク株急落、OpenAIのIPO来年以降延期報道を受け</span>
+        </a><a href="https://jp.investing.com/news/forex-news/article-1583239" target="_blank" class="news-item">
+          <span class="news-source" style="background:#e67e22">Investing.com経済</span>
+          <span class="news-title">日経平均テクニカル：3日ぶり急反発、大陽線で史上最高値</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1584389" target="_blank" class="news-item">
           <span class="news-source" style="background:#e67e22">Investing.com経済</span>
           <span class="news-title">前日の急伸の反動や米テック株安を映して売り先行へ</span>
@@ -465,12 +517,6 @@
         </a><a href="https://www.itmedia.co.jp/business/articles/2606/26/news029.html" target="_blank" class="news-item">
           <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
           <span class="news-title">なぜIBMやウォルマートの採用条件から「大卒」「経験3年」の文字が消えているのか</span>
-        </a><a href="https://www.itmedia.co.jp/business/articles/2606/26/news011.html" target="_blank" class="news-item">
-          <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
-          <span class="news-title">500円席は投資、10万円席で回収　ハンドボール界が仕掛ける「超・高低差プライシング」</span>
-        </a><a href="https://www.itmedia.co.jp/business/articles/2606/26/news024.html" target="_blank" class="news-item">
-          <span class="news-source" style="background:#2d6a4f">ITmediaビジネス</span>
-          <span class="news-title">お寺の副住職が「PDF」を使い倒したら何が起きた？ 「お盆のハガキ300枚」をAIが仕分ける時代へ</span>
         </a>
 </div>
 
@@ -590,13 +636,13 @@
 </div><!-- /tab-watch -->
 
 <script>
-const MARKET_DATA = `【取得時刻】2026年06月26日 11:50
+const MARKET_DATA = `【取得時刻】2026年06月26日 11:56
 
 【日本市場】
 ・日経平均: 69,602.72 (-3.82%) | 高:71786.28 安:69488.82
 ・TOPIX: 420.80 (-1.20%) | 高:425.20 安:420.20
 ・グロース250: 542.60 (-2.16%) | 高:550.80 安:541.60
-・ドル円: 161.79 (+0.02%) | 高:161.85 安:161.69
+・ドル円: 161.77 (+0.00%) | 高:161.85 安:161.69
 
 【米国市場（前日終値）】
 ・ダウ平均: 51,920.62 (+0.14%)
@@ -605,8 +651,8 @@ const MARKET_DATA = `【取得時刻】2026年06月26日 11:50
 
 【グローバル指標】
 ・VIX恐怖指数: 18.89 (+1.40%)
-・金(Gold): 4011.00 (+0.52%)
-・原油(WTI): 71.07 (+1.04%)
+・金(Gold): 4006.10 (+0.40%)
+・原油(WTI): 70.99 (+0.92%)
 ・米10年債利回: 4.39 (-1.33%)
 
 【スクリーニング結果（テクニカル分析済み）】
@@ -751,6 +797,9 @@ function buildClaudePrompt() {
   const gemini = document.getElementById('gemini-input').value.trim();
   const chatgpt = document.getElementById('chatgpt-input').value.trim();
 
+  const mentalText = getMentalText();
+  const profileText = getPersonalProfile();
+
   let prompt = `あなたは20年以上の経験を持つ日本株専門のプロトレーダーです。
 ファンダメンタルとテクニカルの両面から分析し、私が今日の相場で勝てる確率を最大化してください。
 
@@ -758,6 +807,8 @@ function buildClaudePrompt() {
 【情報①】本日の市場データ・テクニカル分析（自動収集）
 ━━━━━━━━━━━━━━━━━━━━
 ${MARKET_DATA}
+${mentalText ? '\n' + mentalText : ''}
+${profileText ? '\n' + profileText : ''}
 `;
 
   if (gemini) {
@@ -795,19 +846,20 @@ ${chatgpt}
 
 ■ 4. 今日弱いテーマ・完全に避けること（3つ）
 
-■ 5. 本日のデイトレ推奨銘柄（3つ厳選）
+■ 5. 本日のデイトレ推奨銘柄（5つ）
+⚠️ 必須条件: このうち最低2つは「1株700円以下（100株=7万円以内）」の銘柄にすること
 各銘柄を以下の形式で：
 
-【銘柄名（コード）】
+【銘柄名（コード）】※700円以下の場合は冒頭に「💚低価格帯」と表記
 ・現在値: 〇〇円 / 100株コスト: 〇〇万円
-・推奨理由: （ファンダ・テクニカル両面から）
-・エントリータイミング: （寄り付き/前場/後場、何円台で）
+・推奨理由: （ファンダ・テクニカル・急騰スキャン結果を踏まえて）
+・エントリータイミング: （9:20以降、何円台で）
 ・第1利確目標: 〇〇円（+〇%、期待利益〇〇円/100株）
 ・第2利確目標: 〇〇円（+〇%）
-・損切りライン: 〇〇円（-〇%、最大損失〇〇円/100株）
+・損切りライン: 〇〇円（-〇%、最大損失〇〇円以内）
 ・リスクリワード比: 〇:1
 ・注意点・リスク: （正直に）
-・信頼度: ★★★★☆（5段階）
+・信頼度: ★〜★★★★★
 
 ■ 6. 今日の「やってはいけない」行動リスト
 
@@ -816,6 +868,10 @@ ${chatgpt}
 
 ■ 8. 総合判断
 ・「積極的に取引すべき日」「慎重に小さく」「今日は休む」のどれか
+
+━━━━━━━━━━━━━━━━━━━━
+【メンタルスコアに基づく本日の運用方針】
+${mentalText ? (getMentalScore() >= 15 ? '✅ メンタル良好 → 通常の推奨でOK' : getMentalScore() >= 10 ? '⚠️ やや不安定 → ロット半分・損切りより早めに設定すること' : '🛑 メンタル要注意 → リスク最小限の安全な銘柄のみ推奨。今日は1銘柄・少ロットのみ') : '（未入力）'}
 
 ━━━━━━━━━━━━━━━━━━━━
 私のルール・プロフィール：
@@ -831,6 +887,102 @@ ${chatgpt}
 ━━━━━━━━━━━━━━━━━━━━`;
 
   return prompt;
+}
+
+// ===== 🧠 メンタルチェック =====
+const MENTAL_KEYS = ['sleep','yesterday','focus','motivation'];
+
+function initStars() {
+  document.querySelectorAll('.star-rating').forEach(group => {
+    const key = group.dataset.key;
+    const saved = parseInt(localStorage.getItem('mental_' + key) || '0');
+    group.querySelectorAll('.star').forEach(star => {
+      const v = parseInt(star.dataset.v);
+      if (v <= saved) star.classList.add('active');
+      star.addEventListener('click', () => {
+        localStorage.setItem('mental_' + key, v);
+        group.querySelectorAll('.star').forEach(s => {
+          s.classList.toggle('active', parseInt(s.dataset.v) <= v);
+        });
+        updateMentalStatus();
+      });
+    });
+  });
+  updateMentalStatus();
+}
+
+function getMentalScore() {
+  return MENTAL_KEYS.reduce((sum, k) => sum + (parseInt(localStorage.getItem('mental_' + k) || '0')), 0);
+}
+
+function updateMentalStatus() {
+  const score = getMentalScore();
+  const el = document.getElementById('mental-status');
+  if (!score) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  if (score >= 15) {
+    el.className = 'mental-status mental-ok';
+    el.textContent = `✅ メンタル良好（スコア${score}/20）→ 通常通りトレードOK`;
+  } else if (score >= 10) {
+    el.className = 'mental-status mental-warn';
+    el.textContent = `⚠️ やや不安定（スコア${score}/20）→ ロットを小さく・損切りを早めに`;
+  } else {
+    el.className = 'mental-status mental-stop';
+    el.textContent = `🛑 要注意（スコア${score}/20）→ 今日は見るだけ推奨。無理して負けるパターン`;
+  }
+}
+
+function saveMental() {
+  const score = getMentalScore();
+  localStorage.setItem('mental_date', new Date().toLocaleDateString('ja-JP'));
+  localStorage.setItem('mental_total', score);
+  updateMentalStatus();
+  const btn = document.querySelector('.mental-btn');
+  btn.textContent = '✅ 保存完了！Claudeプロンプトに反映されます';
+  setTimeout(() => btn.textContent = '✅ メンタル状態を保存してClaudeに反映', 2000);
+}
+
+function getMentalText() {
+  const score = parseInt(localStorage.getItem('mental_total') || '0');
+  const date = localStorage.getItem('mental_date') || '';
+  const today = new Date().toLocaleDateString('ja-JP');
+  if (!score || date !== today) return '';
+  const sleep = parseInt(localStorage.getItem('mental_sleep') || '0');
+  const yest = parseInt(localStorage.getItem('mental_yesterday') || '0');
+  const focus = parseInt(localStorage.getItem('mental_focus') || '0');
+  const motiv = parseInt(localStorage.getItem('mental_motivation') || '0');
+  let advice = score >= 15 ? '通常通りトレードOK' : score >= 10 ? 'ロット小さく・早め損切り推奨' : '今日は見るだけ・無理禁止';
+  return `【🧠 本日のメンタルスコア: ${score}/20】
+・睡眠: ${sleep}/5
+・昨日の結果: ${yest}/5
+・集中度: ${focus}/5
+・意欲: ${motiv}/5
+→ 判定: ${advice}`;
+}
+
+function getPersonalProfile() {
+  const list = loadReflections().filter(r => r.pnl !== null);
+  if (list.length < 3) return '';
+  const wins = list.filter(r => r.result === 'win');
+  const losses = list.filter(r => r.result === 'loss');
+  const totalPnl = list.reduce((s, r) => s + r.pnl, 0);
+  const winRate = Math.round(wins.length / list.length * 100);
+  // 連敗チェック
+  let streak = 0;
+  for (let i = 0; i < Math.min(list.length, 5); i++) {
+    if (list[i].result === 'loss') streak++;
+    else break;
+  }
+  let streakNote = streak >= 3 ? `⚠️ 現在${streak}連敗中。今日は特に慎重に。` : '';
+  // よく取引する銘柄
+  const stockCount = {};
+  list.forEach(r => { if(r.stock) stockCount[r.stock] = (stockCount[r.stock]||0)+1; });
+  const topStock = Object.entries(stockCount).sort((a,b)=>b[1]-a[1])[0];
+  return `【📊 あなたの取引プロファイル（${list.length}回の実績より）】
+・通算勝率: ${winRate}% (${wins.length}勝${losses.length}敗)
+・累計損益: ${totalPnl >= 0 ? '+' : ''}${totalPnl.toLocaleString()}円
+${topStock ? '・最頻取引銘柄: ' + topStock[0] : ''}
+${streakNote}`;
 }
 
 // ===== タブ切替 =====
@@ -1106,6 +1258,7 @@ function copyReflHistory() {
 window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('gemini-hint').innerText = buildGeminiPrompt();
   document.getElementById('chatgpt-hint').innerText = buildChatGPTPrompt();
+  initStars();
   renderWatchList();
   renderReflections();
   renderPnlChart();

@@ -150,7 +150,7 @@
 
 <header>
   <h1>📈 株朝活 PRO</h1>
-  <span class="time">2026年06月26日 16:21</span>
+  <span class="time">2026年06月26日 16:25</span>
 </header>
 
 <!-- ナビゲーション -->
@@ -183,7 +183,7 @@
           <div class="index-sub">高:551 安:538</div>
         </div><div class="index-card">
           <div class="index-name">ドル円</div>
-          <div class="index-price">161.68</div>
+          <div class="index-price">161.69</div>
           <div class="index-change down">▼ -0.05%</div>
           <div class="index-sub">高:162 安:162</div>
         </div></div>
@@ -210,12 +210,12 @@
           <div class="index-change up">▲ +1.40%</div>
         </div><div class="index-card small">
           <div class="index-name">金(Gold)</div>
-          <div class="index-price">4043.10</div>
+          <div class="index-price">4042.80</div>
           <div class="index-change up">▲ +0.31%</div>
         </div><div class="index-card small">
           <div class="index-name">原油(WTI)</div>
-          <div class="index-price">70.46</div>
-          <div class="index-change down">▼ -2.03%</div>
+          <div class="index-price">70.32</div>
+          <div class="index-change down">▼ -2.22%</div>
         </div><div class="index-card small">
           <div class="index-name">米10年債利回</div>
           <div class="index-price">4.45</div>
@@ -746,13 +746,13 @@ function switchTab(tab, btn) {
   } catch(e) { console.error('switchTab error:', e); }
 }
 
-const MARKET_DATA = `【取得時刻】2026年06月26日 16:21
+const MARKET_DATA = `【取得時刻】2026年06月26日 16:25
 
 【日本市場】
 ・日経平均: 69,360.88 (-4.15%) | 高:71786.28 安:68639.84
 ・TOPIX: 420.40 (-1.29%) | 高:425.20 安:417.00
 ・グロース250: 539.50 (-2.72%) | 高:550.80 安:538.00
-・ドル円: 161.68 (-0.05%) | 高:161.85 安:161.52
+・ドル円: 161.69 (-0.05%) | 高:161.85 安:161.52
 
 【米国市場（前日終値）】
 ・ダウ平均: 51,920.62 (+0.14%)
@@ -761,8 +761,8 @@ const MARKET_DATA = `【取得時刻】2026年06月26日 16:21
 
 【グローバル指標】
 ・VIX恐怖指数: 18.89 (+1.40%)
-・金(Gold): 4043.10 (+0.31%)
-・原油(WTI): 70.46 (-2.03%)
+・金(Gold): 4042.80 (+0.31%)
+・原油(WTI): 70.32 (-2.22%)
 ・米10年債利回: 4.45 (+0.00%)
 
 【スクリーニング結果（テクニカル分析済み）】
@@ -1602,8 +1602,7 @@ function copyStatsToClaudePrompt() {
 
   lines2.push('', '上記の私の統計データを踏まえて：', '1. 私が最も得意な条件・パターン', '2. 今すぐ改善すべき弱点', '3. 今日の市場環境で私が勝てる確率が高い条件', '4. やめるべきトレードパターン', 'を具体的に教えてください。');
 
-  let text = lines2.join('
-');
+  let text = lines2.join('\n');
 
   navigator.clipboard.writeText(text).catch(() => {
     const el = document.createElement('textarea');

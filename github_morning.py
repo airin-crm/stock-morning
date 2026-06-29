@@ -1,0 +1,2850 @@
+#!/usr/bin/env python3
+"""
+株朝活ダッシュボード - プロ版
+テクニカル指標・スクリーニング・適時開示・多角的分析
+"""
+
+import yfinance as yf
+import feedparser
+import ssl
+import os
+import subprocess
+import urllib.request
+import json
+from datetime import datetime
+import numpy as np
+
+ssl._create_default_https_context = ssl._create_unverified_context
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+OUTPUT_HTML = os.path.join(SCRIPT_DIR, "index.html")
+
+# ===== 市場指数 =====
+JP_SYMBOLS = {
+    "日経平均": "^N225",
+    "TOPIX": "1306.T",
+    "グロース250": "2516.T",
+    "ドル円": "USDJPY=X",
+}
+US_SYMBOLS = {
+    "ダウ平均": "^DJI",
+    "ナスダック": "^IXIC",
+    "S&P500": "^GSPC",
+}
+GLOBAL_SYMBOLS = {
+    "VIX恐怖指数": "^VIX",
+    "金(Gold)": "GC=F",
+    "原油(WTI)": "CL=F",
+    "米10年債利回": "^TNX",
+}
+
+# ===== 急騰・出来高急増スキャン用ユニバース（80銘柄）=====
+SURGE_UNIVERSE = {
+    # 超低価格帯（〜100円）
+    "2370 メディネット": "2370.T",
+    "3825 リミックスポイント": "3825.T",
+    "3672 オルトプラス": "3672.T",
+    # 低価格帯（100〜500円）
+    "9434 ソフトバンク": "9434.T",
+    "1571 日経インバース": "1571.T",
+    "2516 グロース250ETF": "2516.T",
+    "1699 原油ETF": "1699.T",
+    "1687 農産物ETF": "1687.T",
+    "8411 みずほFG": "8411.T",
+    "9432 NTT": "9432.T",
+    "7201 日産自動車": "7201.T",
+    "5401 日本製鉄": "5401.T",
+    "3765 ガンホー": "3765.T",
+    "6200 インソース": "6200.T",
+    "6050 イー・ガーディアン": "6050.T",
+    "4565 そーせいG": "4565.T",
+    "2413 エムスリー": "2413.T",
+    # 中価格帯（500〜1500円）
+    "8306 三菱UFJ": "8306.T",
+    "8316 三井住友FG": "8316.T",
+    "3697 SHIFT": "3697.T",
+    "4478 フリー": "4478.T",
+    "2371 カカクコム": "2371.T",
+    "1540 純金信託": "1540.T",
+    "4385 メルカリ": "4385.T",
+    "6098 リクルートHD": "6098.T",
+    "7203 トヨタ自動車": "7203.T",
+    "8604 野村HD": "8604.T",
+    "9022 JR東海": "9022.T",
+    "9020 JR東日本": "9020.T",
+    "3563 FOOD&LIFE": "3563.T",
+    "4568 第一三共": "4568.T",
+    "4519 中外製薬": "4519.T",
+    "6367 ダイキン": "6367.T",
+    "7751 キヤノン": "7751.T",
+    "6594 日本電産": "6594.T",
+    "5108 ブリヂストン": "5108.T",
+    "2802 味の素": "2802.T",
+    "4901 富士フイルム": "4901.T",
+    "6762 TDK": "6762.T",
+    "6902 デンソー": "6902.T",
+    "8766 東京海上HD": "8766.T",
+    "8591 オリックス": "8591.T",
+    "7267 ホンダ": "7267.T",
+    "6503 三菱電機": "6503.T",
+    "6501 日立製作所": "6501.T",
+    "6758 ソニーG": "6758.T",
+    # 高価格帯（参考）
+    "9983 ファストリ": "9983.T",
+    "9984 ソフトバンクG": "9984.T",
+    "6920 レーザーテック": "6920.T",
+    "8035 東京エレクトロン": "8035.T",
+    "6857 アドバンテスト": "6857.T",
+    "6861 キーエンス": "6861.T",
+    "7974 任天堂": "7974.T",
+    "4661 OLC": "4661.T",
+    "1570 日経レバETF": "1570.T",
+    "4543 テルモ": "4543.T",
+    "9433 KDDI": "9433.T",
+    "6971 京セラ": "6971.T",
+}
+
+# ===== スクリーニング対象銘柄（300〜700円帯・流動性高い）=====
+SCREEN_UNIVERSE = {
+    # 低位安定・出来高豊富
+    "9434 ソフトバンク": "9434.T",
+    "1570 日経レバETF": "1570.T",
+    "2516 グロース250ETF": "2516.T",
+    "8306 三菱UFJ": "8306.T",
+    "8316 三井住友FG": "8316.T",
+    "9984 ソフトバンクG": "9984.T",
+    # グロース・材料株
+    "4565 そーせいG": "4565.T",
+    "3697 SHIFT": "3697.T",
+    "2413 エムスリー": "2413.T",
+    "4478 フリー": "4478.T",
+    "2371 カカクコム": "2371.T",
+    "3765 ガンホー": "3765.T",
+    "6050 イー・ガーディアン": "6050.T",
+    "3672 オルトプラス": "3672.T",
+    "6200 インソース": "6200.T",
+    "4385 メルカリ": "4385.T",
+    "7974 任天堂": "7974.T",
+    "6920 レーザーテック": "6920.T",
+    "4661 オリエンタルランド": "4661.T",
+    "9983 ファーストリテイリング": "9983.T",
+    # 半導体・AI関連
+    "6857 アドバンテスト": "6857.T",
+    "8035 東京エレクトロン": "8035.T",
+    "6861 キーエンス": "6861.T",
+    # 低価格帯
+    "2370 メディネット": "2370.T",
+    "3825 リミックスポイント": "3825.T",
+    # ベア・インバース（相場下落時の選択肢）
+    "1571 日経インバースETF": "1571.T",
+    # 商品ETF（選択肢として）
+    "1540 純金信託": "1540.T",
+    "1699 原油ETF": "1699.T",
+    "1687 農産物ETF": "1687.T",
+}
+
+# ===== 前日まとめ用（セクターETF・値動き上位）=====
+SECTOR_ETFS = {
+    "銀行": "1615.T",
+    "電機・精密": "1617.T",
+    "自動車・輸送機": "1619.T",
+    "素材・化学": "1620.T",
+    "医薬品": "1621.T",
+    "食品": "1623.T",
+    "建設・不動産": "1618.T",
+    "情報通信": "1625.T",
+    "小売": "1626.T",
+    "商社・卸売": "1629.T",
+}
+
+PREV_DAY_STOCKS = {
+    "6920 レーザーテック": "6920.T",
+    "8035 東京エレクトロン": "8035.T",
+    "6857 アドバンテスト": "6857.T",
+    "9984 ソフトバンクG": "9984.T",
+    "4385 メルカリ": "4385.T",
+    "2413 エムスリー": "2413.T",
+    "4565 そーせいG": "4565.T",
+    "3697 SHIFT": "3697.T",
+    "4478 フリー": "4478.T",
+    "9434 ソフトバンク": "9434.T",
+    "8306 三菱UFJ": "8306.T",
+    "7203 トヨタ": "7203.T",
+    "6758 ソニーG": "6758.T",
+    "9983 ファストリ": "9983.T",
+    "7974 任天堂": "7974.T",
+    "3765 ガンホー": "3765.T",
+    "1570 日経レバETF": "1570.T",
+    "2516 グロース250ETF": "2516.T",
+}
+
+# ===== ニュースフィード =====
+NEWS_FEEDS = [
+    {"name": "NHK経済", "url": "https://www3.nhk.or.jp/rss/news/cat5.xml", "ua": False},
+    {"name": "Yahoo!株式", "url": "https://news.yahoo.co.jp/rss/topics/business.xml", "ua": False},
+    {"name": "東洋経済", "url": "https://toyokeizai.net/list/feed/rss", "ua": False},
+    {"name": "Investing.com株式", "url": "https://jp.investing.com/rss/news_25.rss", "ua": True},
+    {"name": "Investing.com経済", "url": "https://jp.investing.com/rss/news_285.rss", "ua": True},
+    {"name": "ITmediaビジネス", "url": "https://rss.itmedia.co.jp/rss/2.0/business.xml", "ua": False},
+]
+
+STOCK_KEYWORDS = [
+    "株","日経","相場","市場","円","為替","金融","投資","上場","株価",
+    "決算","増益","減益","増収","黒字","赤字","配当","自社株","TOB","買収",
+    "半導体","AI","電気","自動車","銀行","証券","保険","不動産","ゲーム",
+    "上昇","下落","高値","安値","売買","出来高","先物","債券","利上げ","利下げ",
+    "Fed","FOMC","インフレ","景気","GDP","米国","中国","欧州",
+    "ナスダック","ダウ","S&P","急騰","急落","ストップ","寄り","引け",
+]
+
+# ===== テクニカル計算 =====
+def calc_rsi(closes, period=14):
+    if len(closes) < period + 1:
+        return None
+    deltas = np.diff(closes)
+    gains = np.where(deltas > 0, deltas, 0.0)
+    losses = np.where(deltas < 0, -deltas, 0.0)
+    avg_gain = np.mean(gains[:period])
+    avg_loss = np.mean(losses[:period])
+    if avg_loss == 0:
+        return 100.0
+    for i in range(period, len(gains)):
+        avg_gain = (avg_gain * (period - 1) + gains[i]) / period
+        avg_loss = (avg_loss * (period - 1) + losses[i]) / period
+    if avg_loss == 0:
+        return 100.0
+    rs = avg_gain / avg_loss
+    return round(100 - (100 / (1 + rs)), 1)
+
+def calc_ma_deviation(closes, period):
+    if len(closes) < period:
+        return None
+    ma = np.mean(closes[-period:])
+    current = closes[-1]
+    return round((current - ma) / ma * 100, 2)
+
+def calc_bollinger(closes, period=20):
+    if len(closes) < period:
+        return None, None, None
+    ma = np.mean(closes[-period:])
+    std = np.std(closes[-period:])
+    upper = ma + 2 * std
+    lower = ma - 2 * std
+    current = closes[-1]
+    # バンド内位置 0=下限, 100=上限
+    if upper == lower:
+        return round(ma, 1), round(upper, 1), round(lower, 1)
+    position = (current - lower) / (upper - lower) * 100
+    return round(ma, 1), round(upper, 1), round(lower, 1)
+
+def detect_candle(o, h, l, c):
+    body = abs(c - o)
+    total = h - l
+    if total == 0:
+        return "十字線"
+    body_ratio = body / total
+    upper_shadow = h - max(o, c)
+    lower_shadow = min(o, c) - l
+    if body_ratio < 0.1:
+        return "十字線(迷い)"
+    if c > o:
+        if lower_shadow > body * 2 and upper_shadow < body * 0.3:
+            return "🟢陽のカラカサ(反転期待)"
+        if body_ratio > 0.6:
+            return "🟢大陽線(強い買い)"
+        return "🟢陽線"
+    else:
+        if upper_shadow > body * 2 and lower_shadow < body * 0.3:
+            return "🔴陰のカラカサ(反転期待)"
+        if body_ratio > 0.6:
+            return "🔴大陰線(強い売り)"
+        return "🔴陰線"
+
+# ===== データ取得 =====
+def get_price_data(symbols):
+    results = {}
+    for name, symbol in symbols.items():
+        try:
+            hist = yf.Ticker(symbol).history(period="5d", interval="1d")
+            if len(hist) >= 2:
+                prev = float(hist["Close"].iloc[-2])
+                curr = float(hist["Close"].iloc[-1])
+                results[name] = {
+                    "price": curr,
+                    "change": curr - prev,
+                    "change_pct": (curr - prev) / prev * 100,
+                    "prev_close": prev,
+                    "high": float(hist["High"].iloc[-1]),
+                    "low": float(hist["Low"].iloc[-1]),
+                    "open": float(hist["Open"].iloc[-1]),
+                    "volume": int(hist["Volume"].iloc[-1]) if "Volume" in hist.columns else 0,
+                }
+        except:
+            pass
+    return results
+
+def get_global_data():
+    results = {}
+    for name, symbol in GLOBAL_SYMBOLS.items():
+        try:
+            hist = yf.Ticker(symbol).history(period="5d", interval="1d")
+            if len(hist) >= 2:
+                prev = float(hist["Close"].iloc[-2])
+                curr = float(hist["Close"].iloc[-1])
+                results[name] = {
+                    "price": curr,
+                    "change_pct": (curr - prev) / prev * 100,
+                }
+            elif len(hist) == 1:
+                results[name] = {"price": float(hist["Close"].iloc[-1]), "change_pct": 0}
+        except:
+            pass
+    return results
+
+def get_surge_scanner():
+    """80銘柄を高速スキャンして出来高急増・急騰銘柄を発掘"""
+    # yfinanceのバッチ取得で高速化
+    symbols = list(SURGE_UNIVERSE.values())
+    name_map = {v: k for k, v in SURGE_UNIVERSE.items()}
+
+    surges = []
+    try:
+        # 一括ダウンロード（高速）
+        data = yf.download(
+            symbols, period="25d", interval="1d",
+            group_by="ticker", auto_adjust=True, progress=False, threads=True
+        )
+    except:
+        return []
+
+    for sym in symbols:
+        try:
+            if len(symbols) == 1:
+                hist = data
+            else:
+                hist = data[sym] if sym in data.columns.get_level_values(0) else None
+            if hist is None or len(hist) < 22:
+                continue
+
+            hist = hist.dropna()
+            if len(hist) < 22:
+                continue
+
+            closes = hist["Close"].values.astype(float)
+            volumes = hist["Volume"].values.astype(float)
+
+            curr = closes[-1]
+            prev = closes[-2]
+            vol_today = volumes[-1]
+            vol_avg20 = np.mean(volumes[-22:-2])  # 直近20日平均（当日除く）
+
+            if vol_avg20 == 0:
+                continue
+
+            vol_ratio = vol_today / vol_avg20
+            change_pct = (curr - prev) / prev * 100
+
+            # 急騰スコア（出来高急増 × 値動き）
+            surge_score = vol_ratio * (1 + abs(change_pct) / 5)
+
+            # 条件：出来高が2倍以上 OR 変動率2%以上
+            if vol_ratio >= 2.0 or abs(change_pct) >= 2.0:
+                name = name_map.get(sym, sym)
+                surges.append({
+                    "name": name,
+                    "symbol": sym,
+                    "price": round(curr, 0),
+                    "change_pct": round(change_pct, 2),
+                    "vol_ratio": round(vol_ratio, 1),
+                    "vol_today": int(vol_today),
+                    "surge_score": round(surge_score, 1),
+                })
+        except:
+            continue
+
+    surges.sort(key=lambda x: x["surge_score"], reverse=True)
+    return surges[:8]
+
+def get_prev_day_summary():
+    """前日の東証まとめ（セクター騰落・値動き上位）"""
+    # セクター騰落
+    sector_results = []
+    for name, symbol in SECTOR_ETFS.items():
+        try:
+            hist = yf.Ticker(symbol).history(period="5d", interval="1d")
+            if len(hist) >= 2:
+                prev = float(hist["Close"].iloc[-2])
+                curr = float(hist["Close"].iloc[-1])
+                pct = (curr - prev) / prev * 100
+                sector_results.append({"name": name, "pct": pct})
+        except:
+            pass
+    sector_results.sort(key=lambda x: x["pct"], reverse=True)
+
+    # 前日の主要銘柄騰落
+    stock_results = []
+    for name, symbol in PREV_DAY_STOCKS.items():
+        try:
+            hist = yf.Ticker(symbol).history(period="5d", interval="1d")
+            if len(hist) >= 2:
+                prev_close = float(hist["Close"].iloc[-2])
+                curr = float(hist["Close"].iloc[-1])
+                prev_vol = int(hist["Volume"].iloc[-2]) if len(hist) >= 3 else 0
+                curr_vol = int(hist["Volume"].iloc[-1])
+                pct = (curr - prev_close) / prev_close * 100
+                vol_ratio = curr_vol / prev_vol if prev_vol > 0 else 1
+                stock_results.append({
+                    "name": name, "price": curr,
+                    "pct": pct, "vol_ratio": round(vol_ratio, 1)
+                })
+        except:
+            pass
+
+    stock_results.sort(key=lambda x: x["pct"], reverse=True)
+    top_gainers = stock_results[:5]
+    top_losers = sorted(stock_results, key=lambda x: x["pct"])[:5]
+    vol_leaders = sorted(stock_results, key=lambda x: x["vol_ratio"], reverse=True)[:5]
+
+    return {
+        "sectors": sector_results,
+        "gainers": top_gainers,
+        "losers": top_losers,
+        "vol_leaders": vol_leaders,
+    }
+
+def screen_stocks():
+    """テクニカル指標でスクリーニング"""
+    results = []
+    for name, symbol in SCREEN_UNIVERSE.items():
+        try:
+            ticker = yf.Ticker(symbol)
+            hist = ticker.history(period="3mo", interval="1d")
+            if len(hist) < 26:
+                continue
+
+            closes = hist["Close"].values.astype(float)
+            opens = hist["Open"].values.astype(float)
+            highs = hist["High"].values.astype(float)
+            lows = hist["Low"].values.astype(float)
+            volumes = hist["Volume"].values.astype(float)
+
+            curr = closes[-1]
+            prev = closes[-2]
+            vol_today = volumes[-1]
+            vol_avg20 = np.mean(volumes[-21:-1]) if len(volumes) > 21 else vol_today
+
+            rsi = calc_rsi(closes)
+            dev5 = calc_ma_deviation(closes, 5)
+            dev25 = calc_ma_deviation(closes, 25)
+            bb_ma, bb_upper, bb_lower = calc_bollinger(closes)
+            candle = detect_candle(opens[-1], highs[-1], lows[-1], closes[-1])
+
+            change_pct = (curr - prev) / prev * 100
+            vol_ratio = vol_today / vol_avg20 if vol_avg20 > 0 else 1
+
+            # 52週高値・安値
+            w52_high = float(np.max(highs[-252:])) if len(highs) >= 252 else float(np.max(highs))
+            w52_low = float(np.min(lows[-252:])) if len(lows) >= 252 else float(np.min(lows))
+            w52_pos = (curr - w52_low) / (w52_high - w52_low) * 100 if w52_high != w52_low else 50
+
+            results.append({
+                "name": name,
+                "symbol": symbol,
+                "price": curr,
+                "change_pct": change_pct,
+                "volume": int(vol_today),
+                "vol_ratio": round(vol_ratio, 1),
+                "rsi": rsi,
+                "dev5": dev5,
+                "dev25": dev25,
+                "bb_upper": bb_upper,
+                "bb_lower": bb_lower,
+                "candle": candle,
+                "w52_high": round(w52_high, 1),
+                "w52_low": round(w52_low, 1),
+                "w52_pos": round(w52_pos, 1),
+                "prev_high": round(highs[-2], 1),
+                "prev_low": round(lows[-2], 1),
+                "prev_vol": int(volumes[-2]),
+            })
+        except:
+            continue
+
+    # スコアリング（プロが注目する条件）
+    for s in results:
+        score = 0
+        rsi = s.get("rsi") or 50
+        vol_ratio = s.get("vol_ratio", 1)
+        dev25 = s.get("dev25") or 0
+        change_pct = s["change_pct"]
+
+        # 出来高急増（最重要）
+        if vol_ratio >= 3: score += 40
+        elif vol_ratio >= 2: score += 25
+        elif vol_ratio >= 1.5: score += 10
+
+        # RSI（買われすぎ売られすぎでなく動きやすい水準）
+        if 40 <= rsi <= 60: score += 20
+        elif 30 <= rsi < 40 or 60 < rsi <= 70: score += 10
+
+        # 値動きの大きさ
+        if abs(change_pct) >= 3: score += 20
+        elif abs(change_pct) >= 1.5: score += 10
+
+        # 52週高値更新付近（ブレイクアウト期待）
+        if s["w52_pos"] >= 90: score += 15
+
+        # 25日移動平均からの乖離（戻り売り・押し目買い）
+        if abs(dev25) <= 3: score += 10  # 均衡点付近
+
+        s["score"] = score
+
+    results.sort(key=lambda x: x["score"], reverse=True)
+    return results[:10]
+
+def get_earnings_calendar():
+    """今後1週間以内に決算発表がある銘柄を抽出"""
+    from datetime import date, timedelta
+    today = date.today()
+    soon = today + timedelta(days=7)
+    warnings = []
+    all_symbols = {**SCREEN_UNIVERSE, **PREV_DAY_STOCKS}
+    for name, symbol in all_symbols.items():
+        try:
+            cal = yf.Ticker(symbol).calendar
+            if not cal:
+                continue
+            earn_dates = cal.get("Earnings Date", [])
+            if not earn_dates:
+                continue
+            for ed in earn_dates:
+                if hasattr(ed, 'date'):
+                    ed = ed.date() if hasattr(ed, 'date') and callable(ed.date) else ed
+                if today <= ed <= soon:
+                    warnings.append({
+                        "name": name,
+                        "date": str(ed),
+                        "days_left": (ed - today).days
+                    })
+                    break
+        except:
+            continue
+    warnings.sort(key=lambda x: x["days_left"])
+    return warnings
+
+def get_economic_calendar():
+    """今週・来週の重要経済指標を取得（日本株に影響する高インパクト指標）"""
+    IMPORTANT_COUNTRIES = {"USD", "JPY", "CNY", "EUR"}
+    IMPACT_FILTER = {"High", "Medium"}
+    JP_LABELS = {
+        "Non-Farm Employment Change": "米雇用統計",
+        "CPI m/m": "米CPI(インフレ)",
+        "CPI y/y": "米CPI(年率)",
+        "Core CPI m/m": "米コアCPI",
+        "FOMC Statement": "FOMC声明",
+        "Federal Funds Rate": "米政策金利",
+        "GDP q/q": "GDP速報",
+        "Unemployment Rate": "失業率",
+        "Retail Sales m/m": "米小売売上高",
+        "ISM Manufacturing PMI": "米ISM製造業",
+        "BOJ Policy Rate": "日銀政策金利",
+        "Monetary Policy Statement": "金融政策声明",
+        "Trade Balance": "貿易収支",
+        "PPI m/m": "米PPI(生産者物価)",
+        "Consumer Confidence": "消費者信頼感",
+        "Durable Goods Orders m/m": "耐久財受注",
+        "ADP Non-Farm Employment Change": "ADP雇用",
+    }
+    try:
+        req = urllib.request.Request(
+            "https://nfs.faireconomy.media/ff_calendar_thisweek.json",
+            headers={"User-Agent": "Mozilla/5.0"}
+        )
+        data = urllib.request.urlopen(req, timeout=8).read()
+        events = json.loads(data)
+        result = []
+        for e in events:
+            if e.get("impact") not in IMPACT_FILTER:
+                continue
+            country = e.get("country", "")
+            currency = {"United States": "USD", "Japan": "JPY",
+                       "China": "CNY", "European Union": "EUR",
+                       "Germany": "EUR"}.get(country, country)
+            if currency not in IMPORTANT_COUNTRIES:
+                continue
+            title = e.get("title", "")
+            label = JP_LABELS.get(title, title)
+            date_str = e.get("date", "")[:10]
+            time_str = e.get("time", "")
+            result.append({
+                "date": date_str,
+                "time": time_str,
+                "label": label,
+                "impact": e.get("impact"),
+                "currency": currency,
+            })
+        return result
+    except:
+        return []
+
+def get_news():
+    all_news = []
+    for feed_info in NEWS_FEEDS:
+        try:
+            if feed_info.get("ua"):
+                req = urllib.request.Request(
+                    feed_info["url"],
+                    headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)"}
+                )
+                data = urllib.request.urlopen(req, timeout=8).read()
+                feed = feedparser.parse(data)
+            else:
+                feed = feedparser.parse(feed_info["url"])
+
+            count = 0
+            for entry in feed.entries[:30]:
+                title = entry.get("title", "")
+                summary = entry.get("summary", "")
+                link = entry.get("link", "#")
+                if any(kw in title + summary for kw in STOCK_KEYWORDS):
+                    all_news.append({
+                        "source": feed_info["name"],
+                        "title": title,
+                        "link": link,
+                    })
+                    count += 1
+                    if count >= 6:
+                        break
+        except:
+            pass
+    return all_news[:30]
+
+# ===== テキスト生成（AIプロンプト用）=====
+def build_data_text(jp_data, us_data, global_data, stocks, surges, prev_summary, earnings, econ_cal, fetch_time):
+    lines = [f"【取得時刻】{fetch_time}", ""]
+
+    lines.append("【日本市場】")
+    for name, d in jp_data.items():
+        sign = "+" if d["change"] >= 0 else ""
+        extra = ""
+        if "high" in d:
+            extra = f" | 高:{d['high']:.2f} 安:{d['low']:.2f}"
+        lines.append(f"・{name}: {d['price']:,.2f} ({sign}{d['change_pct']:.2f}%){extra}")
+
+    lines.append("\n【米国市場（前日終値）】")
+    for name, d in us_data.items():
+        sign = "+" if d["change"] >= 0 else ""
+        lines.append(f"・{name}: {d['price']:,.2f} ({sign}{d['change_pct']:.2f}%)")
+
+    if global_data:
+        lines.append("\n【グローバル指標】")
+        for name, d in global_data.items():
+            sign = "+" if d["change_pct"] >= 0 else ""
+            lines.append(f"・{name}: {d['price']:.2f} ({sign}{d['change_pct']:.2f}%)")
+
+    lines.append("\n【スクリーニング結果（テクニカル分析済み）】")
+    for s in stocks:
+        sign = "+" if s["change_pct"] >= 0 else ""
+        rsi_str = f"RSI:{s['rsi']}" if s["rsi"] else "RSI:N/A"
+        dev_str = f"25MA乖離:{s['dev25']:+.1f}%" if s["dev25"] is not None else ""
+        lines.append(
+            f"・{s['name']}: {s['price']:.0f}円 ({sign}{s['change_pct']:.2f}%) "
+            f"出来高比:{s['vol_ratio']}倍 {rsi_str} {dev_str} "
+            f"52週位置:{s['w52_pos']:.0f}% {s['candle']}"
+        )
+
+    # 急騰・出来高急増スキャン結果
+    if surges:
+        lines.append("\n【🚀 急騰・出来高急増スキャン結果（80銘柄中）】")
+        for s in surges:
+            sign = "+" if s["change_pct"] >= 0 else ""
+            vol_label = f"出来高{s['vol_ratio']}倍"
+            lines.append(
+                f"・{s['name']}: {s['price']:.0f}円 ({sign}{s['change_pct']:.1f}%) "
+                f"{vol_label} スコア:{s['surge_score']}"
+            )
+
+    # 決算カレンダー
+    if earnings:
+        lines.append("\n【⚠️ 今後7日以内に決算発表がある銘柄（超危険・要注意）】")
+        for e in earnings:
+            days = e["days_left"]
+            urgency = "🔴今日！" if days == 0 else f"🟡{days}日後"
+            lines.append(f"・{urgency} {e['name']} → {e['date']}に決算発表")
+    else:
+        lines.append("\n【決算発表】今後7日以内の決算発表なし（比較的安全）")
+
+    # 経済指標カレンダー
+    if econ_cal:
+        lines.append("\n【📅 今週の重要経済指標（日本株に影響大）】")
+        today_str = datetime.now().strftime("%Y-%m-%d")
+        for e in econ_cal[:10]:
+            flag = "🔴" if e["impact"] == "High" else "🟡"
+            today_mark = "← 本日！" if e["date"] == today_str else ""
+            lines.append(f"・{flag}{e['date']} {e['time']} [{e['currency']}] {e['label']} {today_mark}")
+
+    # 前日まとめ
+    if prev_summary:
+        lines.append("\n【前日（昨日）の東証まとめ】")
+        if prev_summary.get("sectors"):
+            strong = [s for s in prev_summary["sectors"] if s["pct"] >= 0]
+            weak = [s for s in prev_summary["sectors"] if s["pct"] < 0]
+            if strong:
+                lines.append("▲強かったセクター: " + "、".join(f"{s['name']}({s['pct']:+.1f}%)" for s in strong[:4]))
+            if weak:
+                lines.append("▼弱かったセクター: " + "、".join(f"{s['name']}({s['pct']:+.1f}%)" for s in weak[-4:]))
+        if prev_summary.get("gainers"):
+            lines.append("値上がり上位: " + "、".join(f"{s['name']}({s['pct']:+.1f}%)" for s in prev_summary["gainers"]))
+        if prev_summary.get("losers"):
+            lines.append("値下がり上位: " + "、".join(f"{s['name']}({s['pct']:+.1f}%)" for s in prev_summary["losers"]))
+        if prev_summary.get("vol_leaders"):
+            lines.append("出来高急増: " + "、".join(f"{s['name']}(出来高比{s['vol_ratio']}倍)" for s in prev_summary["vol_leaders"]))
+
+    return "\n".join(lines)
+
+# ===== HTML生成 =====
+def load_watchlist_json():
+    """watchlist.jsonを読み込んでJSONとして返す"""
+    wl_path = os.path.join(SCRIPT_DIR, "watchlist.json")
+    try:
+        with open(wl_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        stocks = data.get("stocks", [])
+        # コードの形式を正規化（.Tなし→そのまま保存）
+        return json.dumps(stocks, ensure_ascii=False)
+    except:
+        return "[]"
+
+def generate_html(jp_data, us_data, global_data, stocks, surges, prev_summary, earnings, econ_cal, news, fetch_time):
+    saved_watchlist_json = load_watchlist_json()
+
+    # 推奨銘柄入力行（5行）を静的に生成
+    stock_memo_rows = ""
+    for i in range(5):
+        stock_memo_rows += f"""
+    <div class="stock-memo-row">
+      <div style="display:flex;gap:6px;margin-bottom:4px;align-items:center">
+        <span style="color:#8b949e;font-size:0.75rem;width:16px;flex-shrink:0">{i+1}</span>
+        <input type="text" inputmode="numeric" class="refl-input" id="memo-code-{i}" placeholder="コード" style="width:75px;flex-shrink:0" oninput="memoLookup({i})" maxlength="4">
+        <input type="text" class="refl-input" id="memo-name-{i}" placeholder="銘柄名" style="flex:1">
+        <input type="text" class="refl-input" id="memo-entry-{i}" placeholder="エントリー目安" style="width:100px;flex-shrink:0">
+      </div>
+      <div style="display:flex;gap:5px;margin-bottom:10px;padding-left:22px">
+        <input type="text" class="refl-input" id="memo-target1-{i}" placeholder="利確①" style="flex:1">
+        <input type="text" class="refl-input" id="memo-target2-{i}" placeholder="利確②" style="flex:1">
+        <input type="text" class="refl-input" id="memo-stop-{i}" placeholder="損切り" style="flex:1">
+        <input type="text" class="refl-input" id="memo-point-{i}" placeholder="📌見どころ" style="flex:2">
+      </div>
+    </div>"""
+
+    data_text = build_data_text(jp_data, us_data, global_data, stocks, surges, prev_summary, earnings, econ_cal, fetch_time)
+
+    # 日本市場カード
+    jp_cards = ""
+    for name, d in jp_data.items():
+        sign = "+" if d["change"] >= 0 else ""
+        cls = "up" if d["change"] >= 0 else "down"
+        arrow = "▲" if d["change"] >= 0 else "▼"
+        sub = f"高:{d['high']:.0f} 安:{d['low']:.0f}" if "high" in d else ""
+        jp_cards += f"""<div class="index-card">
+          <div class="index-name">{name}</div>
+          <div class="index-price">{d['price']:,.2f}</div>
+          <div class="index-change {cls}">{arrow} {sign}{d['change_pct']:.2f}%</div>
+          <div class="index-sub">{sub}</div>
+        </div>"""
+
+    # 米国カード
+    us_cards = ""
+    for name, d in us_data.items():
+        sign = "+" if d["change"] >= 0 else ""
+        cls = "up" if d["change"] >= 0 else "down"
+        arrow = "▲" if d["change"] >= 0 else "▼"
+        us_cards += f"""<div class="index-card small">
+          <div class="index-name">{name}</div>
+          <div class="index-price">{d['price']:,.2f}</div>
+          <div class="index-change {cls}">{arrow} {sign}{d['change_pct']:.2f}%</div>
+        </div>"""
+
+    # グローバル指標カード
+    gl_cards = ""
+    for name, d in global_data.items():
+        sign = "+" if d["change_pct"] >= 0 else ""
+        cls = "up" if d["change_pct"] >= 0 else "down"
+        arrow = "▲" if d["change_pct"] >= 0 else "▼"
+        gl_cards += f"""<div class="index-card small">
+          <div class="index-name">{name}</div>
+          <div class="index-price">{d['price']:.2f}</div>
+          <div class="index-change {cls}">{arrow} {sign}{d['change_pct']:.2f}%</div>
+        </div>"""
+
+    # 急騰スキャンHTML
+    surge_html = ""
+    if surges:
+        surge_rows = ""
+        for s in surges:
+            sign = "+" if s["change_pct"] >= 0 else ""
+            cls = "up" if s["change_pct"] >= 0 else "down"
+            vol_cls = "vol-hot" if s["vol_ratio"] >= 3 else ""
+            surge_rows += f"""<tr>
+              <td class="stock-name">{s['name']}</td>
+              <td class="price">{s['price']:.0f}円</td>
+              <td class="{cls}">{sign}{s['change_pct']:.1f}%</td>
+              <td class="{vol_cls}">{s['vol_ratio']}倍</td>
+              <td style="color:#f0a500">{s['surge_score']}</td>
+            </tr>"""
+        surge_html = f"""<div class="card" style="border-color:#f0a500">
+  <div class="card-header">
+    <span class="card-title">🚀 急騰・出来高急増スキャン</span>
+    <span class="badge">{len(SURGE_UNIVERSE)}銘柄を自動スキャン</span>
+  </div>
+  <table>
+    <tr><th>銘柄</th><th>現値</th><th>前日比</th><th>出来高比</th><th>急騰度</th></tr>
+    {surge_rows}
+  </table>
+  <div class="legend"><span class="legend-item">急騰度 = 出来高倍率 × 値動き。3倍以上の出来高急増は🔥で表示。何か材料が出た可能性大</span></div>
+</div>"""
+    else:
+        surge_html = '<div class="card"><div class="card-header"><span class="card-title">🚀 急騰スキャン</span></div><div style="color:#8b949e;font-size:0.83rem">本日は急騰・出来高急増銘柄なし（平常運転）</div></div>'
+
+    # 決算・経済指標アラートHTML
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    alert_html = ""
+
+    # 決算アラート
+    if earnings:
+        earn_items = ""
+        for e in earnings:
+            days = e["days_left"]
+            cls = "earn-today" if days == 0 else "earn-soon"
+            label = "🔴 本日決算！" if days == 0 else f"🟡 {days}日後"
+            earn_items += f'<div class="alert-item {cls}"><span class="alert-badge">{label}</span>{e["name"]} <span class="alert-date">{e["date"]}</span></div>'
+        alert_html += f'<div class="alert-card danger"><div class="alert-title">⚠️ 決算発表あり（保有・新規は危険）</div>{earn_items}</div>'
+
+    # 経済指標アラート
+    today_events = [e for e in econ_cal if e["date"] == today_str]
+    week_events = [e for e in econ_cal if e["date"] != today_str]
+    if today_events or week_events:
+        econ_items = ""
+        for e in today_events:
+            flag = "🔴" if e["impact"] == "High" else "🟡"
+            econ_items += f'<div class="alert-item econ-today">{flag} <strong>{e["time"]} [{e["currency"]}] {e["label"]}</strong> ← 本日！</div>'
+        for e in week_events[:6]:
+            flag = "🔴" if e["impact"] == "High" else "🟡"
+            econ_items += f'<div class="alert-item econ-week">{flag} {e["date"]} {e["time"]} [{e["currency"]}] {e["label"]}</div>'
+        alert_html += f'<div class="alert-card warning"><div class="alert-title">📅 今週の重要経済指標</div>{econ_items}</div>'
+
+    if not alert_html:
+        alert_html = '<div class="alert-card safe"><div class="alert-title">✅ 今週は重大イベントなし（比較的安全な週）</div></div>'
+
+    # 前日まとめHTML
+    prev_summary_html = ""
+    if prev_summary and (prev_summary.get("sectors") or prev_summary.get("gainers")):
+        sec_html = ""
+        if prev_summary.get("sectors"):
+            for s in prev_summary["sectors"]:
+                cls = "up" if s["pct"] >= 0 else "down"
+                sign = "+" if s["pct"] >= 0 else ""
+                sec_html += f'<span class="sec-badge {cls}">{s["name"]} {sign}{s["pct"]:.1f}%</span>'
+
+        gainer_rows = ""
+        for s in (prev_summary.get("gainers") or []):
+            gainer_rows += f'<div class="rank-item up">▲{s["name"]} <strong>{s["pct"]:+.1f}%</strong></div>'
+        loser_rows = ""
+        for s in (prev_summary.get("losers") or []):
+            loser_rows += f'<div class="rank-item down">▼{s["name"]} <strong>{s["pct"]:+.1f}%</strong></div>'
+        vol_rows = ""
+        for s in (prev_summary.get("vol_leaders") or []):
+            vol_rows += f'<div class="rank-item vol">🔥{s["name"]} 出来高比{s["vol_ratio"]}倍</div>'
+
+        prev_summary_html = f"""<div class="card" style="margin-top:14px">
+  <div class="card-header">
+    <span class="card-title">📅 前日の東証まとめ</span>
+    <span class="badge">セクター騰落・値動き上位</span>
+  </div>
+  <div class="section-title" style="margin-top:0">セクター騰落</div>
+  <div class="sec-badges">{sec_html}</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px">
+    <div><div class="rank-label">📈 値上がり上位</div>{gainer_rows}</div>
+    <div><div class="rank-label">📉 値下がり上位</div>{loser_rows}</div>
+    <div><div class="rank-label">🔥 出来高急増</div>{vol_rows}</div>
+  </div>
+</div>"""
+
+    # スクリーニング結果テーブル
+    stock_rows = ""
+    for s in stocks:
+        sign = "+" if s["change_pct"] >= 0 else ""
+        cls = "up" if s["change_pct"] >= 0 else "down"
+        arrow = "▲" if s["change_pct"] >= 0 else "▼"
+        rsi = s["rsi"] or "-"
+        rsi_cls = ""
+        if s["rsi"]:
+            if s["rsi"] >= 70: rsi_cls = "rsi-hot"
+            elif s["rsi"] <= 30: rsi_cls = "rsi-cold"
+        vol_cls = "vol-hot" if s["vol_ratio"] >= 2 else ""
+        stock_rows += f"""<tr>
+          <td><span class="stock-name">{s['name']}</span><br><span class="candle-label">{s['candle']}</span></td>
+          <td class="price">{s['price']:.0f}円</td>
+          <td class="{cls}">{arrow}{sign}{s['change_pct']:.1f}%</td>
+          <td class="{vol_cls}">{s['vol_ratio']}倍</td>
+          <td class="{rsi_cls}">{rsi}</td>
+          <td>{s['dev25']:+.1f}%</td>
+          <td>{s['w52_pos']:.0f}%</td>
+        </tr>"""
+
+    # ニュース
+    source_colors = {
+        "NHK経済": "#c0392b", "Yahoo!株式": "#6200ea",
+        "東洋経済": "#0077b6", "ITmediaビジネス": "#2d6a4f",
+        "Investing.com株式": "#ff6b35", "Investing.com経済": "#e67e22",
+    }
+    news_html = ""
+    for n in news:
+        color = source_colors.get(n["source"], "#555")
+        title_esc = n["title"].replace('"', '&quot;').replace('<','&lt;').replace('>','&gt;')
+        news_html += f"""<a href="{n['link']}" target="_blank" class="news-item">
+          <span class="news-source" style="background:{color}">{n['source']}</span>
+          <span class="news-title">{title_esc}</span>
+        </a>"""
+    if not news_html:
+        news_html = '<div class="no-news">取得中...</div>'
+
+    data_text_escaped = data_text.replace("\\", "\\\\").replace("`", "\\`").replace("${", "\\${")
+
+    return f"""<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>株朝活 PRO</title>
+  <style>
+    *{{box-sizing:border-box;margin:0;padding:0}}
+    body{{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;background:#0d1117;color:#e6edf3;padding:14px;max-width:680px;margin:0 auto}}
+    header{{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}}
+    h1{{font-size:1.15rem}}
+    .time{{color:#8b949e;font-size:0.75rem}}
+    .section-title{{font-size:0.72rem;color:#8b949e;text-transform:uppercase;letter-spacing:.06em;margin:14px 0 7px}}
+    .index-grid{{display:grid;gap:8px;margin-bottom:6px}}
+    .grid-2{{grid-template-columns:repeat(2,1fr)}}
+    .grid-3{{grid-template-columns:repeat(3,1fr)}}
+    .grid-4{{grid-template-columns:repeat(4,1fr)}}
+    .index-card{{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:10px 11px}}
+    .index-card.small{{padding:8px 10px}}
+    .index-name{{font-size:0.68rem;color:#8b949e;margin-bottom:2px}}
+    .index-price{{font-size:1rem;font-weight:bold}}
+    .index-card.small .index-price{{font-size:0.88rem}}
+    .index-change{{font-size:0.78rem;margin-top:1px}}
+    .index-sub{{font-size:0.66rem;color:#8b949e;margin-top:2px}}
+    .up{{color:#3fb950}}.down{{color:#f85149}}
+    .card{{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:13px;margin-bottom:12px}}
+    .card-header{{display:flex;align-items:center;gap:8px;margin-bottom:10px}}
+    .card-title{{font-size:0.9rem;font-weight:bold}}
+    .badge{{font-size:0.65rem;background:#21262d;color:#8b949e;padding:2px 7px;border-radius:10px}}
+    table{{width:100%;border-collapse:collapse;font-size:0.78rem}}
+    th{{color:#8b949e;font-size:0.68rem;padding:3px 5px;border-bottom:1px solid #21262d;text-align:left;white-space:nowrap}}
+    td{{padding:6px 5px;border-bottom:1px solid #21262d;vertical-align:middle}}
+    .stock-name{{font-size:0.78rem;font-weight:bold}}
+    .candle-label{{font-size:0.65rem;color:#8b949e}}
+    .price{{font-weight:bold}}
+    .vol-hot{{color:#f0a500;font-weight:bold}}
+    .rsi-hot{{color:#f85149;font-weight:bold}}
+    .rsi-cold{{color:#58a6ff;font-weight:bold}}
+    .news-item{{display:flex;align-items:flex-start;gap:7px;padding:7px 0;border-bottom:1px solid #21262d;text-decoration:none;color:inherit}}
+    .news-item:last-child{{border-bottom:none}}
+    .news-source{{flex-shrink:0;font-size:0.62rem;color:#fff;padding:2px 5px;border-radius:4px;margin-top:2px;white-space:nowrap}}
+    .news-title{{font-size:0.82rem;line-height:1.4}}
+    .no-news{{color:#8b949e;font-size:0.83rem}}
+    textarea{{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;padding:10px;font-size:0.8rem;line-height:1.55;resize:vertical;min-height:90px;font-family:inherit}}
+    textarea:focus{{outline:none;border-color:#58a6ff}}
+    textarea::placeholder{{color:#484f58}}
+    .btn{{display:block;width:100%;padding:13px;border-radius:10px;border:none;font-size:0.93rem;font-weight:bold;cursor:pointer;transition:opacity .15s}}
+    .btn:active{{opacity:.7}}
+    .btn-generate{{background:linear-gradient(135deg,#238636,#1a6128);color:#fff;margin-bottom:10px}}
+    .btn-claude{{background:linear-gradient(135deg,#1f6feb,#1158c7);color:#fff}}
+    .toast{{display:none;background:#238636;color:#fff;padding:10px;border-radius:8px;text-align:center;font-size:0.85rem;margin-bottom:10px}}
+    .step-badge{{display:inline-flex;align-items:center;justify-content:center;background:#1f6feb;color:#fff;border-radius:50%;width:20px;height:20px;font-size:0.7rem;font-weight:bold;flex-shrink:0}}
+    .prompt-box{{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:10px;font-size:0.73rem;color:#8b949e;white-space:pre-wrap;max-height:180px;overflow-y:auto;margin-bottom:8px}}
+    .btn-copy-hint{{display:block;width:100%;padding:9px;border-radius:8px;border:1px solid #30363d;background:#21262d;color:#e6edf3;font-size:0.8rem;font-weight:bold;cursor:pointer;margin-bottom:8px;transition:opacity .15s}}
+    .btn-copy-hint:active{{opacity:.7}}
+    .toast-small{{display:none;color:#3fb950;font-size:0.78rem;margin-bottom:6px}}
+    .divider{{border:none;border-top:1px solid #21262d;margin:14px 0}}
+    .sec-badges{{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:4px}}
+    .sec-badge{{font-size:0.68rem;padding:3px 7px;border-radius:6px;font-weight:bold}}
+    .sec-badge.up{{background:#0d1f12;color:#3fb950;border:1px solid #238636}}
+    .sec-badge.down{{background:#1f0d0d;color:#f85149;border:1px solid #6e1a1a}}
+    .rank-label{{font-size:0.68rem;color:#8b949e;margin-bottom:4px;font-weight:bold}}
+    .rank-item{{font-size:0.75rem;padding:3px 0;border-bottom:1px solid #21262d}}
+    .rank-item.up{{color:#3fb950}}.rank-item.down{{color:#f85149}}.rank-item.vol{{color:#f0a500}}
+    .alert-card{{border-radius:10px;padding:11px 13px;margin-bottom:10px;border:1px solid}}
+    .alert-card.danger{{background:#1f0d0d;border-color:#6e1a1a}}
+    .alert-card.warning{{background:#1a1500;border-color:#5a4500}}
+    .alert-card.safe{{background:#0d1f12;border-color:#238636}}
+    .alert-title{{font-size:0.82rem;font-weight:bold;margin-bottom:7px}}
+    .alert-card.danger .alert-title{{color:#f85149}}
+    .alert-card.warning .alert-title{{color:#f0a500}}
+    .alert-card.safe .alert-title{{color:#3fb950}}
+    .alert-item{{font-size:0.78rem;padding:4px 0;border-bottom:1px solid #21262d;line-height:1.4}}
+    .alert-item:last-child{{border-bottom:none}}
+    .alert-badge{{display:inline-block;font-size:0.7rem;font-weight:bold;margin-right:6px}}
+    .earn-today{{color:#f85149}}.earn-soon{{color:#f0a500}}
+    .econ-today{{color:#f85149;font-weight:bold}}.econ-week{{color:#e6edf3}}
+    .alert-date{{color:#8b949e;font-size:0.72rem;margin-left:6px}}
+    .legend{{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}}
+    .legend-item{{font-size:0.65rem;color:#8b949e}}
+    /* ナビ */
+    .nav{{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:14px}}
+    .nav-btn{{display:block;padding:10px 4px;border-radius:10px;border:none;background:#21262d;color:#e6edf3;font-size:0.78rem;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none;transition:background .15s}}
+    .nav-btn.active{{background:#1f6feb;color:#fff}}
+    .nav-btn:active{{opacity:.7}}
+    /* タブコンテンツ */
+    .tab-content{{display:none}}
+    .tab-content.active{{display:block}}
+    /* ウォッチリスト */
+    .watch-form{{display:flex;gap:8px;margin-bottom:10px}}
+    .watch-input{{flex:1;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;padding:9px;font-size:0.85rem}}
+    .watch-input:focus{{outline:none;border-color:#58a6ff}}
+    .watch-add-btn{{padding:9px 14px;background:#238636;color:#fff;border:none;border-radius:8px;font-weight:bold;cursor:pointer;font-size:0.85rem}}
+    .watch-list{{list-style:none}}
+    .watch-item{{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #21262d;font-size:0.85rem}}
+    .watch-del{{background:none;border:none;color:#f85149;cursor:pointer;font-size:1rem;padding:2px 6px}}
+    .watch-memo{{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;padding:9px;font-size:0.82rem;resize:vertical;min-height:70px;font-family:inherit;margin-top:6px}}
+    .watch-memo:focus{{outline:none;border-color:#58a6ff}}
+    /* 振り返り */
+    .reflection-card{{background:#1a1f2e;border:1px solid #1f6feb33;border-radius:12px;padding:13px;margin-bottom:12px}}
+    .reflection-title{{font-size:0.88rem;font-weight:bold;color:#58a6ff;margin-bottom:8px}}
+    .refl-label{{font-size:0.75rem;color:#8b949e;margin:8px 0 4px}}
+    .refl-row{{display:grid;grid-template-columns:1fr 1fr;gap:8px}}
+    .refl-input{{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;padding:8px;font-size:0.82rem;font-family:inherit}}
+    .refl-input:focus{{outline:none;border-color:#58a6ff}}
+    .refl-textarea{{width:100%;background:#0d1117;border:1px solid #30363d;border-radius:8px;color:#e6edf3;padding:9px;font-size:0.82rem;resize:vertical;min-height:60px;font-family:inherit}}
+    .refl-textarea:focus{{outline:none;border-color:#58a6ff}}
+    .refl-save-btn{{display:block;width:100%;padding:10px;background:#1f6feb;color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:bold;cursor:pointer;margin-top:10px}}
+    .refl-history{{margin-top:10px}}
+    .refl-entry{{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:10px;margin-bottom:8px;font-size:0.78rem;line-height:1.6}}
+    .refl-date{{font-size:0.7rem;color:#8b949e;margin-bottom:4px}}
+    .refl-del{{float:right;background:none;border:none;color:#8b949e;cursor:pointer;font-size:0.75rem}}
+    .win{{color:#3fb950}}.loss{{color:#f85149}}.even{{color:#8b949e}}
+    .refl-row3{{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:4px}}
+    /* 取引ログ強化 */
+    .check-group{{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}}
+    .check-item{{display:flex;align-items:center;gap:4px;font-size:0.78rem;cursor:pointer;background:#21262d;border:1px solid #30363d;border-radius:6px;padding:4px 8px}}
+    .check-item input{{margin:0;accent-color:#3fb950}}
+    .check-item.selected{{background:#0d1f12;border-color:#238636;color:#3fb950}}
+    .refl-row2{{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}}
+    select.refl-input{{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238b949e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center}}
+    /* 統計タブ */
+    .stats-section{{margin-bottom:16px}}
+    .stats-title{{font-size:0.85rem;font-weight:bold;color:#58a6ff;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid #21262d}}
+    .stats-table{{width:100%;border-collapse:collapse;font-size:0.78rem}}
+    .stats-table th{{color:#8b949e;font-size:0.7rem;padding:4px 6px;border-bottom:1px solid #21262d;text-align:left}}
+    .stats-table td{{padding:6px 6px;border-bottom:1px solid #21262d}}
+    .ev-pos{{color:#3fb950;font-weight:bold}}.ev-neg{{color:#f85149;font-weight:bold}}.ev-neu{{color:#8b949e}}
+    .stat-bar{{height:6px;border-radius:3px;background:#21262d;margin-top:3px}}
+    .stat-bar-fill{{height:100%;border-radius:3px;background:#3fb950}}
+    .stat-bar-fill.neg{{background:#f85149}}
+    /* 見送りログ */
+    .skip-item{{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid #21262d;font-size:0.82rem}}
+    .skip-result{{font-size:0.75rem;font-weight:bold}}
+    .pnl-preview{{padding:10px 12px;border-radius:8px;margin:8px 0;font-size:0.88rem;font-weight:bold;min-height:36px;text-align:center;background:#0d1117;border:1px solid #30363d}}
+    .pnl-win{{color:#3fb950;border-color:#238636;background:#0d1f12}}
+    .pnl-loss{{color:#f85149;border-color:#6e1a1a;background:#1f0d0d}}
+    .pnl-zero{{color:#8b949e}}
+    .trade-row{{display:grid;grid-template-columns:auto 1fr auto auto;gap:8px;align-items:start;padding:8px 0;border-bottom:1px solid #21262d;font-size:0.8rem}}
+    .trade-date{{color:#8b949e;font-size:0.72rem;white-space:nowrap}}
+    .trade-stock{{font-weight:bold}}
+    .trade-detail{{font-size:0.72rem;color:#8b949e;margin-top:2px}}
+    .trade-pnl{{font-weight:bold;text-align:right;white-space:nowrap}}
+    .trade-del{{background:none;border:none;color:#484f58;cursor:pointer;font-size:0.8rem;padding:0 4px}}
+    .trade-del:hover{{color:#f85149}}
+    .trade-note{{grid-column:1/-1;font-size:0.75rem;color:#8b949e;padding:2px 0 4px;border-top:1px dashed #21262d;margin-top:2px}}
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📈 株朝活 PRO</h1>
+  <span class="time">{fetch_time}</span>
+</header>
+
+<!-- ナビゲーション -->
+<div class="nav">
+  <button class="nav-btn active" onclick="switchTab('morning', this)">🌅 朝の分析</button>
+  <button class="nav-btn" onclick="switchTab('log', this)">📒 取引ログ</button>
+  <button class="nav-btn" onclick="switchTab('stats', this)">📊 統計</button>
+  <button class="nav-btn" onclick="switchTab('watch', this)">⭐ Watch</button>
+  <a href="now.html" class="nav-btn">⚡ 今すぐ</a>
+</div>
+
+<!-- 朝の分析タブ -->
+<div id="tab-morning" class="tab-content active">
+
+<div class="section-title">🇯🇵 日本市場</div>
+<div class="index-grid grid-2">{jp_cards}</div>
+
+<div class="section-title">🇺🇸 米国市場（前日終値）</div>
+<div class="index-grid grid-3">{us_cards}</div>
+
+<div class="section-title">🌍 グローバル指標</div>
+<div class="index-grid grid-4">{gl_cards}</div>
+
+<!-- 急騰スキャン -->
+{surge_html}
+
+<!-- アラート -->
+{alert_html}
+
+<!-- 前日まとめ -->
+{prev_summary_html}
+
+<hr class="divider">
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">🔬 テクニカルスクリーニング結果</span>
+    <span class="badge">出来高・RSI・乖離率・52週位置</span>
+  </div>
+  <table>
+    <tr><th>銘柄</th><th>現値</th><th>前日比</th><th>出来高比</th><th>RSI</th><th>25MA乖離</th><th>52週位置</th></tr>
+    {stock_rows}
+  </table>
+  <div class="legend">
+    <span class="legend-item">出来高比: 本日÷20日平均 ｜ RSI: 70↑=過熱 30↓=売られすぎ</span>
+    <span class="legend-item">52週位置: 100%=高値 0%=安値 ｜ 25MA乖離: 移動平均からの距離</span>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="card-title">📰 市場関連ニュース</span>
+    <span class="badge">NHK・Yahoo・東洋経済・Investing.com</span>
+  </div>
+  {news_html}
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="step-badge">2</span>
+    <span class="card-title">Geminiに聞く → 結果を貼り付け</span>
+  </div>
+  <div class="prompt-box" id="gemini-hint">読み込み中...</div>
+  <button class="btn-copy-hint" onclick="copyPrompt('gemini')">📋 このプロンプトをコピーしてGeminiへ</button>
+  <div class="toast-small" id="gemini-copied">✅ コピーしました！</div>
+  <textarea id="gemini-input" placeholder="Geminiの回答をここに貼り付けてください" onblur="autoSaveAIResponse('gemini')"></textarea>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="step-badge">3</span>
+    <span class="card-title">ChatGPTに聞く → 結果を貼り付け</span>
+  </div>
+  <div class="prompt-box" id="chatgpt-hint">読み込み中...</div>
+  <button class="btn-copy-hint" onclick="copyPrompt('chatgpt')">📋 このプロンプトをコピーしてChatGPTへ</button>
+  <div class="toast-small" id="chatgpt-copied">✅ コピーしました！</div>
+  <textarea id="chatgpt-input" placeholder="ChatGPTの回答をここに貼り付けてください" onblur="autoSaveAIResponse('chatgpt')"></textarea>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <span class="step-badge">4</span>
+    <span class="card-title">Claude最終分析（利確・損切りライン付き）</span>
+  </div>
+  <button class="btn btn-generate" onclick="generateFinalPrompt()">✨ 最終プロンプトを生成してコピー</button>
+  <div class="toast" id="toast">✅ コピーしました！Claude.aiに貼り付けてください</div>
+  <div class="prompt-box" id="prompt-preview" style="display:none"></div>
+  <a href="https://claude.ai/project/019eee77-ec0f-76d0-9445-b731633c66ca" target="_blank" id="claude-link" style="display:none">
+    <button class="btn btn-claude" style="margin-top:8px">🤖 Claude.aiを開く →</button>
+  </a>
+</div>
+
+<!-- STEP 5: Claudeの回答を貼り付けるだけ → 全自動 -->
+<div class="card" style="border-color:#f0a500">
+  <div class="card-header">
+    <span class="step-badge" style="background:#f0a500">5</span>
+    <span class="card-title">Claudeの回答を貼り付け → 全自動生成</span>
+  </div>
+  <div style="font-size:0.75rem;color:#8b949e;margin-bottom:10px">
+    Claudeの回答をそのまま貼り付けてボタンを押すだけ。<br>
+    銘柄・エントリー・利確・損切りを自動解析 → iPhoneページも自動生成します。
+  </div>
+
+  <textarea class="refl-textarea" id="ai-response-text" placeholder="Claudeの回答をここにそのまま貼り付け（全文コピーでOK）" style="min-height:160px"></textarea>
+
+  <button class="btn btn-generate" onclick="parseAndGenerate()" style="margin-top:8px;background:linear-gradient(135deg,#b8860b,#8b6914)">
+    ✨ 自動解析 → 記録 + iPhoneページ生成
+  </button>
+  <div class="toast-small" id="ai-pred-saved" style="margin-top:6px">✅ 解析完了！today.htmlをダウンロードしました</div>
+
+  <!-- 解析結果プレビュー -->
+  <div id="parse-preview" style="display:none;margin-top:10px;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:12px;font-size:0.78rem;line-height:1.8"></div>
+
+  <div style="font-size:0.72rem;color:#8b949e;margin-top:8px">
+    ダウンロードされた <strong>today.html</strong> を stock-morning フォルダに移動 → <strong>「今日の作戦を送る.command」</strong> を実行
+  </div>
+</div>
+
+</div><!-- /tab-morning -->
+
+<!-- 📒 取引ログタブ -->
+<div id="tab-log" class="tab-content">
+
+  <div class="reflection-card">
+    <div class="reflection-title">📒 取引ログを記録</div>
+
+    <!-- 日付・時刻 -->
+    <div class="refl-row2">
+      <div>
+        <div class="refl-label">日付</div>
+        <input type="date" class="refl-input" id="refl-date" style="width:100%">
+      </div>
+      <div>
+        <div class="refl-label">エントリー時刻</div>
+        <select class="refl-input" id="refl-timeslot" style="width:100%">
+          <option value="">選択</option>
+          <option value="9:20〜9:40">9:20〜9:40（寄り付き直後）</option>
+          <option value="9:40〜10:30">9:40〜10:30（前場前半）</option>
+          <option value="10:30〜11:30">10:30〜11:30（前場後半）</option>
+          <option value="13:00〜14:00">13:00〜14:00（後場前半）</option>
+          <option value="14:00〜15:00">14:00〜15:00（後場後半）</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 銘柄 -->
+    <div class="refl-label">銘柄コード（4桁）→ 銘柄名が自動入力</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input type="text" inputmode="numeric" pattern="[0-9]*" class="refl-input" id="refl-code" placeholder="例: 9434" style="width:110px;flex-shrink:0" oninput="lookupStock()" maxlength="4">
+      <input type="text" class="refl-input" id="refl-stock" placeholder="銘柄名（自動入力 or 手入力）" style="flex:1">
+    </div>
+
+    <!-- エントリー理由 -->
+    <div class="refl-label">エントリー理由（複数選択可）</div>
+    <div class="check-group" id="reason-group">
+      <label class="check-item"><input type="checkbox" value="VWAP反発"> VWAP反発</label>
+      <label class="check-item"><input type="checkbox" value="前日高値突破"> 前日高値突破</label>
+      <label class="check-item"><input type="checkbox" value="GU"> GU↑</label>
+      <label class="check-item"><input type="checkbox" value="GD"> GD↓</label>
+      <label class="check-item"><input type="checkbox" value="出来高急増"> 出来高急増</label>
+      <label class="check-item"><input type="checkbox" value="RSI売られすぎ"> RSI30以下</label>
+      <label class="check-item"><input type="checkbox" value="RSI過熱"> RSI70以上</label>
+      <label class="check-item"><input type="checkbox" value="材料株"> 材料株</label>
+      <label class="check-item"><input type="checkbox" value="Claude推奨"> Claude推奨</label>
+      <label class="check-item"><input type="checkbox" value="ChatGPT推奨"> ChatGPT推奨</label>
+      <label class="check-item"><input type="checkbox" value="Gemini推奨"> Gemini推奨</label>
+      <label class="check-item"><input type="checkbox" value="自分判断"> 自分判断</label>
+    </div>
+
+    <!-- 地合い・見送りフラグ -->
+    <div class="refl-row2">
+      <div>
+        <div class="refl-label">今日の地合い</div>
+        <select class="refl-input" id="refl-market-type" style="width:100%">
+          <option value="">選択</option>
+          <option value="全面高">全面高（強気）</option>
+          <option value="全面安">全面安（弱気）</option>
+          <option value="GU相場">GU相場</option>
+          <option value="寄り天">寄り天（高く始まって下落）</option>
+          <option value="レンジ">レンジ（方向感なし）</option>
+          <option value="半導体主導">半導体主導</option>
+          <option value="銀行金融主導">銀行・金融主導</option>
+          <option value="乱高下">乱高下</option>
+        </select>
+      </div>
+      <div>
+        <div class="refl-label">記録タイプ</div>
+        <select class="refl-input" id="refl-type" style="width:100%">
+          <option value="trade">✅ 実際に取引した</option>
+          <option value="skip">👀 見送った銘柄</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 買値・売値・株数 -->
+    <div class="refl-row3">
+      <div>
+        <div class="refl-label">買値（円）</div>
+        <input type="number" class="refl-input" id="refl-buy" placeholder="例: 210" oninput="calcPnl()">
+      </div>
+      <div>
+        <div class="refl-label">売値（円）</div>
+        <input type="number" class="refl-input" id="refl-sell" placeholder="例: 215" oninput="calcPnl()">
+      </div>
+      <div>
+        <div class="refl-label">株数</div>
+        <input type="number" class="refl-input" id="refl-shares" placeholder="100" value="100" oninput="calcPnl()">
+      </div>
+    </div>
+
+    <!-- 実現損益 -->
+    <div class="refl-label">実現損益（楽天証券の数字をそのまま入力）</div>
+    <input type="number" class="refl-input" id="refl-actual-pnl" placeholder="例: +345 または -280" style="width:100%" oninput="calcPnl()">
+    <div class="pnl-preview" id="pnl-preview"></div>
+
+    <!-- メモ -->
+    <div class="refl-label">気づき・反省（任意）</div>
+    <textarea class="refl-textarea" id="refl-note" placeholder="例: 損切りできなかった。VWAP割れで即撤退すべきだった。"></textarea>
+
+    <button class="refl-save-btn" onclick="saveReflection()">💾 保存する</button>
+  </div>
+
+  <!-- グラフ -->
+  <div class="card">
+    <div class="card-header">
+      <span class="card-title">📈 累積損益グラフ</span>
+      <span class="badge" id="trade-summary">集計中...</span>
+    </div>
+    <canvas id="pnl-chart" height="120" style="width:100%"></canvas>
+  </div>
+
+  <!-- 取引履歴 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📋 取引履歴</span></div>
+    <div class="refl-history" id="refl-history">履歴なし</div>
+    <button class="btn-copy-hint" onclick="copyReflHistory()" style="margin-top:8px">📋 履歴＋統計をClaudeに渡す（パターン分析）</button>
+    <div class="toast-small" id="refl-copied">✅ コピーしました！</div>
+  </div>
+
+</div><!-- /tab-log -->
+
+<!-- 📊 統計タブ -->
+<div id="tab-stats" class="tab-content">
+
+  <!-- 統計ダッシュボード -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">📊 あなたの期待値データベース</span></div>
+    <div id="stats-dashboard">
+      <div style="color:#8b949e;font-size:0.83rem">取引ログが3件以上たまると自動で統計が表示されます</div>
+    </div>
+    <button class="btn-copy-hint" onclick="copyStatsToClaudePrompt()" style="margin-top:10px">📋 統計をClaudeに渡して戦略改善</button>
+    <div class="toast-small" id="stats-copied">✅ コピーしました！</div>
+  </div>
+
+  <!-- AI的中率トラッカー -->
+  <div class="card" style="border-color:#f0a500">
+    <div class="card-header"><span class="card-title">🤖 AI的中率比較（Gemini / ChatGPT / Claude）</span></div>
+    <div id="ai-accuracy-summary" style="margin-bottom:10px"></div>
+    <div id="ai-pred-tracker">記録なし</div>
+  </div>
+
+  <!-- 地合い予測履歴 -->
+  <div class="card">
+    <div class="card-header"><span class="card-title">🎯 地合い予測の正答率</span></div>
+    <div id="pred-history">記録なし</div>
+  </div>
+
+</div><!-- /tab-stats -->
+
+<!-- ⭐ ウォッチリストタブ -->
+<div id="tab-watch" class="tab-content">
+
+  <div class="card">
+    <div class="card-header"><span class="card-title">⭐ ウォッチリスト</span><span class="badge">追加→watchlist.json自動保存</span></div>
+    <div style="font-size:0.72rem;color:#8b949e;margin-bottom:8px">追加・削除するとwatchlist.jsonが自動ダウンロードされます。<br>stock-morningフォルダに移動（上書き）してください。</div>
+    <div class="watch-form">
+      <input type="text" class="watch-input" id="watch-code" placeholder="コード例: 9434.T">
+      <input type="text" class="watch-input" id="watch-name" placeholder="銘柄名">
+      <button class="watch-add-btn" onclick="addWatch()">追加</button>
+    </div>
+    <ul class="watch-list" id="watch-list"></ul>
+    <div class="refl-label" style="margin-top:10px">メモ</div>
+    <textarea class="watch-memo" id="watch-memo" placeholder="気になる理由、注目材料、エントリー条件など自由に"></textarea>
+    <button class="btn-copy-hint" onclick="saveWatchMemo()" style="margin-top:6px">💾 メモを保存</button>
+  </div>
+
+</div><!-- /tab-watch -->
+
+<script>
+// タブ切替（最優先で定義）
+function switchTab(tab, btn) {{
+  try {{
+    document.querySelectorAll('.tab-content').forEach(function(el) {{ el.classList.remove('active'); }});
+    document.querySelectorAll('.nav-btn').forEach(function(el) {{ el.classList.remove('active'); }});
+    var t = document.getElementById('tab-' + tab);
+    if (t) t.classList.add('active');
+    if (btn) btn.classList.add('active');
+    if (tab === 'stats') {{ try{{ renderStats(); }}catch(e){{}} try{{ renderPredHistory(); }}catch(e){{}} try{{ renderAIPredTracker(); }}catch(e){{}} try{{ renderAIAccuracySummary(); }}catch(e){{}} }}
+    if (tab === 'log') {{ try{{ renderPnlChart(); }}catch(e){{}} }}
+  }} catch(e) {{ console.error('switchTab error:', e); }}
+}}
+
+const MARKET_DATA = `{data_text_escaped}`;
+
+function buildGeminiPrompt() {{
+  const lines = MARKET_DATA.split('\\n');
+  const nikkeiLine = lines.find(l => l.includes('日経平均')) || '';
+  const dollarLine = lines.find(l => l.includes('ドル円')) || '';
+  const dowLine = lines.find(l => l.includes('ダウ')) || '';
+  const vixLine = lines.find(l => l.includes('VIX')) || '';
+
+  const nikkeiPct = (nikkeiLine.match(/\\(([+\\-][\\d.]+)%\\)/) || ['',''])[1];
+  const dollarVal = (dollarLine.match(/([\\d.]+)円/) || ['',''])[1];
+  const vixVal = (vixLine.match(/([\\d.]+)/) || ['',''])[1];
+  const nikkeiDir = nikkeiPct.startsWith('+') ? '上昇' : '下落';
+  const vixLevel = parseFloat(vixVal) > 25 ? '高水準（市場不安定）' : parseFloat(vixVal) > 18 ? '中程度' : '低水準（市場安定）';
+
+  const personalProfile = getPersonalProfile();
+
+  return `【本日の市場データ】
+${{MARKET_DATA}}
+${{personalProfile ? '\\n' + personalProfile : ''}}
+
+上記のデータと私の過去実績を踏まえ、プロの株式アナリストとして以下を教えてください。
+
+■ 今日の市場環境の核心（2〜3行で簡潔に）
+・日経${{nikkeiPct}}%・VIX${{vixVal}}・ドル円${{dollarVal}}円から読み取る今日の地合い
+
+■ 本日の注目ニュース・材料（好材料・悪材料）
+・銘柄コード・銘柄名・材料・インパクト予想（大/中/小）
+
+■ 今日強いセクター・テーマ TOP3（理由 + 代表銘柄コード）
+
+■ 今日弱いセクター・テーマ（避けるべきもの）
+
+━━━━━━━━━━━━━━━━━━━━
+【あなたの役割】ファンダメンタル・ニュース・材料視点で本日のデイトレ候補を10銘柄出す
+━━━━━━━━━━━━━━━━━━━━
+
+以下の条件で必ず10銘柄リストアップしてください：
+
+◆ 条件
+・資金13万円・1株700円以下（100株=7万円以内）の銘柄を4銘柄以上含めること
+・残りは1,300円以下（100株=13万円以内）の銘柄
+・今日の好材料・テーマ・ニュースに関連する銘柄を優先
+${{personalProfile ? '・私の統計で得意なパターンに合う銘柄を優先' : ''}}
+
+◆ 各銘柄の出力形式（10銘柄全て）：
+【銘柄名（コード）】※700円以下は💚マーク
+・現在値: 〇〇円 / 100株コスト: 〇〇万円
+・注目理由: ファンダ・ニュース・材料の観点から
+・好材料 or 悪材料: 具体的に
+・信頼度: ★〜★★★★★
+
+このリストは後でClaudeが最終判断します。できるだけ多様なセクター・価格帯から選んでください。
+
+具体的な銘柄コードと数字で答えてください。`;
+}}
+
+function buildChatGPTPrompt() {{
+  const lines = MARKET_DATA.split('\\n');
+  const screenLines = lines.filter(l => l.includes('RSI') || l.includes('出来高比'));
+  const personalProfile = getPersonalProfile();
+
+  return `【本日の市場データ・テクニカル分析結果】
+${{MARKET_DATA}}
+${{personalProfile ? '\\n' + personalProfile : ''}}
+
+あなたはプロのテクニカルアナリスト兼デイトレーダーです。
+私の統計データと今日のテクニカル指標から分析してください。
+
+■ 今日の時間帯別エントリー戦略（簡潔に）
+・9:20〜9:40 / 前場 / 後場 それぞれの狙い方
+${{personalProfile ? '・私の統計の得意・苦手時間帯を反映してください' : ''}}
+
+■ 今日のリスク要因（1〜2行）
+
+━━━━━━━━━━━━━━━━━━━━
+【あなたの役割】テクニカル・チャート・出来高視点で本日のデイトレ候補を10銘柄出す
+（Geminiとは異なる視点で選ぶこと・ファンダより値動きを重視）
+━━━━━━━━━━━━━━━━━━━━
+
+以下の条件で必ず10銘柄リストアップしてください：
+
+◆ 条件
+・資金13万円・1株700円以下（100株=7万円以内）の銘柄を4銘柄以上含めること
+・RSI・出来高急増・移動平均乖離率・52週位置・ローソク足パターンで選定
+・スクリーニング結果の銘柄を優先しつつ他の銘柄も幅広く検討
+${{personalProfile ? '・私の統計で得意なエントリー条件に合う銘柄を優先' : ''}}
+
+◆ 各銘柄の出力形式（10銘柄全て）：
+【銘柄名（コード）】※700円以下は💚マーク
+・現在値: 〇〇円 / 100株コスト: 〇〇万円
+・テクニカル根拠: RSI・出来高・チャートパターン・52週位置から
+・エントリー戦略: 何円台で・どのタイミングで
+・信頼度: ★〜★★★★★
+
+このリストは後でClaudeが最終判断します。テクニカル的に「今動きそう」な銘柄を優先してください。
+
+⚠️ 必ずBing検索で今日の最新ニュース・株価情報を確認してから回答してください。学習データだけで答えないこと。
+
+数字と根拠で具体的に答えてください。`;
+}}
+
+function buildClaudePrompt() {{
+  const gemini = document.getElementById('gemini-input').value.trim();
+  const chatgpt = document.getElementById('chatgpt-input').value.trim();
+
+  const profileText = getPersonalProfile();
+
+  let prompt = `あなたは20年以上の経験を持つ日本株専門のプロトレーダーです。
+ファンダメンタルとテクニカルの両面から分析し、私が今日の相場で勝てる確率を最大化してください。
+
+━━━━━━━━━━━━━━━━━━━━
+【情報①】本日の市場データ・テクニカル分析（自動収集）
+━━━━━━━━━━━━━━━━━━━━
+${{MARKET_DATA}}
+${{profileText ? '\\n' + profileText : ''}}
+`;
+
+  if (gemini) {{
+    prompt += `
+━━━━━━━━━━━━━━━━━━━━
+【情報②】Geminiの分析（ファンダメンタル・ニュース）
+━━━━━━━━━━━━━━━━━━━━
+${{gemini}}
+`;
+  }}
+
+  if (chatgpt) {{
+    prompt += `
+━━━━━━━━━━━━━━━━━━━━
+【情報③】ChatGPTの分析（テクニカル・時間帯戦略）
+━━━━━━━━━━━━━━━━━━━━
+${{chatgpt}}
+`;
+  }}
+
+  prompt += `
+━━━━━━━━━━━━━━━━━━━━
+【総合分析依頼】
+━━━━━━━━━━━━━━━━━━━━
+
+■ 1. 今日の市場の空気感（1〜2行）
+・強気/弱気/中立、その核心理由
+
+■ 2. 3つのAI情報の一致点と矛盾点
+・GeminiとChatGPTの分析が一致している部分（信頼度高）
+・矛盾している部分（どちらの判断が妥当か）
+
+■ 3. 今日強いテーマ（上位3つ）
+・テーマ → 理由 → 代表銘柄コード
+
+■ 4. 今日弱いテーマ・完全に避けること（3つ）
+
+■ 5. GeminiとChatGPTの20候補から厳選
+（重複銘柄は「2AI一致」として信頼度を上げること）
+
+▼▼▼ 押せる銘柄（最大5つ・自信あり・積極推奨）▼▼▼
+条件: ファンダ・テクニカルの両方で根拠があり、今日動く理由が明確なもの
+⚠️ このうち最低2つは1株700円以下（100株=7万円以内）の銘柄にすること
+⚠️ 根拠が弱い場合は無理に5つ出さなくてよい
+
+各銘柄の形式：
+【💚 銘柄名（コード）】※700円以下は💚、700円超は【 銘柄名（コード）】
+・現在値: 〇〇円 / 100株コスト: 〇〇万円
+・推奨理由: ファンダ（Gemini）×テクニカル（ChatGPT）の一致点を中心に
+・2AI一致: ✅一致 or ❌片方のみ
+・エントリー: 9:20以降・〇〇円台で（指値 or 成行）
+・利確①: 〇〇円（+〇%・期待利益〇〇円）
+・利確②: 〇〇円（+〇%）
+・損切り: 〇〇円（-〇%・最大損失〇〇円以内）
+・リスクリワード: 〇:1
+・信頼度: ★★★★★ 〜 ★★★
+
+▼▼▼ 次点・様子見銘柄（最大5つ・条件次第で検討）▼▼▼
+条件: 片方のAIのみの推奨、または根拠はあるが今日の地合いと微妙にズレるもの
+⚠️ 根拠が弱い場合は無理に出さなくてよい
+
+各銘柄の形式：
+【銘柄名（コード）】
+・現在値: 〇〇円 / 100株コスト: 〇〇万円
+・検討条件: 「〇〇円を超えたら」「出来高が増えてきたら」など具体的な条件
+・信頼度: ★★ 〜 ★
+
+■ 6. 今日の「やってはいけない」行動リスト
+
+■ 7. 総合戦略（2〜3行）
+・目標利益と最大損失許容額も含めて
+
+■ 8. 今日の相場タイプ分類
+・全面高/全面安/GU相場/寄り天/レンジ/半導体主導/銀行主導/乱高下 のどれか
+・理由も1行で
+
+■ 9. 総合判断
+・「積極的に取引すべき日」「慎重に小さく」「今日は休む」のどれか
+
+■ 10. 昨日の振り返り日記（自動生成）
+・昨日の取引プロファイルデータを元に、100〜150字のトレード日記を書いてください
+・フォーマット：「[日付] [勝敗] [気づき] [明日へのアドバイス]」
+
+━━━━━━━━━━━━━━━━━━━━
+私のルール・プロフィール：
+・資金: 10万円
+・目標: 1日1,000〜3,000円の利益（欲張らない・確実に積み上げる）
+・エントリー: 9:20以降のみ（寄り付き直後は絶対に触らない）
+・1回の最大損失: 2,000〜3,000円で必ず損切り
+・1日の最大損失: 5,000円負けたらその日は終了
+・保有時間: 基本デイトレ（その日中に決済）
+・対象: 日本株ETF・個別株・商品ETF（金・原油・農産物）も選択肢
+・レベル: 初心者〜中級者
+・弱点: 含み損になると損切りできなくなりやすい・欲張りやすい
+━━━━━━━━━━━━━━━━━━━━`;
+
+  return prompt;
+}}
+
+function getPersonalProfile() {{
+  const list = loadReflections().filter(r => r.result === 'win' || r.result === 'loss' || r.result === 'even');
+  if (list.length < 3) return '';
+  const wins = list.filter(r => r.result === 'win');
+  const losses = list.filter(r => r.result === 'loss');
+  const totalPnl = list.reduce((s, r) => s + (r.pnl || 0), 0);
+  const winRate = Math.round(wins.length / list.length * 100);
+
+  // 連敗チェック
+  let streak = 0;
+  for (let i = 0; i < Math.min(list.length, 5); i++) {{
+    if (list[i].result === 'loss') streak++;
+    else break;
+  }}
+
+  const streakNote = streak >= 3 ? '⚠️ 現在' + streak + '連敗中。今日は特に慎重に。' : '';
+  const stats = calcTradeStats();
+
+  // 統計から具体的な行動指針を生成
+  const guidance = [];
+
+  if (stats) {{
+    // エントリー理由別（2回以上のデータがある条件のみ）
+    const reasonEntries = Object.entries(stats.byReason).filter(([k,v]) => v.total >= 2);
+    if (reasonEntries.length >= 2) {{
+      const sorted = [...reasonEntries].sort((a,b) => (b[1].wins/b[1].total) - (a[1].wins/a[1].total));
+      const best = sorted[0];
+      const worst = sorted[sorted.length-1];
+      const bestWR = Math.round(best[1].wins/best[1].total*100);
+      const worstWR = Math.round(worst[1].wins/worst[1].total*100);
+      guidance.push('【エントリー条件】' + best[0] + 'は勝率' + bestWR + '%（得意）→ 今日このパターンがあれば積極的に推奨してください');
+      if (worstWR < 40) {{
+        guidance.push('【避けるべき条件】' + worst[0] + 'は勝率' + worstWR + '%（苦手）→ このパターンは推奨しないでください');
+      }}
+    }}
+
+    // 時間帯別（2回以上）
+    const timeEntries = Object.entries(stats.byTime).filter(([k,v]) => v.total >= 2);
+    if (timeEntries.length >= 1) {{
+      const bestTime = [...timeEntries].sort((a,b) => (b[1].wins/b[1].total) - (a[1].wins/a[1].total))[0];
+      const bestTimeWR = Math.round(bestTime[1].wins/bestTime[1].total*100);
+      guidance.push('【得意な時間帯】' + bestTime[0] + 'が勝率' + bestTimeWR + '% → この時間帯のエントリーを優先推奨してください');
+      if (timeEntries.length >= 2) {{
+        const worstTime = [...timeEntries].sort((a,b) => (a[1].wins/a[1].total) - (b[1].wins/b[1].total))[0];
+        const worstTimeWR = Math.round(worstTime[1].wins/worstTime[1].total*100);
+        if (worstTimeWR < 40) {{
+          guidance.push('【苦手な時間帯】' + worstTime[0] + 'は勝率' + worstTimeWR + '% → この時間帯は見送りを推奨');
+        }}
+      }}
+    }}
+
+    // 地合い別（2回以上）
+    const marketEntries = Object.entries(stats.byMarket).filter(([k,v]) => v.total >= 2);
+    if (marketEntries.length >= 1) {{
+      const bestMarket = [...marketEntries].sort((a,b) => (b[1].wins/b[1].total) - (a[1].wins/a[1].total))[0];
+      const bestMarketWR = Math.round(bestMarket[1].wins/bestMarket[1].total*100);
+      guidance.push('【得意な地合い】' + bestMarket[0] + 'での勝率' + bestMarketWR + '% → 今日の地合いが' + bestMarket[0] + 'ならより積極的に');
+      if (marketEntries.length >= 2) {{
+        const worstMarket = [...marketEntries].sort((a,b) => (a[1].wins/a[1].total) - (b[1].wins/b[1].total))[0];
+        const worstMarketWR = Math.round(worstMarket[1].wins/worstMarket[1].total*100);
+        if (worstMarketWR < 40) {{
+          guidance.push('【苦手な地合い】' + worstMarket[0] + 'は勝率' + worstMarketWR + '% → この地合いなら今日は休むことも検討してください');
+        }}
+      }}
+    }}
+  }}
+
+  const lines = [
+    '【📊 私の個人統計データ（' + list.length + '回の実績より自動生成）】',
+    '・通算勝率: ' + winRate + '% (' + wins.length + '勝' + losses.length + '敗)',
+    '・累計損益: ' + (totalPnl >= 0 ? '+' : '') + totalPnl.toLocaleString() + '円',
+  ];
+  if (streakNote) lines.push(streakNote);
+  if (guidance.length) {{
+    lines.push('');
+    lines.push('【⚡ 統計に基づく本日の行動指針（必ず反映してください）】');
+    guidance.forEach(g => lines.push(g));
+  }}
+  return lines.join('\\n');
+}}
+
+// ===== タブ切替 =====
+// switchTabは上部で定義済み
+
+// ===== ウォッチリスト（ファイル保存対応）=====
+// Pythonが埋め込んだ初期データ（watchlist.jsonから読み込み）
+const SAVED_WATCHLIST = {saved_watchlist_json};
+
+function loadWatchList() {{
+  try {{
+    const stored = localStorage.getItem('watchlist');
+    if (stored) return JSON.parse(stored);
+  }} catch(e) {{}}
+  // localStorageがない/空の場合はPythonが埋め込んだデータを使う
+  return SAVED_WATCHLIST;
+}}
+function saveWatchList(list) {{
+  try {{ localStorage.setItem('watchlist', JSON.stringify(list)); }} catch(e) {{}}
+}}
+function renderWatchList() {{
+  const list = loadWatchList();
+  const ul = document.getElementById('watch-list');
+  if (!ul) return;
+  if (!list.length) {{ ul.innerHTML = '<li style="color:#8b949e;font-size:0.83rem;padding:8px 0">まだ登録されていません</li>'; return; }}
+  ul.innerHTML = list.map((item, i) =>
+    `<li class="watch-item">
+      <span>⭐ ${{item.name}} <span style="color:#8b949e;font-size:0.75rem">(${{item.code}})</span></span>
+      <button class="watch-del" onclick="delWatch(${{i}})">✕</button>
+    </li>`
+  ).join('');
+}}
+function addWatch() {{
+  const code = document.getElementById('watch-code').value.trim();
+  const name = document.getElementById('watch-name').value.trim() || code;
+  if (!code) return;
+  const list = loadWatchList();
+  if (!list.find(x => x.code === code)) {{
+    list.push({{code, name}});
+    saveWatchList(list);
+    exportWatchlistJson(list); // ← ファイルにも自動書き出し
+  }}
+  document.getElementById('watch-code').value = '';
+  document.getElementById('watch-name').value = '';
+  renderWatchList();
+}}
+function delWatch(i) {{
+  const list = loadWatchList();
+  list.splice(i, 1);
+  saveWatchList(list);
+  exportWatchlistJson(list); // ← 削除時もファイルに反映
+  renderWatchList();
+}}
+function exportWatchlistJson(list) {{
+  // watchlist.jsonをダウンロードして上書き保存させる
+  const data = JSON.stringify({{stocks: list}}, null, 2);
+  const blob = new Blob([data], {{type: 'application/json'}});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'watchlist.json';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}}
+function saveWatchMemo() {{
+  try {{ localStorage.setItem('watchMemo', document.getElementById('watch-memo').value); }} catch(e) {{}}
+  const btn = event.target;
+  btn.textContent = '✅ 保存しました';
+  setTimeout(() => btn.textContent = '💾 メモを保存', 1500);
+}}
+
+// ===== 銘柄コード辞書 =====
+const STOCK_DICT = {{
+  // メガバンク・金融
+  "8306":"三菱UFJフィナンシャル・グループ","8316":"三井住友フィナンシャルグループ","8411":"みずほフィナンシャルグループ",
+  "8591":"オリックス","8604":"野村ホールディングス","8766":"東京海上ホールディングス",
+  // 通信
+  "9434":"ソフトバンク","9432":"NTT","9433":"KDDI","9984":"ソフトバンクグループ",
+  // 半導体・電機
+  "6920":"レーザーテック","8035":"東京エレクトロン","6857":"アドバンテスト","6861":"キーエンス",
+  "6594":"日本電産(ニデック)","6501":"日立製作所","6502":"東芝","6503":"三菱電機","6758":"ソニーグループ",
+  "6762":"TDK","6902":"デンソー","7735":"SCREENホールディングス","4063":"信越化学工業",
+  // IT・ネット
+  "4385":"メルカリ","4478":"フリー","4565":"そーせいグループ","2413":"エムスリー",
+  "3697":"SHIFT","2371":"カカクコム","3765":"ガンホー・オンライン・エンターテイメント",
+  "4661":"オリエンタルランド","3672":"オルトプラス","6200":"インソース","6050":"イー・ガーディアン",
+  "2370":"メディネット","3825":"リミックスポイント","4478":"フリー",
+  // 自動車
+  "7203":"トヨタ自動車","7267":"ホンダ(本田技研工業)","7201":"日産自動車","7261":"マツダ",
+  "7269":"スズキ","7270":"SUBARU","7272":"ヤマハ発動機",
+  // 小売・外食
+  "9983":"ファーストリテイリング","7974":"任天堂","3563":"FOOD & LIFE COMPANIES",
+  "2914":"日本たばこ産業","2502":"アサヒグループホールディングス","2503":"キリンホールディングス",
+  // ETF
+  "1570":"NEXT FUNDS 日経平均レバレッジETF","1571":"NEXT FUNDS 日経平均インバースETF",
+  "1321":"NEXT FUNDS 日経225連動型ETF","2516":"東証グロース250ETF","1306":"TOPIX連動型ETF",
+  // その他人気銘柄
+  "6098":"リクルートホールディングス","4543":"テルモ","4519":"中外製薬","4568":"第一三共",
+  "6367":"ダイキン工業","5108":"ブリヂストン","7733":"オリンパス","2802":"味の素",
+  "4901":"富士フイルムホールディングス","7751":"キヤノン","6971":"京セラ","9022":"東海旅客鉄道(JR東海)",
+  "9020":"東日本旅客鉄道(JR東日本)","9021":"西日本旅客鉄道(JR西日本)",
+}};
+
+function lookupStock() {{
+  const raw = document.getElementById('refl-code').value;
+  const code = String(raw).replace(/\D/g, '').trim(); // 数字のみ抽出
+  const nameInput = document.getElementById('refl-stock');
+  if (code.length === 4) {{
+    if (STOCK_DICT[code]) {{
+      nameInput.value = STOCK_DICT[code];
+      nameInput.style.borderColor = '#3fb950';
+      nameInput.style.background = '#0d1f12';
+      setTimeout(() => {{
+        nameInput.style.borderColor = '';
+        nameInput.style.background = '';
+      }}, 2000);
+    }} else {{
+      nameInput.value = '';
+      nameInput.placeholder = '辞書にない銘柄 → 手入力してください';
+      nameInput.style.borderColor = '#f0a500';
+      setTimeout(() => {{
+        nameInput.style.borderColor = '';
+        nameInput.placeholder = '銘柄名（自動入力 or 手入力）';
+      }}, 2000);
+    }}
+  }}
+}}
+
+// ===== 損益表示 =====
+function calcPnl() {{
+  const actualPnl = document.getElementById('refl-actual-pnl').value;
+  const buy = parseFloat(document.getElementById('refl-buy').value) || 0;
+  const sell = parseFloat(document.getElementById('refl-sell').value) || 0;
+  const shares = parseInt(document.getElementById('refl-shares').value) || 100;
+  const el = document.getElementById('pnl-preview');
+
+  // 実現損益が入力されていればそちらを優先表示
+  if (actualPnl !== '') {{
+    const pnl = parseFloat(actualPnl);
+    const pct = (buy && sell) ? ((sell - buy) / buy * 100).toFixed(2) : null;
+    const pctStr = pct ? ` (${{pct}}%)` : '';
+    if (pnl > 0) {{
+      el.textContent = `✅ 実現利益 +${{pnl.toLocaleString()}}円${{pctStr}}（手数料込み）`;
+      el.className = 'pnl-preview pnl-win';
+    }} else if (pnl < 0) {{
+      el.textContent = `❌ 実現損失 ${{pnl.toLocaleString()}}円${{pctStr}}（手数料込み）`;
+      el.className = 'pnl-preview pnl-loss';
+    }} else {{
+      el.textContent = `➖ トントン（手数料込み）`;
+      el.className = 'pnl-preview pnl-zero';
+    }}
+    return;
+  }}
+
+  // 実現損益未入力なら買値・売値から自動計算（参考値）
+  if (!buy || !sell) {{ el.textContent = '実現損益 または 買値・売値を入力してください'; el.className = 'pnl-preview pnl-zero'; return; }}
+  const pnl = (sell - buy) * shares;
+  const pct = ((sell - buy) / buy * 100).toFixed(2);
+  if (pnl > 0) {{
+    el.textContent = `📊 参考値 +${{pnl.toLocaleString()}}円 (+${{pct}}%)　←実現損益を入力すると正確になります`;
+    el.className = 'pnl-preview pnl-win';
+  }} else if (pnl < 0) {{
+    el.textContent = `📊 参考値 ${{pnl.toLocaleString()}}円 (${{pct}}%)　←実現損益を入力すると正確になります`;
+    el.className = 'pnl-preview pnl-loss';
+  }} else {{
+    el.textContent = `➖ トントン（参考値）`;
+    el.className = 'pnl-preview pnl-zero';
+  }}
+}}
+
+// ===== 取引ログ =====
+function loadReflections() {{
+  return JSON.parse(localStorage.getItem('reflections') || '[]');
+}}
+
+function saveReflection() {{
+  const date = document.getElementById('refl-date').value;
+  const code = document.getElementById('refl-code').value.trim();
+  const stockName = document.getElementById('refl-stock').value.trim();
+  const stock = stockName || code || '';
+  const buy = parseFloat(document.getElementById('refl-buy').value) || 0;
+  const sell = parseFloat(document.getElementById('refl-sell').value) || 0;
+  const shares = parseInt(document.getElementById('refl-shares').value) || 100;
+  const note = document.getElementById('refl-note').value.trim();
+  const timeslot = document.getElementById('refl-timeslot').value;
+  const marketType = document.getElementById('refl-market-type').value;
+  const tradeType = document.getElementById('refl-type').value;
+
+  // エントリー理由収集
+  const reasons = Array.from(document.querySelectorAll('#reason-group input:checked')).map(cb => cb.value);
+
+  if (!date) {{ alert('日付を入力してください'); return; }}
+  if (!stock && !note) {{ alert('銘柄またはメモを入力してください'); return; }}
+
+  const actualPnlRaw = document.getElementById('refl-actual-pnl').value;
+  const actualPnl = actualPnlRaw !== '' ? parseFloat(actualPnlRaw) : null;
+  const pnl = actualPnl !== null ? actualPnl : (buy && sell ? Math.round((sell - buy) * shares) : null);
+  const result = tradeType === 'skip' ? 'skip' : (pnl === null ? 'memo' : pnl > 0 ? 'win' : pnl < 0 ? 'loss' : 'even');
+
+  const list = loadReflections();
+  list.unshift({{ date, stock, code, buy, sell, shares, pnl, actualPnl, result,
+                   reasons, timeslot, marketType, tradeType, note }});
+  localStorage.setItem('reflections', JSON.stringify(list.slice(0, 200)));
+
+  // フォームリセット
+  ['refl-code','refl-stock','refl-buy','refl-sell','refl-actual-pnl','refl-note'].forEach(id => {{
+    const el = document.getElementById(id);
+    if (el) el.value = id === 'refl-shares' ? '100' : '';
+  }});
+  document.getElementById('refl-shares').value = '100';
+  document.getElementById('refl-timeslot').value = '';
+  document.getElementById('refl-market-type').value = '';
+  document.getElementById('refl-type').value = 'trade';
+  document.querySelectorAll('#reason-group input').forEach(cb => cb.checked = false);
+  const pv = document.getElementById('pnl-preview');
+  if (pv) {{ pv.textContent = ''; pv.className = 'pnl-preview'; }}
+
+  renderReflections();
+  renderPnlChart();
+
+  const btn = document.querySelector('.refl-save-btn');
+  const orig = btn.textContent;
+  btn.textContent = '✅ 保存しました！';
+  btn.style.background = '#238636';
+  setTimeout(() => {{ btn.textContent = orig; btn.style.background = ''; }}, 2000);
+}}
+
+function renderReflections() {{
+  const list = loadReflections();
+  const el = document.getElementById('refl-history');
+  const summary = document.getElementById('trade-summary');
+
+  if (!list.length) {{
+    el.innerHTML = '<div style="color:#8b949e;font-size:0.83rem;padding:8px 0">まだ記録がありません</div>';
+    summary.textContent = '記録なし';
+    return;
+  }}
+
+  // 集計
+  const trades = list.filter(r => r.pnl !== null);
+  const totalPnl = trades.reduce((s, r) => s + (r.pnl || 0), 0);
+  const wins = trades.filter(r => r.result === 'win').length;
+  const total = trades.length;
+  const winRate = total ? Math.round(wins / total * 100) : 0;
+  const sign = totalPnl >= 0 ? '+' : '';
+  summary.textContent = `${{total}}回 勝率${{winRate}}% 累計${{sign}}${{totalPnl.toLocaleString()}}円`;
+  summary.style.color = totalPnl >= 0 ? '#3fb950' : '#f85149';
+
+  el.innerHTML = list.map((r, i) => {{
+    const isSkip = r.tradeType === 'skip';
+    const pnlStr = isSkip
+      ? '<span style="color:#8b949e">👀見送り</span>'
+      : r.pnl !== null
+        ? `<span class="${{r.pnl >= 0 ? 'win' : 'loss'}}">${{r.pnl >= 0 ? '+' : ''}}${{r.pnl.toLocaleString()}}円</span>`
+        : '<span class="even">-</span>';
+    const reasons = (r.reasons || []).join('・');
+    const tags = [r.timeslot, r.marketType].filter(Boolean).join(' / ');
+    return `<div class="trade-row">
+      <span class="trade-date">${{r.date}}</span>
+      <div>
+        <div class="trade-stock">${{r.stock || '-'}}</div>
+        <div class="trade-detail">${{[r.buy ? '買:'+r.buy+'円' : '', r.sell ? '売:'+r.sell+'円' : '', r.shares ? r.shares+'株' : ''].filter(Boolean).join(' | ')}}</div>
+        ${{reasons ? `<div class="trade-detail" style="color:#58a6ff">${{reasons}}</div>` : ''}}
+        ${{tags ? `<div class="trade-detail">${{tags}}</div>` : ''}}
+      </div>
+      <span class="trade-pnl">${{pnlStr}}</span>
+      <button class="trade-del" onclick="delRefl(${{i}})">✕</button>
+      ${{r.note ? '<div class="trade-note">' + r.note + '</div>' : ''}}
+    </div>`;
+  }}).join('');
+}}
+
+function delRefl(i) {{
+  const list = loadReflections();
+  list.splice(i, 1);
+  localStorage.setItem('reflections', JSON.stringify(list));
+  renderReflections();
+  renderPnlChart();
+}}
+
+function copyReflHistory() {{
+  const list = loadReflections();
+  if (!list.length) {{ alert('取引履歴がありません'); return; }}
+
+  const trades = list.filter(r => r.pnl !== null);
+  const totalPnl = trades.reduce((s, r) => s + (r.pnl || 0), 0);
+  const wins = trades.filter(r => r.result === 'win').length;
+  const winRate = trades.length ? Math.round(wins / trades.length * 100) : 0;
+
+  let text = `【取引履歴・パターン分析依頼】\\n`;
+  text += `総取引数: ${{trades.length}}回 / 勝率: ${{winRate}}% / 累計損益: ${{totalPnl >= 0 ? '+' : ''}}${{totalPnl.toLocaleString()}}円\\n\\n`;
+  text += `【取引一覧】\\n`;
+  list.slice(0, 20).forEach(r => {{
+    text += `${{r.date}} ${{r.stock}}`;
+    if (r.buy && r.sell) text += ` 買:${{r.buy}}円→売:${{r.sell}}円 ${{r.shares}}株 ${{r.pnl >= 0 ? '+' : ''}}${{r.pnl}}円`;
+    if (r.note) text += ` [${{r.note}}]`;
+    text += '\\n';
+  }});
+  text += `\\n上記の取引履歴を分析して以下を教えてください：
+・私の負けパターン（どんな時に負けているか）
+・私の勝ちパターン（どんな時に勝っているか）
+・改善すべき最優先の習慣1つ
+・今日の相場で活かせるアドバイス`;
+
+  navigator.clipboard.writeText(text).catch(() => {{
+    const el = document.createElement('textarea');
+    el.value = text; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+  }});
+  const t = document.getElementById('refl-copied');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}}
+
+window.addEventListener('DOMContentLoaded', () => {{
+  // プロンプト生成（エラーが起きても他の処理を止めない）
+  try {{ document.getElementById('gemini-hint').innerText = buildGeminiPrompt(); }} catch(e) {{ console.error('Gemini prompt:', e); }}
+  try {{ document.getElementById('chatgpt-hint').innerText = buildChatGPTPrompt(); }} catch(e) {{ console.error('ChatGPT prompt:', e); }}
+
+  // ウォッチリスト・取引ログ（必ず実行）
+  try {{ renderWatchList(); }} catch(e) {{ console.error('WatchList:', e); }}
+  try {{ renderReflections(); }} catch(e) {{ console.error('Reflections:', e); }}
+  try {{ renderPnlChart(); }} catch(e) {{ console.error('Chart:', e); }}
+  try {{ renderPredHistory(); }} catch(e) {{}}
+  try {{ renderAIPredTracker(); }} catch(e) {{}}
+
+  // 地合い予測の今日の日付を初期設定
+  try {{
+    const t2 = new Date();
+    const pred_date = document.getElementById('pred-date');
+    if (pred_date) pred_date.value = `${{t2.getFullYear()}}-${{String(t2.getMonth()+1).padStart(2,'0')}}-${{String(t2.getDate()).padStart(2,'0')}}`;
+  }} catch(e) {{}}
+
+  // メモ復元
+  try {{
+    const memo = localStorage.getItem('watchMemo');
+    if (memo) document.getElementById('watch-memo').value = memo;
+  }} catch(e) {{}}
+
+  // 日付を今日に初期設定
+  try {{
+    const today = new Date();
+    const y = today.getFullYear();
+    const m = String(today.getMonth()+1).padStart(2,'0');
+    const d = String(today.getDate()).padStart(2,'0');
+    document.getElementById('refl-date').value = `${{y}}-${{m}}-${{d}}`;
+  }} catch(e) {{}}
+}});
+
+function copyPrompt(type) {{
+  const text = type === 'gemini' ? buildGeminiPrompt() : buildChatGPTPrompt();
+  const toastId = type + '-copied';
+  navigator.clipboard.writeText(text).catch(() => {{
+    const el = document.createElement('textarea');
+    el.value = text; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+  }});
+  const t = document.getElementById(toastId);
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}}
+
+function generateFinalPrompt() {{
+  const prompt = buildClaudePrompt();
+  const preview = document.getElementById('prompt-preview');
+  preview.textContent = prompt;
+  preview.style.display = 'block';
+  document.getElementById('claude-link').style.display = 'block';
+  navigator.clipboard.writeText(prompt).then(showToast).catch(() => {{
+    const el = document.createElement('textarea');
+    el.value = prompt; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+    showToast();
+  }});
+}}
+
+function showToast() {{
+  const t = document.getElementById('toast');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}}
+
+// ===== 📱 今日の作戦メモ =====
+function memoLookup(i) {{
+  const code = document.getElementById('memo-code-' + i).value.trim();
+  const nameEl = document.getElementById('memo-name-' + i);
+  if (code.length === 4 && STOCK_DICT[code]) {{
+    nameEl.value = STOCK_DICT[code];
+    nameEl.style.borderColor = '#3fb950';
+    setTimeout(() => nameEl.style.borderColor = '', 1500);
+  }}
+}}
+
+function generateTodayPage() {{
+  const market = document.getElementById('memo-market').value;
+  const theme = document.getElementById('memo-theme').value.trim();
+  const caution = document.getElementById('memo-caution').value.trim();
+  const dateStr = new Date().toLocaleDateString('ja-JP', {{year:'numeric',month:'long',day:'numeric',weekday:'short'}});
+  const timeStr = new Date().toLocaleTimeString('ja-JP', {{hour:'2-digit',minute:'2-digit'}});
+
+  // 銘柄データ収集
+  const stocks = [];
+  for (let i = 0; i < 5; i++) {{
+    const name = document.getElementById('memo-name-' + i).value.trim();
+    const code = document.getElementById('memo-code-' + i).value.trim();
+    if (!name && !code) continue;
+    stocks.push({{
+      code: code,
+      name: name || code,
+      entry: document.getElementById('memo-entry-' + i).value.trim(),
+      target1: document.getElementById('memo-target1-' + i).value.trim(),
+      target2: document.getElementById('memo-target2-' + i).value.trim(),
+      stop: document.getElementById('memo-stop-' + i).value.trim(),
+      point: document.getElementById('memo-point-' + i).value.trim(),
+    }});
+  }}
+
+  if (!market && stocks.length === 0) {{
+    alert('地合いか銘柄を入力してください');
+    return;
+  }}
+
+  const marketColor = market.includes('🟢') ? '#3fb950' : market.includes('🔴') ? '#f85149' : '#f0a500';
+
+  let stockCards = '';
+  stocks.forEach((s, idx) => {{
+    stockCards += '<div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:14px;margin-bottom:12px">';
+    stockCards += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    stockCards += '<div><span style="font-size:1.05rem;font-weight:bold">' + s.name + '</span>';
+    if (s.code) stockCards += '<span style="color:#8b949e;font-size:0.75rem;margin-left:6px">(' + s.code + ')</span>';
+    stockCards += '</div>';
+    stockCards += '<span style="background:#1f6feb;color:#fff;border-radius:20px;padding:3px 10px;font-size:0.75rem">No.' + (idx+1) + '</span>';
+    stockCards += '</div>';
+    if (s.point) stockCards += '<div style="background:#0d1117;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:0.85rem;color:#58a6ff">📌 ' + s.point + '</div>';
+    stockCards += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">';
+    if (s.entry) stockCards += '<div style="background:#0d1f12;border:1px solid #238636;border-radius:8px;padding:8px;text-align:center"><div style="font-size:0.65rem;color:#8b949e;margin-bottom:2px">エントリー目安</div><div style="color:#3fb950;font-weight:bold">' + s.entry + '</div></div>';
+    if (s.target1) stockCards += '<div style="background:#0d1f12;border:1px solid #238636;border-radius:8px;padding:8px;text-align:center"><div style="font-size:0.65rem;color:#8b949e;margin-bottom:2px">利確① 目標</div><div style="color:#3fb950;font-weight:bold">' + s.target1 + '</div></div>';
+    if (s.target2) stockCards += '<div style="background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:8px;text-align:center"><div style="font-size:0.65rem;color:#8b949e;margin-bottom:2px">利確② 目標</div><div style="color:#3fb950">' + s.target2 + '</div></div>';
+    if (s.stop) stockCards += '<div style="background:#1f0d0d;border:1px solid #6e1a1a;border-radius:8px;padding:8px;text-align:center"><div style="font-size:0.65rem;color:#8b949e;margin-bottom:2px">損切りライン</div><div style="color:#f85149;font-weight:bold">' + s.stop + '</div></div>';
+    stockCards += '</div></div>';
+  }});
+
+  // CSS部分（Pythonのf-string問題を避けるため変数に分離）
+  const todayCss = [
+    '*', 'box-sizing:border-box;margin:0;padding:0',
+    'body', 'font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;background:#0d1117;color:#e6edf3;padding:16px;max-width:520px;margin:0 auto',
+    '.header', 'margin-bottom:16px',
+    '.date', 'font-size:0.78rem;color:#8b949e',
+    '.title', 'font-size:1.2rem;font-weight:bold;margin:4px 0',
+    '.market-badge', 'display:inline-block;border-radius:20px;padding:6px 16px;font-size:0.95rem;font-weight:bold;margin:8px 0',
+    '.info-card', 'background:#161b22;border:1px solid #30363d;border-radius:12px;padding:12px;margin-bottom:12px',
+    '.info-label', 'font-size:0.72rem;color:#8b949e;margin-bottom:4px',
+    '.info-value', 'font-size:0.9rem',
+    '.caution-card', 'background:#1f0d0d;border:1px solid #6e1a1a;border-radius:12px;padding:12px;margin-bottom:16px;font-size:0.85rem;color:#f85149',
+    '.section-title', 'font-size:0.8rem;color:#8b949e;text-transform:uppercase;letter-spacing:.05em;margin:16px 0 8px',
+    '.footer', 'margin-top:20px;text-align:center;font-size:0.72rem;color:#8b949e;padding-bottom:20px',
+  ];
+  let cssStr = '';
+  for (let ci = 0; ci < todayCss.length; ci += 2) {{
+    cssStr += todayCss[ci] + '{' + todayCss[ci+1] + '}';
+  }}
+  // market-badgeのカラーを動的に追加
+  cssStr += '.market-badge' + '{{' + 'background:' + marketColor + '22;border:1px solid ' + marketColor + ';color:' + marketColor + '}}';
+
+  const html = '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>今日の作戦 ' + dateStr + '</title><style>' + cssStr + '</style></head><body>';
+  const htmlBody = '<div class="header"><div class="date">' + dateStr + ' ' + timeStr + ' 作成</div><div class="title">📱 今日の作戦</div><div class="market-badge">' + (market || '地合い未設定') + '</div></div>'
+    + (theme ? '<div class="info-card"><div class="info-label">📈 今日のテーマ</div><div class="info-value">' + theme + '</div></div>' : '')
+    + (caution ? '<div class="caution-card">⚠️ 注意: ' + caution + '</div>' : '')
+    + '<div class="section-title">推奨銘柄 ' + stocks.length + '件</div>'
+    + stockCards
+    + '<div class="footer">株朝活PRO | 朝のPC分析データより</div>';
+
+  const fullHtml = html + htmlBody + '</body></html>';
+
+  // ダウンロード
+  const blob = new Blob([fullHtml], {{type: 'text/html;charset=utf-8'}});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'today.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+
+  // ローカルにも保存
+  try {{ localStorage.setItem('today_memo_html', fullHtml); }} catch(e) {{}}
+  alert('today.html をダウンロードしました！\\nstock-morning フォルダに移動して「今日の作戦を送る.command」を実行してください。');
+}}
+
+// ===== Claudeの回答を自動解析 =====
+function parseClaudeResponse(text) {{
+  const result = {{
+    marketCall: '',
+    marketType: '',
+    theme: '',
+    caution: '',
+    stocks: []
+  }};
+  if (!text) return result;
+
+  const lines = text.split('\\n');
+
+  // 総合判断を抽出
+  const callPatterns = [
+    ['積極的', '🟢 積極的に取引'],
+    ['慎重に小さく', '🟡 慎重に小さく'],
+    ['今日は休む', '🔴 今日は休む'],
+    ['休む', '🔴 今日は休む'],
+  ];
+  for (const line of lines) {{
+    for (const [kw, label] of callPatterns) {{
+      if (line.includes(kw) && (line.includes('判断') || line.includes('総合') || line.includes('●') || line.includes('・'))) {{
+        if (!result.marketCall) result.marketCall = label;
+      }}
+    }}
+  }}
+
+  // 相場タイプを抽出
+  const typeKws = ['全面高', '全面安', 'GU相場', 'GU', '寄り天', 'レンジ', '半導体主導', '銀行', '乱高下'];
+  for (const line of lines) {{
+    if (line.includes('相場タイプ') || line.includes('分類') || line.includes('タイプ')) {{
+      for (const kw of typeKws) {{
+        if (line.includes(kw)) {{ result.marketType = kw; break; }}
+      }}
+    }}
+  }}
+
+  // テーマを抽出
+  for (const line of lines) {{
+    if (line.includes('テーマ') || line.includes('強いセクター') || line.includes('強いテーマ')) {{
+      const m = line.match(/[:：](.+)/);
+      if (m && m[1].trim().length > 1 && m[1].trim().length < 30) {{
+        result.theme = m[1].trim();
+        break;
+      }}
+    }}
+  }}
+
+  // 注意事項を抽出
+  for (const line of lines) {{
+    if (line.includes('やってはいけない') || line.includes('注意') || line.includes('NG')) {{
+      const m = line.match(/[:：●・](.+)/);
+      if (m && m[1].trim().length > 2) {{
+        result.caution = m[1].trim().slice(0, 60);
+        break;
+      }}
+    }}
+  }}
+
+  // 銘柄セクションを抽出（【銘柄名（コード）】形式）
+  const stockSections = text.split(/(?=【[^】]+】)/);
+  for (const section of stockSections) {{
+    if (!section.trim()) continue;
+    // 銘柄ヘッダー検出
+    const headerMatch = section.match(/【([^（）【】]+?)(?:（([0-9A-Z]+)）)?】/);
+    if (!headerMatch) continue;
+    const sName = headerMatch[1].trim();
+    const sCode = headerMatch[2] || '';
+    if (!sName || sName.length < 2 || sName.length > 20) continue;
+    // システム的なヘッダーを除外
+    if (['情報①','情報②','情報③','分析依頼','本日の市場','取引履歴','今すぐ'].some(x => sName.includes(x))) continue;
+
+    const stock = {{ name: sName, code: sCode, entry: '', target1: '', target2: '', stop: '', point: '' }};
+
+    // 各フィールドを抽出
+    const sLines = section.split('\\n');
+    for (const sl of sLines) {{
+      if (!stock.entry && (sl.includes('エントリー') || sl.includes('エントリポイント'))) {{
+        const m = sl.match(/[:：](.{3,25})/);
+        if (m) stock.entry = m[1].trim().split('　')[0].split(' ')[0];
+      }}
+      if (!stock.target1 && (sl.includes('第1利確') || sl.includes('利確①') || sl.includes('第1目標'))) {{
+        const m = sl.match(/[:：](.{2,20})/);
+        if (m) stock.target1 = m[1].trim().split('（')[0].split('　')[0];
+      }}
+      if (!stock.target2 && (sl.includes('第2利確') || sl.includes('利確②') || sl.includes('第2目標'))) {{
+        const m = sl.match(/[:：](.{2,20})/);
+        if (m) stock.target2 = m[1].trim().split('（')[0].split('　')[0];
+      }}
+      if (!stock.stop && (sl.includes('損切') || sl.includes('ストップ'))) {{
+        const m = sl.match(/[:：](.{2,20})/);
+        if (m) stock.stop = m[1].trim().split('（')[0].split('　')[0];
+      }}
+      if (!stock.point && sl.includes('推奨理由')) {{
+        const m = sl.match(/[:：](.{5,50})/);
+        if (m) stock.point = m[1].trim().slice(0, 40);
+      }}
+      if (!stock.point && sl.includes('信頼度')) {{
+        const m = sl.match(/信頼度[：: ]+(.+)/);
+        if (m) stock.point = m[1].trim().slice(0, 20);
+      }}
+    }}
+    if (stock.name) result.stocks.push(stock);
+    if (result.stocks.length >= 5) break;
+  }}
+
+  return result;
+}}
+
+function parseAndGenerate() {{
+  const text = document.getElementById('ai-response-text').value.trim();
+  if (!text) {{ alert('Claudeの回答を貼り付けてください'); return; }}
+
+  const parsed = parseClaudeResponse(text);
+
+  // 解析結果プレビュー
+  const preview = document.getElementById('parse-preview');
+  let previewHtml = '<strong style="color:#58a6ff">📋 解析結果</strong><br>';
+  previewHtml += '地合い: ' + (parsed.marketCall || '不明') + '<br>';
+  previewHtml += '相場タイプ: ' + (parsed.marketType || '不明') + '<br>';
+  previewHtml += '推奨銘柄: ' + parsed.stocks.length + '件<br>';
+  parsed.stocks.forEach((s, i) => {{
+    previewHtml += (i+1) + '. ' + s.name + (s.code ? '(' + s.code + ')' : '');
+    if (s.entry) previewHtml += ' 買:' + s.entry;
+    if (s.stop) previewHtml += ' 損切:' + s.stop;
+    previewHtml += '<br>';
+  }});
+  preview.innerHTML = previewHtml;
+  preview.style.display = 'block';
+
+  // AI判断を保存
+  saveAIPredictionFromParsed(parsed, text);
+
+  // iPhoneページを生成・ダウンロード
+  generateTodayPageFromParsed(parsed);
+
+  const t = document.getElementById('ai-pred-saved');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 4000);
+}}
+
+// Gemini/ChatGPT回答を自動保存
+function autoSaveAIResponse(aiName) {{
+  const text = document.getElementById(aiName + '-input').value.trim();
+  if (!text || text.length < 50) return;
+  const today = new Date();
+  const dateStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  // 推奨銘柄を抽出
+  const parsed = parseClaudeResponse(text); // 同じパーサーを流用
+  const stocks = parsed.stocks.map(s => (s.code ? s.code + ' ' : '') + s.name).filter(Boolean);
+  const key = aiName + '_predictions';
+  const preds = JSON.parse(localStorage.getItem(key) || '[]');
+  const existing = preds.findIndex(p => p.date === dateStr);
+  const entry = {{ date: dateStr, stocks: stocks, responseText: text.slice(0, 1500), actualResults: {{}} }};
+  if (existing >= 0) preds[existing] = entry;
+  else preds.unshift(entry);
+  localStorage.setItem(key, JSON.stringify(preds.slice(0, 90)));
+}}
+
+function saveAIPredictionFromParsed(parsed, fullText) {{
+  const today = new Date();
+  const dateStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  const stocks = parsed.stocks.map(s => (s.code ? s.code + ' ' : '') + s.name);
+  const preds = JSON.parse(localStorage.getItem('ai_predictions') || '[]');
+  const existing = preds.findIndex(p => p.date === dateStr);
+  const entry = {{ date: dateStr, marketCall: parsed.marketCall, marketType: parsed.marketType,
+                   stocks: stocks, responseText: fullText.slice(0, 2000), actualResult: '', actualNikkei: '' }};
+  if (existing >= 0) preds[existing] = entry;
+  else preds.unshift(entry);
+  localStorage.setItem('ai_predictions', JSON.stringify(preds.slice(0, 90)));
+}}
+
+function generateTodayPageFromParsed(parsed) {{
+  const dateStr = new Date().toLocaleDateString('ja-JP', {{year:'numeric',month:'long',day:'numeric',weekday:'short'}});
+  const timeStr = new Date().toLocaleTimeString('ja-JP', {{hour:'2-digit',minute:'2-digit'}});
+  const market = parsed.marketCall || '未設定';
+  const theme = parsed.theme || '';
+  const caution = parsed.caution || '';
+
+  const marketColor = market.includes('🟢') ? '#3fb950' : market.includes('🔴') ? '#f85149' : '#f0a500';
+
+  let stockCards = '';
+  parsed.stocks.forEach((s, idx) => {{
+    stockCards += '<div style="background:#161b22;border:1px solid #30363d;border-radius:12px;padding:14px;margin-bottom:12px">';
+    stockCards += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">';
+    stockCards += '<div><span style="font-size:1.05rem;font-weight:bold">' + s.name + '</span>';
+    if (s.code) stockCards += '<span style="color:#8b949e;font-size:0.75rem;margin-left:6px">(' + s.code + ')</span>';
+    stockCards += '</div><span style="background:#1f6feb;color:#fff;border-radius:20px;padding:3px 10px;font-size:0.75rem">No.' + (idx+1) + '</span></div>';
+    if (s.point) stockCards += '<div style="background:#0d1117;border-radius:8px;padding:8px 10px;margin-bottom:10px;font-size:0.85rem;color:#58a6ff">📌 ' + s.point + '</div>';
+    stockCards += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">';
+    if (s.entry) stockCards += '<div style="background:#0d1f12;border:1px solid #238636;border-radius:8px;padding:8px;text-align:center"><div style="font-size:0.65rem;color:#8b949e;margin-bottom:2px">エントリー目安</div><div style="color:#3fb950;font-weight:bold">' + s.entry + '</div></div>';
+    if (s.target1) stockCards += '<div style="background:#0d1f12;border:1px solid #238636;border-radius:8px;padding:8px;text-align:center"><div style="font-size:0.65rem;color:#8b949e;margin-bottom:2px">利確① 目標</div><div style="color:#3fb950;font-weight:bold">' + s.target1 + '</div></div>';
+    if (s.target2) stockCards += '<div style="background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:8px;text-align:center"><div style="font-size:0.65rem;color:#8b949e;margin-bottom:2px">利確② 目標</div><div style="color:#3fb950">' + s.target2 + '</div></div>';
+    if (s.stop) stockCards += '<div style="background:#1f0d0d;border:1px solid #6e1a1a;border-radius:8px;padding:8px;text-align:center"><div style="font-size:0.65rem;color:#8b949e;margin-bottom:2px">損切りライン</div><div style="color:#f85149;font-weight:bold">' + s.stop + '</div></div>';
+    stockCards += '</div></div>';
+  }});
+
+  if (stockCards === '') stockCards = '<div style="color:#8b949e;text-align:center;padding:20px">銘柄が検出されませんでした<br>Claudeの回答に【銘柄名（コード）】形式が含まれているか確認してください</div>';
+
+  const todayCss = [
+    '*', 'box-sizing:border-box;margin:0;padding:0',
+    'body', 'font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans",sans-serif;background:#0d1117;color:#e6edf3;padding:16px;max-width:520px;margin:0 auto',
+    '.header', 'margin-bottom:16px',
+    '.date', 'font-size:0.78rem;color:#8b949e',
+    '.title', 'font-size:1.2rem;font-weight:bold;margin:4px 0',
+    '.market-badge', 'display:inline-block;border-radius:20px;padding:6px 16px;font-size:0.95rem;font-weight:bold;margin:8px 0',
+    '.info-card', 'background:#161b22;border:1px solid #30363d;border-radius:12px;padding:12px;margin-bottom:12px',
+    '.info-label', 'font-size:0.72rem;color:#8b949e;margin-bottom:4px',
+    '.info-value', 'font-size:0.9rem',
+    '.caution-card', 'background:#1f0d0d;border:1px solid #6e1a1a;border-radius:12px;padding:12px;margin-bottom:16px;font-size:0.85rem;color:#f85149',
+    '.section-title', 'font-size:0.8rem;color:#8b949e;text-transform:uppercase;letter-spacing:.05em;margin:16px 0 8px',
+    '.footer', 'margin-top:20px;text-align:center;font-size:0.72rem;color:#8b949e;padding-bottom:20px',
+  ];
+  let cssStr = '';
+  for (let ci = 0; ci < todayCss.length; ci += 2) {{
+    cssStr += todayCss[ci] + '{{' + todayCss[ci+1] + '}}';
+  }}
+  cssStr += '.market-badge' + '{{' + 'background:' + marketColor + '22;border:1px solid ' + marketColor + ';color:' + marketColor + '}}';
+
+  const bodyContent = '<div class="header"><div class="date">' + dateStr + ' ' + timeStr + ' 作成</div>'
+    + '<div class="title">今日の作戦</div>'
+    + '<div class="market-badge">' + market + '</div></div>'
+    + (theme ? '<div class="info-card"><div class="info-label">今日のテーマ</div><div class="info-value">' + theme + '</div></div>' : '')
+    + (caution ? '<div class="caution-card">注意: ' + caution + '</div>' : '')
+    + '<div class="section-title">推奨銘柄 ' + parsed.stocks.length + '件</div>'
+    + stockCards
+    + '<div class="footer">株朝活PRO | Claude分析より自動生成</div>';
+
+  const fullHtml = '<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>今日の作戦 ' + dateStr + '</title><style>' + cssStr + '</style></head><body>' + bodyContent + '</body></html>';
+
+  const blob = new Blob([fullHtml], {{type: 'text/html;charset=utf-8'}});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'today.html';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(a.href);
+}}
+
+// ===== AI判断記録 =====
+function saveAIPrediction() {{
+  const today = new Date();
+  const dateStr = today.getFullYear() + '-' + String(today.getMonth()+1).padStart(2,'0') + '-' + String(today.getDate()).padStart(2,'0');
+  const marketCall = document.getElementById('ai-market-call').value;
+  const marketType = document.getElementById('ai-market-type').value;
+  const stocks = [
+    document.getElementById('ai-stock1').value.trim(),
+    document.getElementById('ai-stock2').value.trim(),
+    document.getElementById('ai-stock3').value.trim()
+  ].filter(Boolean);
+  const responseText = document.getElementById('ai-response-text').value.trim();
+
+  if (!marketCall && !stocks.length) {{ alert('地合い判断か推奨銘柄を入力してください'); return; }}
+
+  const preds = JSON.parse(localStorage.getItem('ai_predictions') || '[]');
+  const existing = preds.findIndex(p => p.date === dateStr);
+  const entry = {{ date: dateStr, marketCall, marketType, stocks, responseText, actualResult: '', actualNikkei: '' }};
+  if (existing >= 0) preds[existing] = entry;
+  else preds.unshift(entry);
+  localStorage.setItem('ai_predictions', JSON.stringify(preds.slice(0, 90)));
+
+  const t = document.getElementById('ai-pred-saved');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}}
+
+// ===== 📊 統計ダッシュボード =====
+function calcTradeStats() {{
+  const trades = loadReflections().filter(r => r.result === 'win' || r.result === 'loss' || r.result === 'even');
+  if (!trades.length) return null;
+
+  // 条件別（エントリー理由別）集計
+  const byReason = {{}};
+  trades.forEach(t => {{
+    (t.reasons || []).forEach(r => {{
+      if (!byReason[r]) byReason[r] = {{wins:0, total:0, pnl:0}};
+      byReason[r].total++;
+      if (t.result === 'win') byReason[r].wins++;
+      byReason[r].pnl += t.pnl || 0;
+    }});
+  }});
+
+  // 時間帯別集計
+  const byTime = {{}};
+  trades.forEach(t => {{
+    const slot = t.timeslot || '不明';
+    if (!byTime[slot]) byTime[slot] = {{wins:0, total:0, pnl:0}};
+    byTime[slot].total++;
+    if (t.result === 'win') byTime[slot].wins++;
+    byTime[slot].pnl += t.pnl || 0;
+  }});
+
+  // 地合い別集計
+  const byMarket = {{}};
+  trades.forEach(t => {{
+    const mt = t.marketType || '不明';
+    if (!byMarket[mt]) byMarket[mt] = {{wins:0, total:0, pnl:0}};
+    byMarket[mt].total++;
+    if (t.result === 'win') byMarket[mt].wins++;
+    byMarket[mt].pnl += t.pnl || 0;
+  }});
+
+  return {{byReason, byTime, byMarket, total: trades.length}};
+}}
+
+function renderStatsTable(data, label) {{
+  const entries = Object.entries(data).filter(([k,v]) => v.total >= 1)
+    .sort((a,b) => (b[1].wins/b[1].total) - (a[1].wins/a[1].total));
+  if (!entries.length) return '<div style="color:#8b949e;font-size:0.8rem">データなし</div>';
+
+  const rows = entries.map(([key, v]) => {{
+    const wr = Math.round(v.wins / v.total * 100);
+    const ev = v.pnl / v.total;
+    const evCls = ev > 0 ? 'ev-pos' : ev < 0 ? 'ev-neg' : 'ev-neu';
+    const barW = Math.min(wr, 100);
+    return `<tr>
+      <td>${{key}}</td>
+      <td>${{v.total}}回</td>
+      <td>
+        ${{wr}}%
+        <div class="stat-bar"><div class="stat-bar-fill${{wr < 50 ? ' neg' : ''}}" style="width:${{barW}}%"></div></div>
+      </td>
+      <td class="${{evCls}}">${{ev >= 0 ? '+' : ''}}${{Math.round(ev).toLocaleString()}}円</td>
+    </tr>`;
+  }}).join('');
+
+  return `<div class="stats-title">${{label}}</div>
+  <table class="stats-table">
+    <tr><th>条件</th><th>回数</th><th>勝率</th><th>平均損益</th></tr>
+    ${{rows}}
+  </table>`;
+}}
+
+function renderStats() {{
+  const el = document.getElementById('stats-dashboard');
+  if (!el) return;
+  const stats = calcTradeStats();
+  if (!stats) {{
+    el.innerHTML = '<div style="color:#8b949e;font-size:0.83rem">取引ログが3件以上たまると統計が表示されます</div>';
+    return;
+  }}
+
+  // 見送り銘柄集計
+  const skips = loadReflections().filter(r => r.tradeType === 'skip');
+
+  let html = '';
+  html += '<div class="stats-section">' + renderStatsTable(stats.byReason, '📌 エントリー理由別（期待値データベース）') + '</div>';
+  html += '<div class="stats-section">' + renderStatsTable(stats.byTime, '⏰ 時間帯別成績') + '</div>';
+  html += '<div class="stats-section">' + renderStatsTable(stats.byMarket, '🌡️ 地合い別成績') + '</div>';
+  if (skips.length) {{
+    let skipHtml = '<div class="stats-section"><div class="stats-title">👀 見送り銘柄記録（' + skips.length + '件）</div>';
+    skips.slice(0,5).forEach(s => {{
+      skipHtml += '<div class="skip-item"><span>' + s.date + ' ' + (s.stock||'') + '</span><span class="skip-result" style="color:#8b949e">' + (s.note||'-') + '</span></div>';
+    }});
+    skipHtml += '</div>';
+    html += skipHtml;
+  }}
+  el.innerHTML = html;
+}}
+
+// ===== 地合い予測 =====
+function savePrediction() {{
+  const date = document.getElementById('pred-date').value;
+  const type = document.getElementById('pred-type').value;
+  const actual = document.getElementById('pred-actual').value;
+  const nikkei = document.getElementById('pred-nikkei').value;
+  if (!date || !type) {{ alert('日付と予測を入力してください'); return; }}
+
+  const preds = JSON.parse(localStorage.getItem('predictions') || '[]');
+  const existing = preds.findIndex(p => p.date === date);
+  const entry = {{date, type, actual, nikkei}};
+  if (existing >= 0) preds[existing] = entry;
+  else preds.unshift(entry);
+  localStorage.setItem('predictions', JSON.stringify(preds.slice(0, 60)));
+
+  document.getElementById('pred-actual').value = '';
+  document.getElementById('pred-nikkei').value = '';
+  renderPredHistory();
+
+  const btn = event.target;
+  btn.textContent = '✅ 保存しました';
+  setTimeout(() => btn.textContent = '💾 予測を保存', 1500);
+}}
+
+function renderPredHistory() {{
+  const el = document.getElementById('pred-history');
+  if (!el) return;
+  const preds = JSON.parse(localStorage.getItem('predictions') || '[]');
+  if (!preds.length) {{ el.innerHTML = '<div style="color:#8b949e;font-size:0.83rem">記録なし</div>'; return; }}
+
+  const judged = preds.filter(p => p.actual);
+  const correct = judged.filter(p => p.type === p.actual || (p.type === '休め' && p.actual === '弱気'));
+  const accuracy = judged.length ? Math.round(correct.length / judged.length * 100) : null;
+
+  let ph = '';
+  if (accuracy !== null) {{
+    ph += '<div style="font-size:0.88rem;color:#3fb950;font-weight:bold;margin-bottom:8px">✅ 地合い予測正答率: ' + accuracy + '% (' + correct.length + '/' + judged.length + '件)</div>';
+  }}
+  preds.slice(0,10).forEach(p => {{
+    const hit = p.actual ? (p.type === p.actual ? '✅' : '❌') : '⏳';
+    ph += '<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid #21262d;font-size:0.78rem">'
+        + '<span>' + p.date + '</span>'
+        + '<span>予測: ' + p.type + '</span>'
+        + '<span>実際: ' + (p.actual || '未入力') + '</span>'
+        + '<span>' + hit + ' ' + (p.nikkei || '') + '</span></div>';
+  }});
+  el.innerHTML = ph;
+}}
+
+function renderAIAccuracySummary() {{
+  const el = document.getElementById('ai-accuracy-summary');
+  if (!el) return;
+  const ais = [
+    {{key: 'ai_predictions', name: 'Claude', color: '#f0a500'}},
+    {{key: 'gemini_predictions', name: 'Gemini', color: '#4285f4'}},
+    {{key: 'chatgpt_predictions', name: 'ChatGPT', color: '#10a37f'}},
+  ];
+  let html = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:8px">';
+  ais.forEach(ai => {{
+    const preds = JSON.parse(localStorage.getItem(ai.key) || '[]');
+    const judged = preds.filter(p => p.actualResult || (p.actualResults && Object.keys(p.actualResults).length > 0));
+    const total = judged.length;
+    // Claude用
+    let correct = 0;
+    if (ai.key === 'ai_predictions') {{
+      correct = judged.filter(p => {{
+        if (!p.marketCall || !p.actualResult) return false;
+        if (p.marketCall.includes('積極') || p.marketCall.includes('強気')) return p.actualResult === '上昇';
+        if (p.marketCall.includes('弱気') || p.marketCall.includes('休')) return p.actualResult === '下落';
+        return false;
+      }}).length;
+    }}
+    const accuracy = total > 0 ? Math.round(correct / total * 100) : null;
+    const recorded = preds.length;
+    html += '<div style="background:#161b22;border:1px solid ' + ai.color + '33;border-radius:10px;padding:10px;text-align:center">';
+    html += '<div style="font-size:0.75rem;color:' + ai.color + ';font-weight:bold;margin-bottom:4px">' + ai.name + '</div>';
+    html += '<div style="font-size:1.1rem;font-weight:bold">' + (accuracy !== null ? accuracy + '%' : '-') + '</div>';
+    html += '<div style="font-size:0.65rem;color:#8b949e">' + recorded + '日記録</div>';
+    html += '</div>';
+  }});
+  html += '</div>';
+  el.innerHTML = html;
+}}
+
+function renderAIPredTracker() {{
+  const el = document.getElementById('ai-pred-tracker');
+  if (!el) return;
+  renderAIAccuracySummary();
+  const preds = JSON.parse(localStorage.getItem('ai_predictions') || '[]');
+  if (!preds.length) {{ el.innerHTML = '<div style="color:#8b949e;font-size:0.83rem">まだ記録がありません。朝の分析タブでClaudeの回答を記録してください。</div>'; return; }}
+
+  const judged = preds.filter(p => p.actualResult);
+  const correct = judged.filter(p => {{
+    if (!p.marketCall || !p.actualResult) return false;
+    if (p.marketCall === '積極的' || p.marketCall === '強気') return p.actualResult === '上昇';
+    if (p.marketCall === '弱気' || p.marketCall === '休む') return p.actualResult === '下落';
+    if (p.marketCall === 'レンジ' || p.marketCall === '慎重') return p.actualResult === 'レンジ';
+    return false;
+  }});
+  const accuracy = judged.length ? Math.round(correct.length / judged.length * 100) : null;
+
+  let html = '';
+  if (accuracy !== null) {{
+    const color = accuracy >= 60 ? '#3fb950' : accuracy >= 40 ? '#f0a500' : '#f85149';
+    html += '<div style="font-size:0.95rem;font-weight:bold;color:' + color + ';margin-bottom:10px">🤖 Claude的中率: ' + accuracy + '% (' + correct.length + '/' + judged.length + '件)</div>';
+  }}
+
+  html += '<table style="width:100%;border-collapse:collapse;font-size:0.75rem">';
+  html += '<tr><th style="color:#8b949e;padding:3px 5px;text-align:left;border-bottom:1px solid #21262d">日付</th><th style="color:#8b949e;padding:3px 5px;text-align:left">地合い判断</th><th style="color:#8b949e;padding:3px 5px;text-align:left">推奨銘柄</th><th style="color:#8b949e;padding:3px 5px;text-align:left">実際</th><th style="color:#8b949e;padding:3px 5px;text-align:left">結果入力</th></tr>';
+
+  preds.slice(0, 10).forEach((p, i) => {{
+    const resultOpts = ['上昇','下落','レンジ'].map(v =>
+      '<option value="' + v + '"' + (p.actualResult === v ? ' selected' : '') + '>' + v + '</option>'
+    ).join('');
+    const hit = p.actualResult ? (correct.includes(p) ? '✅' : '❌') : '⏳';
+    html += '<tr>';
+    html += '<td style="padding:5px 5px;border-bottom:1px solid #21262d">' + p.date + '</td>';
+    html += '<td style="padding:5px 5px;border-bottom:1px solid #21262d">' + (p.marketCall||'-') + '</td>';
+    html += '<td style="padding:5px 5px;border-bottom:1px solid #21262d">' + (p.stocks||[]).slice(0,1).join(', ') + '</td>';
+    html += '<td style="padding:5px 5px;border-bottom:1px solid #21262d">' + hit + ' ' + (p.actualNikkei||'') + '</td>';
+    html += '<td style="padding:5px 5px;border-bottom:1px solid #21262d"><select style="background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:4px;padding:2px;font-size:0.7rem" onchange="updateAIResult(' + i + ', this.value)">';
+    html += '<option value="">翌日入力</option>' + resultOpts + '</select>';
+    html += '<input type="text" placeholder="+350円" value="' + (p.actualNikkei||'') + '" style="width:60px;background:#21262d;color:#e6edf3;border:1px solid #30363d;border-radius:4px;padding:2px;font-size:0.7rem;margin-left:4px" onchange="updateAINikkei(' + i + ', this.value)">';
+    html += '</td></tr>';
+  }});
+  html += '</table>';
+  el.innerHTML = html;
+}}
+
+function updateAIResult(idx, val) {{
+  const preds = JSON.parse(localStorage.getItem('ai_predictions') || '[]');
+  if (preds[idx]) {{ preds[idx].actualResult = val; localStorage.setItem('ai_predictions', JSON.stringify(preds)); renderAIPredTracker(); }}
+}}
+
+function updateAINikkei(idx, val) {{
+  const preds = JSON.parse(localStorage.getItem('ai_predictions') || '[]');
+  if (preds[idx]) {{ preds[idx].actualNikkei = val; localStorage.setItem('ai_predictions', JSON.stringify(preds)); }}
+}}
+
+function copyStatsToClaudePrompt() {{
+  const stats = calcTradeStats();
+  const preds = JSON.parse(localStorage.getItem('predictions') || '[]');
+  if (!stats) {{ alert('統計データがありません'); return; }}
+
+  let lines2 = ['【📊 私の取引統計データ（Claudeへの分析依頼）】', ''];
+
+  // エントリー理由別
+  lines2.push('■ エントリー理由別勝率');
+  Object.entries(stats.byReason).sort((a,b)=>b[1].total-a[1].total).forEach(([k,v]) => {{
+    const wr = Math.round(v.wins/v.total*100);
+    const ev = Math.round(v.pnl/v.total);
+    lines2.push('・' + k + ': 勝率' + wr + '% (' + v.total + '回) 平均損益' + (ev>=0?'+':'') + ev + '円');
+  }});
+
+  // 時間帯別
+  lines2.push('', '■ 時間帯別勝率');
+  Object.entries(stats.byTime).sort((a,b)=>b[1].total-a[1].total).forEach(([k,v]) => {{
+    const wr = Math.round(v.wins/v.total*100);
+    lines2.push('・' + k + ': 勝率' + wr + '% (' + v.total + '回)');
+  }});
+
+  // 地合い別
+  lines2.push('', '■ 地合い別勝率');
+  Object.entries(stats.byMarket).sort((a,b)=>b[1].total-a[1].total).forEach(([k,v]) => {{
+    const wr = Math.round(v.wins/v.total*100);
+    lines2.push('・' + k + ': 勝率' + wr + '% (' + v.total + '回)');
+  }});
+
+  // 地合い予測精度
+  const judged = preds.filter(p => p.actual);
+  if (judged.length) {{
+    const correct = judged.filter(p => p.type === p.actual);
+    lines2.push('', '■ AI地合い予測正答率: ' + Math.round(correct.length/judged.length*100) + '% (' + judged.length + '件)');
+  }}
+
+  lines2.push('', '上記の私の統計データを踏まえて：', '1. 私が最も得意な条件・パターン', '2. 今すぐ改善すべき弱点', '3. 今日の市場環境で私が勝てる確率が高い条件', '4. やめるべきトレードパターン', 'を具体的に教えてください。');
+
+  let text = lines2.join('\\n');
+
+  navigator.clipboard.writeText(text).catch(() => {{
+    const el = document.createElement('textarea');
+    el.value = text; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+  }});
+  const t = document.getElementById('stats-copied');
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 3000);
+}}
+
+function renderPnlChart() {{
+  const canvas = document.getElementById('pnl-chart');
+  if (!canvas) return;
+  const list = loadReflections().filter(r => r.pnl !== null).reverse(); // 古い順
+  const ctx = canvas.getContext('2d');
+  const W = canvas.offsetWidth || 300;
+  const H = 120;
+  canvas.width = W;
+  canvas.height = H;
+  ctx.clearRect(0, 0, W, H);
+
+  if (list.length < 2) {{
+    ctx.fillStyle = '#8b949e';
+    ctx.font = '13px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('取引を2件以上記録するとグラフが表示されます', W/2, H/2);
+    return;
+  }}
+
+  // 累積損益を計算
+  let cumulative = 0;
+  const points = [0];
+  list.forEach(r => {{ cumulative += r.pnl; points.push(cumulative); }});
+
+  const maxVal = Math.max(...points, 1);
+  const minVal = Math.min(...points, -1);
+  const range = maxVal - minVal || 1;
+  const pad = {{t:15, b:20, l:45, r:10}};
+  const cW = W - pad.l - pad.r;
+  const cH = H - pad.t - pad.b;
+
+  const toX = i => pad.l + (i / (points.length - 1)) * cW;
+  const toY = v => pad.t + cH - ((v - minVal) / range) * cH;
+  const zeroY = toY(0);
+
+  // ゼロライン
+  ctx.strokeStyle = '#30363d';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([4, 4]);
+  ctx.beginPath(); ctx.moveTo(pad.l, zeroY); ctx.lineTo(W - pad.r, zeroY); ctx.stroke();
+  ctx.setLineDash([]);
+
+  // 塗りつぶし
+  const lastPnl = points[points.length - 1];
+  const grad = ctx.createLinearGradient(0, pad.t, 0, H - pad.b);
+  if (lastPnl >= 0) {{
+    grad.addColorStop(0, 'rgba(63,185,80,0.3)');
+    grad.addColorStop(1, 'rgba(63,185,80,0)');
+  }} else {{
+    grad.addColorStop(0, 'rgba(248,81,73,0)');
+    grad.addColorStop(1, 'rgba(248,81,73,0.3)');
+  }}
+  ctx.beginPath();
+  ctx.moveTo(toX(0), zeroY);
+  points.forEach((v, i) => ctx.lineTo(toX(i), toY(v)));
+  ctx.lineTo(toX(points.length - 1), zeroY);
+  ctx.closePath();
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // ライン
+  ctx.strokeStyle = lastPnl >= 0 ? '#3fb950' : '#f85149';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  points.forEach((v, i) => i === 0 ? ctx.moveTo(toX(i), toY(v)) : ctx.lineTo(toX(i), toY(v)));
+  ctx.stroke();
+
+  // Y軸ラベル
+  ctx.fillStyle = '#8b949e';
+  ctx.font = '10px sans-serif';
+  ctx.textAlign = 'right';
+  ctx.fillText(`+${{maxVal.toLocaleString()}}`, pad.l - 4, pad.t + 4);
+  ctx.fillText(`${{minVal.toLocaleString()}}`, pad.l - 4, H - pad.b);
+  ctx.fillText('0', pad.l - 4, zeroY + 4);
+
+  // 最終値
+  ctx.textAlign = 'left';
+  ctx.fillStyle = lastPnl >= 0 ? '#3fb950' : '#f85149';
+  ctx.font = 'bold 11px sans-serif';
+  ctx.fillText(`${{lastPnl >= 0 ? '+' : ''}}${{lastPnl.toLocaleString()}}円`, toX(points.length-1) - 35, toY(lastPnl) - 6);
+}}
+</script>
+</body>
+</html>"""
+
+def push_to_github(repo_dir):
+    try:
+        subprocess.run(["git", "-C", repo_dir, "add", "index.html"], check=True)
+        fetch_time = datetime.now().strftime("%Y-%m-%d %H:%M")
+        result = subprocess.run(
+            ["git", "-C", repo_dir, "commit", "-m", f"update: {fetch_time}"],
+            capture_output=True, text=True
+        )
+        if "nothing to commit" in result.stdout:
+            return True
+        subprocess.run(["git", "-C", repo_dir, "push"], check=True)
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"⚠️ GitHubへのプッシュ失敗: {e}")
+        return False
+
+def main():
+    """GitHub Actions用エントリーポイント - ローカルMac不要で自動実行"""
+    # GitHub Actions環境ではカレントディレクトリに index.html を出力
+    output_path = os.path.join(SCRIPT_DIR, "index.html")
+
+    print("📈 市場データ取得中...")
+    fetch_time = datetime.now().strftime("%Y年%m月%d日 %H:%M")
+
+    jp_data = get_price_data(JP_SYMBOLS)
+    us_data = get_price_data(US_SYMBOLS)
+    global_data = get_global_data()
+    print("✅ 指数データ取得完了")
+
+    print("🔬 テクニカルスクリーニング中...")
+    stocks = screen_stocks()
+    print(f"✅ スクリーニング完了（{len(stocks)}銘柄）")
+
+    print("🚀 急騰スキャン中...")
+    surges = get_surge_scanner()
+    print(f"✅ 急騰候補 {len(surges)}銘柄")
+
+    print("📅 前日東証まとめ取得中...")
+    prev_summary = get_prev_day_summary()
+    print(f"✅ 前日まとめ完了")
+
+    print("⚠️ 決算カレンダー確認中...")
+    earnings = get_earnings_calendar()
+    print(f"✅ 決算アラート {len(earnings)}件")
+
+    print("📅 経済指標確認中...")
+    econ_cal = get_economic_calendar()
+    print(f"✅ 経済指標 {len(econ_cal)}件")
+
+    print("📰 ニュース取得中...")
+    news = get_news()
+    print(f"✅ ニュース {len(news)}件")
+
+    html = generate_html(jp_data, us_data, global_data, stocks, surges, prev_summary, earnings, econ_cal, news, fetch_time)
+
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"✅ index.html 生成完了 → GitHub Actionsがコミット・プッシュします")
+
+if __name__ == "__main__":
+    main()

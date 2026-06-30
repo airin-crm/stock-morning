@@ -150,7 +150,7 @@
 
 <header>
   <h1>📈 株朝活 PRO</h1>
-  <span class="time">2026年06月30日 18:12</span>
+  <span class="time">2026年06月30日 18:19</span>
 </header>
 
 <!-- ナビゲーション -->
@@ -206,16 +206,16 @@
 <div class="section-title">🌍 グローバル指標</div>
 <div class="index-grid grid-4"><div class="index-card small">
           <div class="index-name">VIX恐怖指数</div>
-          <div class="index-price">17.65</div>
-          <div class="index-change up">▲ +0.00%</div>
+          <div class="index-price">17.61</div>
+          <div class="index-change down">▼ -0.23%</div>
         </div><div class="index-card small">
           <div class="index-name">金(Gold)</div>
-          <div class="index-price">4030.00</div>
-          <div class="index-change up">▲ +0.19%</div>
+          <div class="index-price">4034.10</div>
+          <div class="index-change up">▲ +0.29%</div>
         </div><div class="index-card small">
           <div class="index-name">原油(WTI)</div>
-          <div class="index-price">70.61</div>
-          <div class="index-change down">▼ -0.20%</div>
+          <div class="index-price">70.60</div>
+          <div class="index-change down">▼ -0.21%</div>
         </div><div class="index-card small">
           <div class="index-name">米10年債利回</div>
           <div class="index-price">4.37</div>
@@ -668,7 +668,9 @@
   <div class="card">
     <div class="card-header"><span class="card-title">📋 取引履歴</span></div>
     <div class="refl-history" id="refl-history">履歴なし</div>
-    <button class="btn-copy-hint" onclick="copyReflHistory()" style="margin-top:8px">📋 履歴＋統計をClaudeに渡す（パターン分析）</button>
+    <button class="btn btn-generate" onclick="copyTodayResult()" style="margin-top:8px">📋 今日の結果をClaudeに送る</button>
+    <div class="toast-small" id="today-copied" style="margin-top:6px">✅ コピーしました！Claude.aiに貼り付けてください</div>
+    <button class="btn-copy-hint" onclick="copyReflHistory()" style="margin-top:8px">📊 全履歴をClaudeに渡す（パターン分析）</button>
     <div class="toast-small" id="refl-copied">✅ コピーしました！</div>
   </div>
 
@@ -735,7 +737,7 @@ function switchTab(tab, btn) {
   } catch(e) { console.error('switchTab error:', e); }
 }
 
-const MARKET_DATA = `【取得時刻】2026年06月30日 18:12
+const MARKET_DATA = `【取得時刻】2026年06月30日 18:19
 
 【日本市場】
 ・日経平均: 70,062.32 (+0.86%) | 高:70667.00 安:69302.19
@@ -749,9 +751,9 @@ const MARKET_DATA = `【取得時刻】2026年06月30日 18:12
 ・S&P500: 7,440.43 (+1.18%)
 
 【グローバル指標】
-・VIX恐怖指数: 17.65 (+0.00%)
-・金(Gold): 4030.00 (+0.19%)
-・原油(WTI): 70.61 (-0.20%)
+・VIX恐怖指数: 17.61 (-0.23%)
+・金(Gold): 4034.10 (+0.29%)
+・原油(WTI): 70.60 (-0.21%)
 ・米10年債利回: 4.37 (-0.46%)
 
 【スクリーニング結果（テクニカル分析済み）】
@@ -1368,6 +1370,62 @@ function delRefl(i) {
   localStorage.setItem('reflections', JSON.stringify(list));
   renderReflections();
   renderPnlChart();
+}
+
+function copyTodayResult() {
+  const today = new Date().toLocaleDateString('ja-JP', {year:'numeric',month:'2-digit',day:'2-digit'}).replace(/\//g,'-');
+  const allTrades = loadReflections();
+  const todayTrades = allTrades.filter(r => r.date === today || r.date === new Date().toISOString().slice(0,10));
+
+  if (!todayTrades.length) {
+    alert('今日の取引記録がありません。先に取引ログを入力してください。');
+    return;
+  }
+
+  const wins = todayTrades.filter(r => r.result === 'win');
+  const losses = todayTrades.filter(r => r.result === 'loss');
+  const totalPnl = todayTrades.filter(r => r.pnl !== null).reduce((s,r) => s + (r.pnl||0), 0);
+  const resultLabel = {win:'✅ 勝ち', loss:'❌ 負け', even:'➖ トントン', skip:'👀 見送り', memo:'-'};
+
+  const lines = [
+    '【' + today + ' 本日の取引結果】',
+    '合計: ' + (totalPnl >= 0 ? '+' : '') + totalPnl.toLocaleString() + '円 (' + wins.length + '勝' + losses.length + '敗)',
+    '',
+  ];
+
+  todayTrades.forEach(r => {
+    lines.push('─────────────────');
+    const pnlStr = r.pnl !== null ? (r.pnl >= 0 ? '+' : '') + r.pnl.toLocaleString() + '円' : '-';
+    lines.push((resultLabel[r.result] || '-') + ' ' + (r.stock || '-') + ' (' + pnlStr + ')');
+    if (r.buy && r.sell) lines.push('買:' + r.buy + '円 | 売:' + r.sell + '円 | ' + (r.shares||100) + '株');
+    if (r.reasons && r.reasons.length) lines.push('エントリー理由: ' + r.reasons.join('・'));
+    if (r.timeslot) lines.push('時間帯: ' + r.timeslot + (r.marketType ? ' | 地合い: ' + r.marketType : ''));
+    if (r.note) lines.push('メモ: ' + r.note);
+  });
+
+  lines.push('');
+  lines.push('─────────────────');
+  lines.push('上記の今日の取引を踏まえて以下を教えてください：');
+  lines.push('');
+  lines.push('1. 今日の判断で良かった点（続けるべき行動）');
+  lines.push('2. 改善すべき点（次回やめるべき行動）');
+  lines.push('3. 明日への具体的なアドバイス1つ');
+  lines.push('');
+  lines.push('※資金10万円・デイトレ初心者・損切りが苦手という前提で、正直に教えてください。');
+
+  const text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(() => {
+    const t = document.getElementById('today-copied');
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  }).catch(() => {
+    const el = document.createElement('textarea');
+    el.value = text; document.body.appendChild(el); el.select();
+    document.execCommand('copy'); document.body.removeChild(el);
+    const t = document.getElementById('today-copied');
+    t.style.display = 'block';
+    setTimeout(() => t.style.display = 'none', 3000);
+  });
 }
 
 function copyReflHistory() {

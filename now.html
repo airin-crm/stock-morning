@@ -62,11 +62,18 @@
   </style>
 </head>
 <body>
-<div class="top-bar">
-  <h1>⚡ 今すぐチェック</h1>
-  <span class="fetch-time">更新: 16:02:40</span>
+<!-- 共通ナビ（index.htmlと同じ見た目） -->
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:14px">
+  <a href="index.html" style="display:block;padding:10px 4px;border-radius:10px;border:none;background:#21262d;color:#e6edf3;font-size:0.78rem;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none">🌅 朝の分析</a>
+  <a href="index.html#target" style="display:block;padding:10px 4px;border-radius:10px;border:none;background:#21262d;color:#e6edf3;font-size:0.78rem;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none">🎯 今日の狙い</a>
+  <a href="index.html#log" style="display:block;padding:10px 4px;border-radius:10px;border:none;background:#21262d;color:#e6edf3;font-size:0.78rem;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none">📒 ログ</a>
+  <a href="index.html#stats" style="display:block;padding:10px 4px;border-radius:10px;border:none;background:#21262d;color:#e6edf3;font-size:0.78rem;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none">📊 統計</a>
+  <a href="now.html" style="display:block;padding:10px 4px;border-radius:10px;border:none;background:#1f6feb;color:#fff;font-size:0.78rem;font-weight:bold;cursor:pointer;text-align:center;text-decoration:none">⚡ 今すぐ</a>
 </div>
-<a href="index.html" class="back-btn">← 朝の分析に戻る</a>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+  <h1 style="font-size:1.1rem">⚡ 今すぐチェック</h1>
+  <span style="font-size:0.72rem;color:#8b949e">更新: 16:07:13</span>
+</div>
 
 <!-- 時間帯バナー -->
 <div class="time-banner time-danger">🏁 取引終了(15:00) → 今日の振り返りをしましょう</div>
@@ -82,11 +89,11 @@
           <div class="m-change up">▲+2.86%</div>
         </div><div class="m-card">
           <div class="m-name">ドル円</div>
-          <div class="m-price">161.91</div>
-          <div class="m-change down">▼-0.44%</div>
+          <div class="m-price">161.82</div>
+          <div class="m-change down">▼-0.50%</div>
         </div><div class="m-card">
           <div class="m-name">ダウ先物</div>
-          <div class="m-price">52,593.00</div>
+          <div class="m-price">52,594.00</div>
           <div class="m-change down">▼-0.14%</div>
         </div></div>
 
@@ -140,23 +147,29 @@
   <table>
     <tr><th>銘柄</th><th>現値</th><th>前日比</th><th>出来高比</th><th>急騰度</th></tr>
     <tr>
-              <td style="font-size:0.75rem;font-weight:bold">7815 東京ボード工業</td>
-              <td style="font-weight:bold">411円</td>
-              <td class="down">-16.3%</td>
-              <td class="vol-hot">52.7倍</td>
-              <td style="color:#f0a500">224.4</td>
+              <td style="font-size:0.75rem;font-weight:bold">7063 Ｂｉｒｄｍａｎ</td>
+              <td style="font-weight:bold">106円</td>
+              <td class="up">+39.5%</td>
+              <td class="vol-hot">15.6倍</td>
+              <td style="color:#f0a500">139.1</td>
             </tr><tr>
-              <td style="font-size:0.75rem;font-weight:bold">9425 ＲｅＹｕｕ　Ｊａｐａｎ</td>
-              <td style="font-weight:bold">210円</td>
-              <td class="down">-2.3%</td>
-              <td class="vol-hot">7.9倍</td>
-              <td style="color:#f0a500">11.6</td>
+              <td style="font-size:0.75rem;font-weight:bold">1438 岐阜造園</td>
+              <td style="font-weight:bold">1900円</td>
+              <td class="up">+0.5%</td>
+              <td class="vol-hot">12.8倍</td>
+              <td style="color:#f0a500">14.1</td>
             </tr><tr>
-              <td style="font-size:0.75rem;font-weight:bold">3306 日本製麻</td>
-              <td style="font-weight:bold">665円</td>
-              <td class="up">+2.9%</td>
-              <td class="vol-hot">6.3倍</td>
-              <td style="color:#f0a500">10.0</td>
+              <td style="font-size:0.75rem;font-weight:bold">6573 ＣＲＡＶＩＡ</td>
+              <td style="font-weight:bold">25円</td>
+              <td class="down">-7.4%</td>
+              <td class="vol-hot">4.8倍</td>
+              <td style="color:#f0a500">12.0</td>
+            </tr><tr>
+              <td style="font-size:0.75rem;font-weight:bold">4120 スガイ化学工業</td>
+              <td style="font-weight:bold">3150円</td>
+              <td class="up">+5.2%</td>
+              <td class="vol-hot">5.8倍</td>
+              <td style="color:#f0a500">11.9</td>
             </tr><tr>
               <td style="font-size:0.75rem;font-weight:bold">4478 フリー</td>
               <td style="font-weight:bold">2116円</td>
@@ -164,17 +177,11 @@
               <td class="">2.7倍</td>
               <td style="color:#f0a500">8.4</td>
             </tr><tr>
-              <td style="font-size:0.75rem;font-weight:bold">4293 セプテーニ・ホールディングス</td>
-              <td style="font-weight:bold">468円</td>
-              <td class="up">+6.6%</td>
+              <td style="font-size:0.75rem;font-weight:bold">4389 プロパティデータバンク</td>
+              <td style="font-weight:bold">1044円</td>
+              <td class="up">+6.4%</td>
               <td class="vol-hot">3.5倍</td>
-              <td style="color:#f0a500">8.2</td>
-            </tr><tr>
-              <td style="font-size:0.75rem;font-weight:bold">9337 トリドリ</td>
-              <td style="font-weight:bold">1650円</td>
-              <td class="up">+9.3%</td>
-              <td class="">2.6倍</td>
-              <td style="color:#f0a500">7.4</td>
+              <td style="color:#f0a500">8.0</td>
             </tr><tr>
               <td style="font-size:0.75rem;font-weight:bold">5246 ＥＬＥＭＥＮＴＳ</td>
               <td style="font-weight:bold">639円</td>
@@ -182,10 +189,10 @@
               <td class="vol-hot">3.3倍</td>
               <td style="color:#f0a500">7.2</td>
             </tr><tr>
-              <td style="font-size:0.75rem;font-weight:bold">1770 藤田エンジニアリング</td>
-              <td style="font-weight:bold">2000円</td>
-              <td class="up">+8.0%</td>
-              <td class="">2.5倍</td>
+              <td style="font-size:0.75rem;font-weight:bold">3778 さくらインターネット</td>
+              <td style="font-weight:bold">2793円</td>
+              <td class="down">-8.4%</td>
+              <td class="">2.4倍</td>
               <td style="color:#f0a500">6.5</td>
             </tr>
   </table>
@@ -399,6 +406,9 @@
         </a><a href="https://news.yahoo.co.jp/pickup/6586465?source=rss" target="_blank" class="news-item">
           <span class="ns" style="background:#6200ea">Yahoo!株式</span>
           <span class="nt">異例 スペースX株の空売り急増</span>
+        </a><a href="https://jp.investing.com/news/stock-market-news/article-1591027" target="_blank" class="news-item">
+          <span class="ns" style="background:#ff6b35">Investing.com</span>
+          <span class="nt">HSBCが格上げ、アドビ・システムズ株が上昇――AI懸念は過剰との見方</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1591016" target="_blank" class="news-item">
           <span class="ns" style="background:#ff6b35">Investing.com</span>
           <span class="nt">新興市場銘柄ダイジェスト:コマースワンが続伸、カウリスが大幅上昇</span>
@@ -420,12 +430,12 @@
         </a><a href="https://jp.investing.com/news/forex-news/article-1590955" target="_blank" class="news-item">
           <span class="ns" style="background:#e67e22">Investing.com経済</span>
           <span class="nt">日経平均は1354円安、米雇用統計発表控え様子見ムード</span>
-        </a><a href="https://jp.investing.com/news/forex-news/article-1590976" target="_blank" class="news-item">
-          <span class="ns" style="background:#e67e22">Investing.com経済</span>
-          <span class="nt">日経平均は1259円安、米雇用統計などに関心</span>
         </a><a href="https://jp.investing.com/news/stock-market-news/article-1589173" target="_blank" class="news-item">
           <span class="ns" style="background:#e67e22">Investing.com経済</span>
           <span class="nt">「株式」ADR日本株ランキング～全般買い優勢、シカゴは大阪日中比405円高の71250円</span>
+        </a><a href="https://jp.investing.com/news/forex-news/article-1590976" target="_blank" class="news-item">
+          <span class="ns" style="background:#e67e22">Investing.com経済</span>
+          <span class="nt">日経平均は1259円安、米雇用統計などに関心</span>
         </a>
 </div>
 
@@ -451,13 +461,13 @@
 </div>
 
 <script>
-const NOW_DATA = `【現在時刻】2026年07月02日 16:02
+const NOW_DATA = `【現在時刻】2026年07月02日 16:07
 
 【現在の主要指数】
 ・日経平均: 68,733.15 (-2.47%)
 ・グロース250: 568.00 (+2.86%)
-・ドル円: 161.91 (-0.44%)
-・ダウ先物: 52,593.00 (-0.14%)
+・ドル円: 161.82 (-0.50%)
+・ダウ先物: 52,594.00 (-0.14%)
 
 【現在の銘柄データ（リアルタイム）】
 ・1699 原油ETF: 535円 前日比-1.9% VWAP:534.5(VWAP上(強)) 出来高ペース:1090% ↑上昇中(0.1%) 前日安値割れ⚠️  RSI短期:57.2
@@ -479,18 +489,18 @@ const NOW_DATA = `【現在時刻】2026年07月02日 16:02
 ・6200 インソース: 611円 前日比+3.0% VWAP:614.3(VWAP下(弱)) 出来高ペース:65% ↓下落中(0.0%) 前日高値突破🔥  RSI短期:47.6
 ・9434 ソフトバンク: 209円 前日比+1.4% VWAP:209.1(VWAP上(強)) 出来高ペース:59% ↓下落中(0.1%) 前日高値突破🔥  RSI短期:42.7
 ・2370 メディネット: 24円 前日比+0.0% VWAP:23.7(VWAP上(強)) 出来高ペース:19% ↓下落中(0.0%) 前日レンジ内  RSI短期:55.8`;
-const NOW_TIME = "2026年07月02日 16:02";
+const NOW_TIME = "2026年07月02日 16:07";
 const HOUR = 16;
-const MIN = 3;
+const MIN = 7;
 const SURGE_INFO = `【🚀 急騰・出来高急増スキャン結果】
-・7815 東京ボード工業: 411円 (-16.3%) 出来高52.7倍 急騰度:224.4
-・9425 ＲｅＹｕｕ　Ｊａｐａｎ: 210円 (-2.3%) 出来高7.9倍 急騰度:11.6
-・3306 日本製麻: 665円 (+2.9%) 出来高6.3倍 急騰度:10.0
+・7063 Ｂｉｒｄｍａｎ: 106円 (+39.5%) 出来高15.6倍 急騰度:139.1
+・1438 岐阜造園: 1900円 (+0.5%) 出来高12.8倍 急騰度:14.1
+・6573 ＣＲＡＶＩＡ: 25円 (-7.4%) 出来高4.8倍 急騰度:12.0
+・4120 スガイ化学工業: 3150円 (+5.2%) 出来高5.8倍 急騰度:11.9
 ・4478 フリー: 2116円 (+10.3%) 出来高2.7倍 急騰度:8.4
-・4293 セプテーニ・ホールディングス: 468円 (+6.6%) 出来高3.5倍 急騰度:8.2
-・9337 トリドリ: 1650円 (+9.3%) 出来高2.6倍 急騰度:7.4
+・4389 プロパティデータバンク: 1044円 (+6.4%) 出来高3.5倍 急騰度:8.0
 ・5246 ＥＬＥＭＥＮＴＳ: 639円 (+6.0%) 出来高3.3倍 急騰度:7.2
-・1770 藤田エンジニアリング: 2000円 (+8.0%) 出来高2.5倍 急騰度:6.5`;
+・3778 さくらインターネット: 2793円 (-8.4%) 出来高2.4倍 急騰度:6.5`;
 const CONT_INFO = `
 【🔥 急騰継続シグナル（翌日続伸候補）】
 ・1699 原油ETF: 535円 (-1.9%) 条件:出来高急増🔥 VWAP維持✅ 高値圏維持📈
@@ -537,6 +547,8 @@ function genHoldPrompt() {
     '【保有中の銘柄】',
     '銘柄: ' + stock,
     buyPrice ? '買値: ' + buyPrice + '円' : '',
+    '',
+    '⚠️ まずBing検索で「' + stock + ' 株価 今日 材料 チャート」を調べてから判断してください。',
     '',
     '━━━━━━━━━━━━━━',
     '【判断依頼】',

@@ -772,8 +772,22 @@ def generate_now_html(market, stocks_data, surges, continuation, earnings, econ_
 </div>
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
   <h1 style="font-size:1.1rem">⚡ 今すぐチェック</h1>
-  <span style="font-size:0.72rem;color:#8b949e">更新: {fetch_time}</span>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span style="font-size:0.72rem;color:#8b949e">更新: {fetch_time}</span>
+    <button onclick="refreshNow()" style="padding:5px 10px;background:#238636;color:#fff;border:none;border-radius:8px;font-size:0.75rem;font-weight:bold;cursor:pointer">🔄 更新</button>
+  </div>
 </div>
+<div id="refresh-toast" style="display:none;background:#1f6feb;color:#fff;border-radius:8px;padding:8px 12px;font-size:0.78rem;margin-bottom:8px;text-align:center">
+  ⚡ デスクトップの <strong>「今すぐ更新.command」</strong> をダブルクリック → 完了後このボタンを押すとリロードします
+  <button onclick="location.reload()" style="margin-left:8px;padding:3px 8px;background:#fff;color:#1f6feb;border:none;border-radius:5px;font-size:0.75rem;font-weight:bold;cursor:pointer">リロード</button>
+  <button onclick="document.getElementById('refresh-toast').style.display='none'" style="margin-left:4px;padding:3px 6px;background:transparent;color:#ccc;border:none;font-size:0.85rem;cursor:pointer">✕</button>
+</div>
+<script>
+function refreshNow() {{
+  var t = document.getElementById('refresh-toast');
+  t.style.display = t.style.display === 'none' ? 'block' : 'none';
+}}
+</script>
 
 <!-- 時間帯バナー -->
 <div class="time-banner {time_cls}">{time_advice}</div>

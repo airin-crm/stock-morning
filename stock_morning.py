@@ -2255,6 +2255,20 @@ function copyReflHistory() {{
 }}
 
 window.addEventListener('DOMContentLoaded', () => {{
+  // URLハッシュによるタブ切り替え（now.htmlなど外部からのリンク対応）
+  try {{
+    const hashMap = {{'#target':'target','#log':'log','#stats':'stats','#watch':'watch','#morning':'morning'}};
+    const targetTab = hashMap[window.location.hash];
+    if (targetTab) {{
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(el => el.classList.remove('active'));
+      const tc = document.getElementById('tab-' + targetTab);
+      if (tc) tc.classList.add('active');
+      const btns = document.querySelectorAll('.nav-btn');
+      btns.forEach(b => {{ if (b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + targetTab + "'")) b.classList.add('active'); }});
+    }}
+  }} catch(e) {{}}
+
   // プロンプト生成（エラーが起きても他の処理を止めない）
   try {{ document.getElementById('gemini-hint').innerText = buildGeminiPrompt(); }} catch(e) {{ console.error('Gemini prompt:', e); }}
   try {{ document.getElementById('chatgpt-hint').innerText = buildChatGPTPrompt(); }} catch(e) {{ console.error('ChatGPT prompt:', e); }}
